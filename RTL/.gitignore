@@ -1,0 +1,9 @@
+*.jou
+*.log
+.*
+!.gitignore
+!.vscode/
+*.str
+*.mem
+*.hex
+*.tcl
