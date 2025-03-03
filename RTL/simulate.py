@@ -29,11 +29,11 @@ def generate_tcl(toplevel, synthesize=False):
     set_property top {toplevel} [get_fileset sim_1]
     set_property -name {{xsim.simulate.log_all_signals}} -value {{true}} -objects [get_filesets sim_1]
     """.format(toplevel=toplevel) + ("""
-    set_property xsim.view { ./waveforms/system_tb.wcfg } [get_filesets sim_1]
-    """ if add_waveform else "") + ("""
+    set_property xsim.view {{ ./waveforms/{toplevel}.wcfg }} [get_filesets sim_1]
+    """.format(toplevel=toplevel) if add_waveform else "") + ("""
     synth_design
     """ if synthesize else "") + """
-    launch_simulation -mode behavioral
+    launch_simulation -mode """ + ("post-synthesis -type functional" if synthesize else "behavioral") + """
     log_wave -r /
     run all
     """
