@@ -26,6 +26,10 @@ interface decode_to_execute_if;
   logic halt;
   // ALU
   alu_op_t   alu_op;
+  // Multiplier
+  logic     mult;
+  logic     mult_half;      // 0 - low half, 1 - high half
+  logic     mult_signed_a, mult_signed_b;
   // Register file
   reg_t rd;
   reg_t rs1;

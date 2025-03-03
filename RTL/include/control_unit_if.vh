@@ -15,6 +15,10 @@ interface control_unit_if;
   // ALU
   reg_t rs1, rs2, rd;
   alu_op_t   alu_op;
+  // Multiplier
+  logic     mult;
+  logic     mult_half;      // 0 - low half, 1 - high half
+  logic     mult_signed_a, mult_signed_b;
   // Register file
   logic     rf_wen;
   // Memory control
@@ -37,25 +41,27 @@ interface control_unit_if;
   // control ports
   modport control_unit (
     input   inst,
-    output  rs1, rs2, rd, rf_wen,   // Register File
-            alu_op,                 // ALU
-            dread, dwrite,          // Request Unit
-            immediate,              // Immediate Generator
-            alu_src1, alu_src2,     // ALU source mux
-            reg_wr_src,             // Reg File writeback source
-            branch_pol, pc_ctrl,    // Program Counter
-            halt                    // Halt
+    output  rs1, rs2, rd, rf_wen,                           // Register File
+            alu_op,                                         // ALU
+            mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
+            dread, dwrite,                                  // Request Unit
+            immediate,                                      // Immediate Generator
+            alu_src1, alu_src2,                             // ALU source mux
+            reg_wr_src,                                     // Reg File writeback source
+            branch_pol, pc_ctrl,                            // Program Counter
+            halt                                            // Halt
   );
   // control tb
   modport tb (
-    input   rs1, rs2, rd, rf_wen,   // Register File
-            alu_op,                 // ALU
-            dread, dwrite,          // Request Unit
-            immediate,              // Immediate Generator
-            alu_src1, alu_src2,     // ALU source mux
-            reg_wr_src,             // Reg File writeback source
-            branch_pol, pc_ctrl,    // Program Counter
-            halt,                   // Halt
+    input   rs1, rs2, rd, rf_wen,                           // Register File
+            alu_op,                                         // ALU
+            mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
+            dread, dwrite,                                  // Request Unit
+            immediate,                                      // Immediate Generator
+            alu_src1, alu_src2,                             // ALU source mux
+            reg_wr_src,                                     // Reg File writeback source
+            branch_pol, pc_ctrl,                            // Program Counter
+            halt,                                           // Halt
     output  inst
   );
 endinterface

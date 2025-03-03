@@ -73,8 +73,20 @@ logic [2:0] weight_0_60;
 logic [1:0] weight_0_61;
 logic weight_0_62;
 logic [31:0] a, b;
-assign a = multiplier_if.a;
-assign b = multiplier_if.b;
+
+always_comb begin
+    a = multiplier_if.a;
+    b = multiplier_if.b;
+
+    // If negative, convert to positive
+    if (multiplier_if.is_signed_a) begin
+        a = multiplier_if.a[31] ? (~multiplier_if.a + 1) : multiplier_if.a;
+    end
+    if (multiplier_if.is_signed_b) begin
+        b = multiplier_if.b[31] ? (~multiplier_if.b + 1) : multiplier_if.b;
+    end
+end
+
 assign weight_0_0 = a[0] & b[0];
 assign weight_0_1[0] = a[0] & b[1];
 assign weight_0_1[1] = a[1] & b[0];
@@ -3073,7 +3085,26 @@ logic [63:0] final_sum_a;
 logic [63:0] final_sum_b;
 assign final_sum_a = {weight_8_63, weight_8_62[0], weight_8_61[0], weight_8_60[0], weight_8_59[0], weight_8_58[0], weight_8_57[0], weight_8_56[0], weight_8_55[0], weight_8_54[0], weight_8_53[0], weight_8_52[0], weight_8_51[0], weight_8_50[0], weight_8_49[0], weight_8_48[0], weight_8_47[0], weight_8_46[0], weight_8_45[0], weight_8_44[0], weight_8_43[0], weight_8_42[0], weight_8_41[0], weight_8_40[0], weight_8_39[0], weight_8_38[0], weight_8_37[0], weight_8_36[0], weight_8_35[0], weight_8_34[0], weight_8_33[0], weight_8_32[0], weight_8_31[0], weight_8_30[0], weight_8_29[0], weight_8_28[0], weight_8_27[0], weight_8_26[0], weight_8_25[0], weight_8_24[0], weight_8_23[0], weight_8_22[0], weight_8_21[0], weight_8_20[0], weight_8_19[0], weight_8_18[0], weight_8_17[0], weight_8_16[0], weight_8_15[0], weight_8_14[0], weight_8_13[0], weight_8_12[0], weight_8_11[0], weight_8_10[0], weight_8_9[0], weight_8_8, weight_8_7, weight_8_6, weight_8_5, weight_8_4, weight_8_3, weight_8_2, weight_8_1, weight_8_0};
 assign final_sum_b = {1'b0, weight_8_62[1], weight_8_61[1], weight_8_60[1], weight_8_59[1], weight_8_58[1], weight_8_57[1], weight_8_56[1], weight_8_55[1], weight_8_54[1], weight_8_53[1], weight_8_52[1], weight_8_51[1], weight_8_50[1], weight_8_49[1], weight_8_48[1], weight_8_47[1], weight_8_46[1], weight_8_45[1], weight_8_44[1], weight_8_43[1], weight_8_42[1], weight_8_41[1], weight_8_40[1], weight_8_39[1], weight_8_38[1], weight_8_37[1], weight_8_36[1], weight_8_35[1], weight_8_34[1], weight_8_33[1], weight_8_32[1], weight_8_31[1], weight_8_30[1], weight_8_29[1], weight_8_28[1], weight_8_27[1], weight_8_26[1], weight_8_25[1], weight_8_24[1], weight_8_23[1], weight_8_22[1], weight_8_21[1], weight_8_20[1], weight_8_19[1], weight_8_18[1], weight_8_17[1], weight_8_16[1], weight_8_15[1], weight_8_14[1], weight_8_13[1], weight_8_12[1], weight_8_11[1], weight_8_10[1], weight_8_9[1], 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0};
-assign multiplier_if.out = final_sum_a + final_sum_b;
 
+
+always_comb begin
+    multiplier_if.out = final_sum_a + final_sum_b;
+    if(multiplier_if.is_signed_a && multiplier_if.is_signed_b) begin
+        // If the signs are different, the result is negative
+        if(multiplier_if.a[31] ^ multiplier_if.b[31]) begin
+            multiplier_if.out = ~multiplier_if.out + 1;
+        end
+    end else if (multiplier_if.is_signed_a) begin
+        // If the first number is negative, the result is negative
+        if(multiplier_if.a[31]) begin
+            multiplier_if.out = ~multiplier_if.out + 1;
+        end
+    end else if (multiplier_if.is_signed_b) begin
+        // If the second number is negative, the result is negative
+        if(multiplier_if.b[31]) begin
+            multiplier_if.out = ~multiplier_if.out + 1;
+        end
+    end
+end
 
 endmodule

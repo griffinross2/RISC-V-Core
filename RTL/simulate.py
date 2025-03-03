@@ -31,8 +31,7 @@ def generate_tcl(toplevel, synthesize=False):
     """.format(toplevel=toplevel) + ("""
     set_property xsim.view {{ ./waveforms/{toplevel}.wcfg }} [get_filesets sim_1]
     """.format(toplevel=toplevel) if add_waveform else "") + ("""
-    synth_design
-    """ if synthesize else "") + """
+    synth_design -top {toplevel} -part xc7s25ftgb196-1""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
     launch_simulation -mode """ + ("post-synthesis -type functional" if synthesize else "behavioral") + """
     log_wave -r /
     run all

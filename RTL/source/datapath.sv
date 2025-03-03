@@ -5,6 +5,7 @@ import common_types_pkg::*;
 // interfaces (module)
 `include "control_unit_if.vh"
 `include "alu_if.vh"
+`include "multiplier_if.vh"
 `include "register_file_if.vh"
 `include "hazard_unit_if.vh"
 `include "forward_unit_if.vh"
@@ -32,6 +33,7 @@ module datapath #(
   // Interface instantiation
   control_unit_if ctrlif();
   alu_if aluif();
+  multiplier_if mulif();
   register_file_if rfif();
   hazard_unit_if hazif();
   forward_unit_if fuif();
@@ -39,6 +41,7 @@ module datapath #(
   // Module instantiation
   control_unit ctrl0(ctrlif);
   alu alu0(aluif);
+  multiplier mul0(clk, nrst, mulif);
   register_file rf0(clk, nrst, rfif);
   hazard_unit haz0(hazif);
   forward_unit for0(fuif);
@@ -139,6 +142,10 @@ module datapath #(
       d2eif.pc_ctrl <= '0;
       d2eif.rdat1 <= '0;
       d2eif.rdat2 <= '0;
+      d2eif.mult <= '0;
+      d2eif.mult_half <= '0;
+      d2eif.mult_signed_a <= '0;
+      d2eif.mult_signed_b <= '0;
     end else if (d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
@@ -156,6 +163,10 @@ module datapath #(
       d2eif.pc_ctrl <= '0;
       d2eif.rdat1 <= '0;
       d2eif.rdat2 <= '0;
+      d2eif.mult <= '0;
+      d2eif.mult_half <= '0;
+      d2eif.mult_signed_a <= '0;
+      d2eif.mult_signed_b <= '0;
     end else if (d2eif.en) begin
       d2eif.pc <= f2dif.pc;
       d2eif.halt <= ctrlif.halt;
@@ -173,6 +184,10 @@ module datapath #(
       d2eif.pc_ctrl <= ctrlif.pc_ctrl;
       d2eif.rdat1 <= rfif.rdat1;
       d2eif.rdat2 <= rfif.rdat2;
+      d2eif.mult <= ctrlif.mult;
+      d2eif.mult_half <= ctrlif.mult_half;
+      d2eif.mult_signed_a <= ctrlif.mult_signed_a;
+      d2eif.mult_signed_b <= ctrlif.mult_signed_b;
     end
   end
 
@@ -222,6 +237,12 @@ module datapath #(
     aluif.b = d2eif.alu_src2 ? d2eif.immediate : forwarded_rdat2;
     // ALU control
     aluif.op = d2eif.alu_op;
+
+    // Multiplier Unit
+    mulif.a = forwarded_rdat1;
+    mulif.b = forwarded_rdat2;
+    mulif.is_signed_a = ctrlif.mult_signed_a;
+    mulif.is_signed_b = ctrlif.mult_signed_b;
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY
@@ -263,7 +284,7 @@ module datapath #(
       e2mif.pc_ctrl <= d2eif.pc_ctrl;
       e2mif.rdat2 <= forwarded_rdat2;
       e2mif.pc_plus_imm <= (d2eif.pc + {d2eif.immediate[31:1], 1'b0});
-      e2mif.alu_out <= aluif.out;
+      e2mif.alu_out <= d2eif.mult ? (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]) : aluif.out;
       e2mif.alu_zero <= aluif.zero;
     end
   end

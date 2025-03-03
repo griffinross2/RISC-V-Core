@@ -35,6 +35,10 @@ always_comb begin
     ctrlif.reg_wr_src = 2'd0;
     ctrlif.pc_ctrl = 2'd0;
     ctrlif.branch_pol = 1'b0;
+    ctrlif.mult = 1'b0;
+    ctrlif.mult_signed_a = 1'b0;
+    ctrlif.mult_signed_b = 1'b0;
+    ctrlif.mult_half = 1'b0;
 
     casez(ctrlif.inst[OP_W-1:0])
         RTYPE:
@@ -46,16 +50,40 @@ always_comb begin
             ctrlif.rd = r_inst.rd;
 
             casez({r_inst.funct3, r_inst.funct7})
-                {ADD_SUB, ADD}: ctrlif.alu_op = ALU_ADD;    // ADD
-                {ADD_SUB, SUB}: ctrlif.alu_op = ALU_SUB;    // SUB
-                {SLL, 7'd0}:    ctrlif.alu_op = ALU_SLL;    // SLL
-                {SRL_SRA, SRA}: ctrlif.alu_op = ALU_SRA;    // SRA
-                {SRL_SRA, SRL}: ctrlif.alu_op = ALU_SRL;    // SRL
-                {AND, 7'd0}:    ctrlif.alu_op = ALU_AND;    // AND
-                {OR, 7'd0}:     ctrlif.alu_op = ALU_OR;     // OR
-                {XOR, 7'd0}:    ctrlif.alu_op = ALU_XOR;    // XOR
-                {SLT, 7'd0}:    ctrlif.alu_op = ALU_SLT;    // SLT
-                {SLTU, 7'd0}:   ctrlif.alu_op = ALU_SLTU;   // SLTU
+                {ADD_SUB_MUL, ADD}: ctrlif.alu_op = ALU_ADD;    // ADD
+                {ADD_SUB_MUL, SUB}: ctrlif.alu_op = ALU_SUB;    // SUB
+                {SLL_MULH, 7'd0}:   ctrlif.alu_op = ALU_SLL;    // SLL
+                {SRL_SRA, SRA}:     ctrlif.alu_op = ALU_SRA;    // SRA
+                {SRL_SRA, SRL}:     ctrlif.alu_op = ALU_SRL;    // SRL
+                {AND, 7'd0}:        ctrlif.alu_op = ALU_AND;    // AND
+                {OR, 7'd0}:         ctrlif.alu_op = ALU_OR;     // OR
+                {XOR, 7'd0}:        ctrlif.alu_op = ALU_XOR;    // XOR
+                {SLT_MULHSU, 7'd0}: ctrlif.alu_op = ALU_SLT;    // SLT
+                {SLTU_MULHU, 7'd0}: ctrlif.alu_op = ALU_SLTU;   // SLTU
+                {ADD_SUB_MUL, MULT}: begin                      // MUL                 
+                    ctrlif.mult = 1'b1;
+                    ctrlif.mult_signed_a = 1'b1;
+                    ctrlif.mult_signed_b = 1'b1;
+                    ctrlif.mult_half = 1'b0;
+                end
+                {SLTU_MULHU, MULT}: begin                       // MULHU
+                    ctrlif.mult = 1'b1;
+                    ctrlif.mult_signed_a = 1'b0;
+                    ctrlif.mult_signed_b = 1'b0;
+                    ctrlif.mult_half = 1'b1;
+                end
+                {SLL_MULH, MULT}: begin                         // MULH
+                    ctrlif.mult = 1'b1;
+                    ctrlif.mult_signed_a = 1'b1;
+                    ctrlif.mult_signed_b = 1'b1;
+                    ctrlif.mult_half = 1'b1;
+                end
+                {SLT_MULHSU, MULT}: begin                       // MULHSU
+                    ctrlif.mult = 1'b1;
+                    ctrlif.mult_signed_a = 1'b1;
+                    ctrlif.mult_signed_b = 1'b0;
+                    ctrlif.mult_half = 1'b1;
+                end
             endcase
         end
         ITYPE:
