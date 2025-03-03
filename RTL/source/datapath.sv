@@ -39,12 +39,12 @@ module datapath #(
   forward_unit_if fuif();
 
   // Module instantiation
-  control_unit ctrl0(ctrlif);
-  alu alu0(aluif);
-  multiplier mul0(clk, nrst, mulif);
-  register_file rf0(clk, nrst, rfif);
-  hazard_unit haz0(hazif);
-  forward_unit for0(fuif);
+  (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
+  (* keep_hierarchy = "yes" *) alu alu0(aluif);
+  (* keep_hierarchy = "yes" *) multiplier mul0(clk, nrst, mulif);
+  (* keep_hierarchy = "yes" *) register_file rf0(clk, nrst, rfif);
+  (* keep_hierarchy = "yes" *) hazard_unit haz0(hazif);
+  (* keep_hierarchy = "yes" *) forward_unit for0(fuif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();

@@ -13,6 +13,22 @@ def generate_tcl(toplevel, synthesize=False):
     set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 
     add_files -fileset sources_1 [ glob ./include/*.vh ]
+    add_files -fileset sim_1 [ glob ./include/*.vh ]
+
+    # Get the list of .vh files in the target directory
+    set vh_files [glob -nocomplain -directory ./include *.vh]
+
+    # Loop through each .vh file and set the file_type property
+    foreach file $vh_files {
+        set file_obj [get_files $file]
+        if {$file_obj ne ""} {
+            set_property file_type "Verilog Header" $file_obj
+            puts "Set file_type to 'Verilog Header' for: $file"
+        } else {
+            puts "Warning: File not found in project: $file"
+        }
+    }
+
     add_files -fileset sources_1 [ glob ./source/*.sv ]
     add_files -fileset sim_1 [ glob ./testbench/*.sv ]
     """ + ("""
@@ -31,7 +47,8 @@ def generate_tcl(toplevel, synthesize=False):
     """.format(toplevel=toplevel) + ("""
     set_property xsim.view {{ ./waveforms/{toplevel}.wcfg }} [get_filesets sim_1]
     """.format(toplevel=toplevel) if add_waveform else "") + ("""
-    synth_design -top {toplevel} -part xc7s25ftgb196-1""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
+    set_param general.maxThreads 12
+    synth_design -top {toplevel} -part xc7s25ftgb196-1 -flatten_hierarchy rebuilt -include_dirs {{../../include}} -mode out_of_context""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
     launch_simulation -mode """ + ("post-synthesis -type functional" if synthesize else "behavioral") + """
     log_wave -r /
     run all
