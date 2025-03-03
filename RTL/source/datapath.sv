@@ -77,6 +77,8 @@ module datapath #(
     hazif.f2dif_rs1 = ctrlif.rs1;
     hazif.f2dif_rs2 = ctrlif.rs2;
     hazif.d2eif_rd = d2eif.rd;
+    hazif.d2eif_mult = d2eif.mult;
+    hazif.mult_ready = mulif.ready;
   end
 
   // Forwarding Unit to Pipeline
@@ -241,8 +243,9 @@ module datapath #(
     // Multiplier Unit
     mulif.a = forwarded_rdat1;
     mulif.b = forwarded_rdat2;
-    mulif.is_signed_a = ctrlif.mult_signed_a;
-    mulif.is_signed_b = ctrlif.mult_signed_b;
+    mulif.en = d2eif.mult;
+    mulif.is_signed_a = d2eif.mult_signed_a;
+    mulif.is_signed_b = d2eif.mult_signed_b;
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY

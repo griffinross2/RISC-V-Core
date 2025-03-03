@@ -17,6 +17,7 @@ interface hazard_unit_if;
   logic [REG_W-1:0] d2eif_rd;     // EXECUTE STAGE destination register
   logic [REG_W-1:0] f2dif_rs1;    // DECODE STAGE source register 1
   logic [REG_W-1:0] f2dif_rs2;    // DECODE STAGE source register 2
+  logic d2eif_mult, mult_ready;   // EXECUTE STAGE multiplier signals
 
   logic f2dif_en;       // Enable fetch to decode
   logic d2eif_en;       // Enable decode to execute
@@ -38,6 +39,8 @@ interface hazard_unit_if;
             d2eif_rd,         // EXECUTE STAGE destination register
             f2dif_rs1,        // DECODE STAGE source register 1
             f2dif_rs2,        // DECODE STAGE source register 2
+            d2eif_mult,       // EXECUTE STAGE multiplier signals
+            mult_ready,       // EXECUTE STAGE multiplier signals
     output  f2dif_en,         // Output to pipeline
             d2eif_en,         // Output to pipeline
             e2mif_en,         // Output to pipeline
@@ -64,7 +67,9 @@ interface hazard_unit_if;
             d2eif_dread,
             d2eif_rd,
             f2dif_rs1,
-            f2dif_rs2
+            f2dif_rs2,
+            d2eif_mult,
+            mult_ready
   );
 endinterface
 
