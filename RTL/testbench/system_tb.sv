@@ -26,19 +26,23 @@ module system_tb;
   );
 
   task automatic dump_memory();
+  `ifndef SIMULATOR
     string filename = "../../../../ramcpu.hex";
+  `else
+    string filename = "ramcpu.hex";
+  `endif
     int memfd;
 
     cpu_ram_if.iaddr = 0;
     cpu_ram_if.iren = 0;
 
     memfd = $fopen(filename,"w");
-    if (memfd)
+    if (memfd != 0)
       $display("Starting memory dump.");
     else
       begin $display("Failed to open %s.",filename); $finish; end
 
-    for (int unsigned i = 0; memfd && i < 16384; i++)
+    for (int unsigned i = 0; memfd != 0 && i < 16384; i++)
     begin
       int chksum = 0;
       bit [7:0][7:0] values;
@@ -49,16 +53,16 @@ module system_tb;
       cpu_ram_if.iren = 1;
       @(negedge clk);
       wait(~cpu_ram_if.iwait);
-      if (cpu_ram_if.iload === 0)
-        continue;
-      values = {8'h04,16'(i<<2),8'h00,cpu_ram_if.iload};
-      foreach (values[j])
-        chksum += values[j];
-      chksum = 16'h100 - chksum;
-      ihex = $sformatf(":04%h00%h%h",16'(i<<2),cpu_ram_if.iload,8'(chksum));
-      $fdisplay(memfd,"%s",ihex.toupper());
+      if (cpu_ram_if.iload != 0) begin
+        values = {8'h04,16'(i<<2),8'h00,cpu_ram_if.iload};
+        foreach (values[j])
+          chksum += 32'(values[j]);
+        chksum = 32'h100 - chksum;
+        ihex = $sformatf(":04%h00%h%h",16'(i<<2),cpu_ram_if.iload,8'(chksum));
+        $fdisplay(memfd,"%s",ihex.toupper());
+      end
     end //for
-    if (memfd)
+    if (memfd != 0)
     begin
       cpu_ram_if.iren = 0;
       $fdisplay(memfd,":00000001FF");

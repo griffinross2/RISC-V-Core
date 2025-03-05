@@ -7,3 +7,5 @@
 *.mem
 *.hex
 *.tcl
+*.o
+obj_dir/

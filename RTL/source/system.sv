@@ -2,6 +2,7 @@
 /*   Top-level System module   */
 /* Contains the CPU and memory */
 /*******************************/
+`timescale 1ns/1ns
 
 `include "common_types.vh"
 import common_types_pkg::*;

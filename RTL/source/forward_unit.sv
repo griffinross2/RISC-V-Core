@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 `include "forward_unit_if.vh"
 
 `include "common_types.vh"

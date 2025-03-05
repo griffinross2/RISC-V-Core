@@ -19,8 +19,6 @@ interface control_unit_if;
   logic     mult;
   logic     mult_half;      // 0 - low half, 1 - high half
   logic     mult_signed_a, mult_signed_b;
-  // Register file
-  logic     rf_wen;
   // Memory control
   logic     dread;
   logic [1:0] dwrite;
@@ -41,7 +39,7 @@ interface control_unit_if;
   // control ports
   modport control_unit (
     input   inst,
-    output  rs1, rs2, rd, rf_wen,                           // Register File
+    output  rs1, rs2, rd,                                   // Register File
             alu_op,                                         // ALU
             mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
             dread, dwrite,                                  // Request Unit
@@ -53,7 +51,7 @@ interface control_unit_if;
   );
   // control tb
   modport tb (
-    input   rs1, rs2, rd, rf_wen,                           // Register File
+    input   rs1, rs2, rd,                                   // Register File
             alu_op,                                         // ALU
             mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
             dread, dwrite,                                  // Request Unit

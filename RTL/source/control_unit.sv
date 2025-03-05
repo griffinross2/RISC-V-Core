@@ -1,4 +1,5 @@
 // Control Unit (instruction decode)
+`timescale 1ns/1ns
 
 `include "control_unit_if.vh"
 `include "common_types.vh"
@@ -8,12 +9,14 @@ module control_unit (
     control_unit_if.control_unit ctrlif
 );
 
+// verilator lint_off UNUSEDSIGNAL
 j_t j_inst;
 u_t u_inst;
 b_t b_inst;
 s_t s_inst;
 i_t i_inst;
 r_t r_inst;
+// verilator lint_on UNUSEDSIGNAL
 
 always_comb begin
     j_inst = 32'h0;
@@ -28,7 +31,7 @@ always_comb begin
     ctrlif.rd = '0;
     ctrlif.halt = 1'b0;
     ctrlif.dread = 1'b0;
-    ctrlif.dwrite = 4'b0;
+    ctrlif.dwrite = 2'b0;
     ctrlif.immediate = 32'd0;
     ctrlif.alu_src1 = 1'b0;
     ctrlif.alu_src2 = 1'b0;
@@ -45,6 +48,7 @@ always_comb begin
         begin
             // R-type instruction
             r_inst = r_t'(ctrlif.inst);
+            
             ctrlif.rs1 = r_inst.rs1;
             ctrlif.rs2 = r_inst.rs2;
             ctrlif.rd = r_inst.rd;
@@ -84,6 +88,10 @@ always_comb begin
                     ctrlif.mult_signed_b = 1'b0;
                     ctrlif.mult_half = 1'b1;
                 end
+                default: begin
+                    // Illegal instruction
+                    ctrlif.halt = 1'b1;
+                end
             endcase
         end
         ITYPE:
@@ -108,6 +116,10 @@ always_comb begin
                 end
                 SLTI:           ctrlif.alu_op = ALU_SLT;    // SLT
                 SLTIU:          ctrlif.alu_op = ALU_SLTU;   // SLTU
+                default: begin
+                    // Illegal instruction
+                    ctrlif.halt = 1'b1;
+                end
             endcase
             // I-type uses a sign-extended 12-bit immediate
             ctrlif.immediate = {{20{i_inst.imm[11]}}, i_inst.imm};
@@ -170,7 +182,10 @@ always_comb begin
                 SW: ctrlif.dwrite = 2'b11;
                 SH: ctrlif.dwrite = 2'b10;
                 SB: ctrlif.dwrite = 2'b01;
-                default: ctrlif.dwrite = 2'b0;
+                default: begin
+                    // Illegal instruction
+                    ctrlif.halt = 1'b1;
+                end
             endcase
         end
         LUI:
@@ -237,6 +252,10 @@ always_comb begin
                     ctrlif.alu_op = ALU_SLTU;
                     ctrlif.branch_pol = 1'b0;
                 end
+                default: begin
+                    // Illegal instruction
+                    ctrlif.halt = 1'b1;
+                end
             endcase
 
             // B-type uses a sign-extended weird 12-bit immediate that is split in two
@@ -274,8 +293,7 @@ always_comb begin
                 default: ctrlif.halt = 1'b1;
             endcase
         end
-        default:
-        begin
+        default: begin
             // Illegal instruction
             ctrlif.halt = 1'b1;
         end

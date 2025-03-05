@@ -104,7 +104,11 @@ program test(input logic clk, output logic nrst, cpu_ram_if.cpu cpuramif);
 
   // Dump the contents of the RAM into a hex file
   task automatic dump_memory();
-    string filename = "../../../../ramcpu.hex";
+    `ifndef SIMULATOR
+      string filename = "../../../../ramcpu.hex";
+    `else
+      string filename = "ramcpu.hex";
+    `endif
     int memfd;
 
     cpu_ram_if.iaddr = 0;
@@ -127,14 +131,14 @@ program test(input logic clk, output logic nrst, cpu_ram_if.cpu cpuramif);
       cpu_ram_if.iren = 1;
       @(negedge clk);
       wait(~cpu_ram_if.iwait);
-      if (cpu_ram_if.iload === 0)
-        continue;
-      values = {8'h04,16'(i<<2),8'h00,cpu_ram_if.iload};
-      foreach (values[j])
-        chksum += values[j];
-      chksum = 16'h100 - chksum;
-      ihex = $sformatf(":04%h00%h%h",16'(i<<2),cpu_ram_if.iload,8'(chksum));
-      $fdisplay(memfd,"%s",ihex.toupper());
+      if (cpu_ram_if.iload != 0) begin
+        values = {8'h04,16'(i<<2),8'h00,cpu_ram_if.iload};
+        foreach (values[j])
+          chksum += 32'(values[j]);
+        chksum = 32'h100 - chksum;
+        ihex = $sformatf(":04%h00%h%h",16'(i<<2),cpu_ram_if.iload,8'(chksum));
+        $fdisplay(memfd,"%s",ihex.toupper());
+      end
     end //for
     if (memfd)
     begin

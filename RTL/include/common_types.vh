@@ -124,8 +124,8 @@ package common_types_pkg;
     } funct7_srla_r_t;
 
     typedef enum logic [IMM_W_I-1:0] {
-        ECALL   = 7'h0,
-        EBREAK  = 7'h1
+        ECALL   = 12'h0,
+        EBREAK  = 12'h1
     } imm_env_i_t;
 
     // uj type

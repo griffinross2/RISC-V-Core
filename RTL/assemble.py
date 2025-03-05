@@ -23,7 +23,6 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
                 data_size = int(hex_data[0:2], 16)
                 record_addr = int(hex_data[2:6], 16)
-                print("Record addr: {}".format(record_addr))
 
                 # Loop through each byte in the record
                 for i in range(data_size):

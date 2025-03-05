@@ -7,7 +7,8 @@ import common_types_pkg::*;
 interface ram_dump_if;
 
   // CPU side
-  logic iwait, dwait, iren, dren, dwen;
+  logic iwait, dwait, iren, dren;
+  logic [3:0] dwen;
   word_t iload, dload, dstore;
   word_t iaddr, daddr;
   logic override_ctrl;

@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 `include "common_types.vh"
 import common_types_pkg::*;
 `include "multiplier_if.vh"
@@ -2192,7 +2194,7 @@ logic [1:0] weight_3_62;
 assign weight_3_0 = weight_2_0_reg;
 assign weight_3_1 = weight_2_1_reg;
 assign weight_3_2 = weight_2_2_reg;
-half_adder ha39(.a(weight_2_3[0]), .b(weight_2_3_reg[1]), .sum(weight_3_3), .cout(weight_3_4[0]));
+half_adder ha39(.a(weight_2_3_reg[0]), .b(weight_2_3_reg[1]), .sum(weight_3_3), .cout(weight_3_4[0]));
 half_adder ha40(.a(weight_2_4_reg[0]), .b(weight_2_4_reg[1]), .sum(weight_3_4[1]), .cout(weight_3_5[0]));
 full_adder fa511(.a(weight_2_5_reg[0]), .b(weight_2_5_reg[1]), .cin(weight_2_5_reg[2]), .sum(weight_3_5[1]), .cout(weight_3_6[0]));
 full_adder fa512(.a(weight_2_6_reg[0]), .b(weight_2_6_reg[1]), .cin(weight_2_6_reg[2]), .sum(weight_3_6[1]), .cout(weight_3_7[0]));

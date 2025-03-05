@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 `include "ram_if.vh"
 `include "cpu_ram_if.vh"
 `include "common_types.vh"

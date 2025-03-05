@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 module half_adder (
     input logic a, b,
     output logic sum, cout

@@ -1,6 +1,8 @@
 /************************/
 /* Register File module */
 /************************/
+`timescale 1ns/1ns
+
 `include "register_file_if.vh"
 
 `include "common_types.vh"

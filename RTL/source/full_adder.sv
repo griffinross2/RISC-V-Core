@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 module full_adder (
     input logic a, b, cin,
     output logic sum, cout

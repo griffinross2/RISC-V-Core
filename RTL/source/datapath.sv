@@ -1,3 +1,5 @@
+`timescale 1ns/1ns
+
 `include "common_types.vh"
 import common_types_pkg::*;
 `include "cpu_ram_if.vh"
@@ -414,6 +416,9 @@ module datapath #(
       2'b11: begin
         hazif.branch = 1;
       end
+      default: begin
+        hazif.branch = 0;
+      end
     endcase
 
     // Create the next PC state when the fetch stage is ready to proceed
@@ -440,6 +445,9 @@ module datapath #(
       3'b111: begin
         // Unconditional JALR requested
         pc_n = e2mif.alu_out;
+      end
+      default: begin
+        pc_n = pc;
       end
     endcase
   end

@@ -1,4 +1,6 @@
 // Hazard Unit
+`timescale 1ns/1ns
+
 `include "hazard_unit_if.vh"
 
 `include "common_types.vh"

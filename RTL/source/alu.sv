@@ -1,6 +1,7 @@
 /**************************************/
 /* ALU (Arithmetic Logic Unit) module */
 /**************************************/
+`timescale 1ns/1ns
 
 `include "alu_if.vh"
 
