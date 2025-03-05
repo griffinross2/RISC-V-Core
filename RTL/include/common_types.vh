@@ -60,7 +60,7 @@ package common_types_pkg;
         LUI       = 7'b0110111,
         AUIPC     = 7'b0010111,
         LR_SC     = 7'b0101111,
-        HALT      = 7'b1111111
+        ENV       = 7'b1110011
     } opcode_t;
   
     typedef enum logic [FUNCT3_W-1:0] {
@@ -94,6 +94,10 @@ package common_types_pkg;
     } funct3_ld_i_t;
 
     typedef enum logic [FUNCT3_W-1:0] {
+        ENV_CALL_BREAK  = 3'h0
+    } funct3_env_i_t;
+
+    typedef enum logic [FUNCT3_W-1:0] {
         SB      = 3'h0,
         SH      = 3'h1,
         SW      = 3'h2
@@ -118,6 +122,11 @@ package common_types_pkg;
         SRA     = 7'h20,
         SRL     = 7'h00
     } funct7_srla_r_t;
+
+    typedef enum logic [IMM_W_I-1:0] {
+        ECALL   = 7'h0,
+        EBREAK  = 7'h1
+    } imm_env_i_t;
 
     // uj type
     typedef struct packed {

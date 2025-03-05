@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="545.483 ns"></ZoomEndTime>
-      <Cursor1Time time="159.463 ns"></Cursor1Time>
+      <ZoomStartTime time="93.700 ns"></ZoomStartTime>
+      <ZoomEndTime time="536.901 ns"></ZoomEndTime>
+      <Cursor1Time time="290.500 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="176"></NameColumnWidth>
-      <ValueColumnWidth column_width="66"></ValueColumnWidth>
+      <NameColumnWidth column_width="208"></NameColumnWidth>
+      <ValueColumnWidth column_width="127"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="12" />
+   <WVObjectSize size="13" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -425,6 +425,43 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_ram_if/daddr" type="array">
          <obj_property name="ElementShortName">daddr[31:0]</obj_property>
          <obj_property name="ObjectShortName">daddr[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group107" type="group">
+      <obj_property name="label">Multiplier Interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/en" type="logic">
+         <obj_property name="ElementShortName">en</obj_property>
+         <obj_property name="ObjectShortName">en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/ready" type="logic">
+         <obj_property name="ElementShortName">ready</obj_property>
+         <obj_property name="ObjectShortName">ready</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/d2eif/mult_half" type="logic">
+         <obj_property name="ElementShortName">mult_half</obj_property>
+         <obj_property name="ObjectShortName">mult_half</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/is_signed_a" type="logic">
+         <obj_property name="ElementShortName">is_signed_a</obj_property>
+         <obj_property name="ObjectShortName">is_signed_a</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/is_signed_b" type="logic">
+         <obj_property name="ElementShortName">is_signed_b</obj_property>
+         <obj_property name="ObjectShortName">is_signed_b</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/a" type="array">
+         <obj_property name="ElementShortName">a[31:0]</obj_property>
+         <obj_property name="ObjectShortName">a[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/b" type="array">
+         <obj_property name="ElementShortName">b[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/out" type="array">
+         <obj_property name="ElementShortName">out[63:0]</obj_property>
+         <obj_property name="ObjectShortName">out[63:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

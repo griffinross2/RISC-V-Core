@@ -255,10 +255,24 @@ always_comb begin
             // Write PC + 4 back to the destination register
             ctrlif.reg_wr_src = 2'd2;
         end
-        HALT:
+        ENV:
         begin
-            // HALT instruction
-            ctrlif.halt = 1'b1;
+            // I-type instruction
+            i_inst = i_t'(ctrlif.inst);
+            casez(funct3_env_i_t'(i_inst.funct3))
+                ENV_CALL_BREAK: begin
+                    casez(i_inst.imm)
+                        // NOP
+                        ECALL: begin end
+                        // Halt
+                        EBREAK: ctrlif.halt = 1'b1;
+                        // Illegal instruction
+                        default: ctrlif.halt = 1'b1;
+                    endcase
+                end
+                // Illegal instruction
+                default: ctrlif.halt = 1'b1;
+            endcase
         end
         default:
         begin

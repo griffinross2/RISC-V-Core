@@ -1,8 +1,12 @@
+ENTRY(_start)
+
+MEMORY {
+    RAM (rwx)   : ORIGIN = 0x0, LENGTH = 0x10000
+}
 
 SECTIONS
 {
-. = 0x00000;
-.text ALIGN(4) : { *(.text) }
-.data ALIGN(4) : { *(.data) }
-.bss ALIGN(4) : { *(.bss) }
+    .text : {
+        ALIGN(4) : { *(.text) }
+    } > RAM
 }
