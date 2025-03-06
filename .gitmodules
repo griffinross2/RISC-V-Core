@@ -1,0 +1,3 @@
+[submodule "RTL/RISC-V Emulator/rars"]
+	path = RTL/RISC-V Emulator/rars
+	url = https://github.com/griffinross2/rars
