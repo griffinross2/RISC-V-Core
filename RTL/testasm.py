@@ -36,6 +36,10 @@ def diff_files(file1, file2):
     f1.close()
     f2.close()
 
+    # Log diff to file
+    with open("diff.log", 'w') as file:
+        file.write(diff_str)
+
     if diff_str == "":
         return True
     
@@ -80,7 +84,6 @@ def run_test():
 
         # Compare the output
         success = diff_files("ramsim.hex", "ramcpu.hex")
-
 
         if success:
             print("\x1b[32mPASSED\x1b[0m")

@@ -12,7 +12,7 @@ interface hazard_unit_if;
   logic halt;           // Halt signal from Control Unit
   logic dread, dwrite;  // Memory control signals from Control Unit
   logic dhit, ihit;     // Cache hit signals
-  logic branch;         // Branch control signals from Control Unit
+  logic branch_flush;   // Branch flush requested by Branch Unit
   logic d2eif_dread;    // EXECUTE STAGE dread signal
   logic [REG_W-1:0] d2eif_rd;     // EXECUTE STAGE destination register
   logic [REG_W-1:0] f2dif_rs1;    // DECODE STAGE source register 1
@@ -33,7 +33,7 @@ interface hazard_unit_if;
   modport hazard_unit (
     input   halt,             // Input from control unit
             dread, dwrite,    // Input from control unit
-            branch,           // Input from control unit
+            branch_flush,     // Input from branch unit
             dhit, ihit,       // Input from caches
             d2eif_dread,      // EXECUTE STAGE dread signal
             d2eif_rd,         // EXECUTE STAGE destination register
@@ -62,7 +62,7 @@ interface hazard_unit_if;
             m2wif_flush,
     output  halt,
             dread, dwrite,
-            branch,
+            branch_flush,
             dhit, ihit,
             d2eif_dread,
             d2eif_rd,

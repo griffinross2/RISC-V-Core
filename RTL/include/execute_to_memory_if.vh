@@ -46,12 +46,16 @@ interface execute_to_memory_if;
   word_t alu_out;
   logic alu_zero;
 
-
-
   /*****************/
   /* PC Arithmetic */
   /*****************/
   word_t pc_plus_imm;
+
+  /***************/
+  /* Branch Unit */
+  /***************/
+  logic branch_predict;
+  word_t branch_target;
 endinterface
 
 `endif // EXECUTE_TO_MEMORY_IF_VH

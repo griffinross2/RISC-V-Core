@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="93.700 ns"></ZoomStartTime>
-      <ZoomEndTime time="536.901 ns"></ZoomEndTime>
-      <Cursor1Time time="290.500 ns"></Cursor1Time>
+      <ZoomStartTime time="52,931.419 ns"></ZoomStartTime>
+      <ZoomEndTime time="53,381.020 ns"></ZoomEndTime>
+      <Cursor1Time time="53,067.619 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="208"></NameColumnWidth>
-      <ValueColumnWidth column_width="127"></ValueColumnWidth>
+      <ValueColumnWidth column_width="95"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="13" />
+   <WVObjectSize size="19" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -36,6 +36,27 @@
    <wvobject fp_name="/system_tb/halt" type="logic">
       <obj_property name="ElementShortName">halt</obj_property>
       <obj_property name="ObjectShortName">halt</obj_property>
+   </wvobject>
+   <wvobject fp_name="group165" type="group">
+      <obj_property name="label">Program Counter</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/pc" type="array">
+         <obj_property name="ElementShortName">pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/pc_n" type="array">
+         <obj_property name="ElementShortName">pc_n[31:0]</obj_property>
+         <obj_property name="ObjectShortName">pc_n[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/f2dif/branch_predict" type="logic">
+      <obj_property name="ElementShortName">branch_predict</obj_property>
+      <obj_property name="ObjectShortName">branch_predict</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/f2dif/branch_target" type="array">
+      <obj_property name="ElementShortName">branch_target[31:0]</obj_property>
+      <obj_property name="ObjectShortName">branch_target[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="group14" type="group">
       <obj_property name="label">Fetch to Decode</obj_property>
@@ -150,6 +171,14 @@
          <obj_property name="ElementShortName">mult_signed_b</obj_property>
          <obj_property name="ObjectShortName">mult_signed_b</obj_property>
       </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/d2eif/branch_predict" type="logic">
+         <obj_property name="ElementShortName">branch_predict</obj_property>
+         <obj_property name="ObjectShortName">branch_predict</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/d2eif/branch_target" type="array">
+         <obj_property name="ElementShortName">branch_target[31:0]</obj_property>
+         <obj_property name="ObjectShortName">branch_target[31:0]</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group48" type="group">
       <obj_property name="label">Execute to Memory</obj_property>
@@ -212,6 +241,14 @@
          <obj_property name="ElementShortName">pc_plus_imm[31:0]</obj_property>
          <obj_property name="ObjectShortName">pc_plus_imm[31:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/e2mif/branch_predict" type="logic">
+         <obj_property name="ElementShortName">branch_predict</obj_property>
+         <obj_property name="ObjectShortName">branch_predict</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/e2mif/branch_target" type="array">
+         <obj_property name="ElementShortName">branch_target[31:0]</obj_property>
+         <obj_property name="ObjectShortName">branch_target[31:0]</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group57" type="group">
       <obj_property name="label">Memory to Writeback</obj_property>
@@ -253,11 +290,6 @@
    <wvobject fp_name="group71" type="group">
       <obj_property name="label">Hazard Unit</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/hazif/branch" type="logic">
-         <obj_property name="ElementShortName">branch</obj_property>
-         <obj_property name="ObjectShortName">branch</obj_property>
-      </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/hazif/d2eif_dread" type="logic">
          <obj_property name="ElementShortName">d2eif_dread</obj_property>
          <obj_property name="ObjectShortName">d2eif_dread</obj_property>
@@ -330,7 +362,6 @@
    <wvobject fp_name="group78" type="group">
       <obj_property name="label">Forwarding Unit</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/forward_a" type="array">
          <obj_property name="ElementShortName">forward_a[1:0]</obj_property>
          <obj_property name="ObjectShortName">forward_a[1:0]</obj_property>
@@ -355,7 +386,6 @@
    <wvobject fp_name="group92" type="group">
       <obj_property name="label">RAM Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/ram_if/addr" type="array">
          <obj_property name="ElementShortName">addr[31:0]</obj_property>
          <obj_property name="ObjectShortName">addr[31:0]</obj_property>
@@ -385,7 +415,6 @@
    <wvobject fp_name="group103" type="group">
       <obj_property name="label">CPU RAM Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_ram_if/iwait" type="logic">
          <obj_property name="ElementShortName">iwait</obj_property>
          <obj_property name="ObjectShortName">iwait</obj_property>
@@ -430,7 +459,6 @@
    <wvobject fp_name="group107" type="group">
       <obj_property name="label">Multiplier Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/en" type="logic">
          <obj_property name="ElementShortName">en</obj_property>
          <obj_property name="ObjectShortName">en</obj_property>
@@ -462,6 +490,106 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/mulif/out" type="array">
          <obj_property name="ElementShortName">out[63:0]</obj_property>
          <obj_property name="ObjectShortName">out[63:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group119" type="group">
+      <obj_property name="label">Branch Unit Interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_branch" type="logic">
+         <obj_property name="ElementShortName">mem_branch</obj_property>
+         <obj_property name="ObjectShortName">mem_branch</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_taken" type="logic">
+         <obj_property name="ElementShortName">mem_taken</obj_property>
+         <obj_property name="ObjectShortName">mem_taken</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_pc" type="array">
+         <obj_property name="ElementShortName">mem_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_target_res" type="array">
+         <obj_property name="ElementShortName">mem_target_res[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_target_res[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_target" type="array">
+         <obj_property name="ElementShortName">mem_target[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_target[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_predict" type="logic">
+         <obj_property name="ElementShortName">mem_predict</obj_property>
+         <obj_property name="ObjectShortName">mem_predict</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_flush" type="logic">
+         <obj_property name="ElementShortName">mem_flush</obj_property>
+         <obj_property name="ObjectShortName">mem_flush</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/fetch_pc" type="array">
+         <obj_property name="ElementShortName">fetch_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">fetch_pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/fetch_target" type="array">
+         <obj_property name="ElementShortName">fetch_target[31:0]</obj_property>
+         <obj_property name="ObjectShortName">fetch_target[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/fetch_predict" type="logic">
+         <obj_property name="ElementShortName">fetch_predict</obj_property>
+         <obj_property name="ObjectShortName">fetch_predict</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/bu0/prediction_buffer" type="array">
+         <obj_property name="ElementShortName">prediction_buffer[0:255][1:0]</obj_property>
+         <obj_property name="ObjectShortName">prediction_buffer[0:255][1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/bu0/prediction_buffer_n" type="array">
+         <obj_property name="ElementShortName">prediction_buffer_n[0:255][1:0]</obj_property>
+         <obj_property name="ObjectShortName">prediction_buffer_n[0:255][1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/bu0/target_buffer" type="array">
+         <obj_property name="ElementShortName">target_buffer[0:255][31:0]</obj_property>
+         <obj_property name="ObjectShortName">target_buffer[0:255][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/bu0/target_buffer_n" type="array">
+         <obj_property name="ElementShortName">target_buffer_n[0:255][31:0]</obj_property>
+         <obj_property name="ObjectShortName">target_buffer_n[0:255][31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group645" type="group">
+      <obj_property name="label">Register File</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/rf0/registers" type="array">
+         <obj_property name="ElementShortName">registers[1:31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">registers[1:31][31:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/rf0/registers_n" type="array">
+         <obj_property name="ElementShortName">registers_n[1:31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">registers_n[1:31][31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group427" type="group">
+      <obj_property name="label">ALU</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/a" type="array">
+         <obj_property name="ElementShortName">a[31:0]</obj_property>
+         <obj_property name="ObjectShortName">a[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/b" type="array">
+         <obj_property name="ElementShortName">b[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/op" type="array">
+         <obj_property name="ElementShortName">op[3:0]</obj_property>
+         <obj_property name="ObjectShortName">op[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/out" type="array">
+         <obj_property name="ElementShortName">out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/zero" type="logic">
+         <obj_property name="ElementShortName">zero</obj_property>
+         <obj_property name="ObjectShortName">zero</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

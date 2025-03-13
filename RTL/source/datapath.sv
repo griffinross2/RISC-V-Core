@@ -11,6 +11,7 @@ import common_types_pkg::*;
 `include "register_file_if.vh"
 `include "hazard_unit_if.vh"
 `include "forward_unit_if.vh"
+`include "branch_unit_if.vh"
 
 // interface (pipeline)
 `include "fetch_to_decode_if.vh"
@@ -39,6 +40,7 @@ module datapath #(
   register_file_if rfif();
   hazard_unit_if hazif();
   forward_unit_if fuif();
+  branch_unit_if buif();
 
   // Module instantiation
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
@@ -47,6 +49,7 @@ module datapath #(
   (* keep_hierarchy = "yes" *) register_file rf0(clk, nrst, rfif);
   (* keep_hierarchy = "yes" *) hazard_unit haz0(hazif);
   (* keep_hierarchy = "yes" *) forward_unit for0(fuif);
+  (* keep_hierarchy = "yes" *) branch_unit bu0(clk, nrst, buif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();
@@ -81,6 +84,7 @@ module datapath #(
     hazif.d2eif_rd = d2eif.rd;
     hazif.d2eif_mult = d2eif.mult;
     hazif.mult_ready = mulif.ready;
+    hazif.branch_flush = buif.mem_flush;
   end
 
   // Forwarding Unit to Pipeline
@@ -103,7 +107,9 @@ module datapath #(
   // STAGE 1: FETCH
   always_comb begin
     cpu_ram_if.iren = 1'b1;
-    cpu_ram_if.iaddr = pc;
+    // If branch is predicted, fetch from the predicted target address
+    buif.fetch_pc = pc;
+    cpu_ram_if.iaddr = buif.fetch_predict ? buif.fetch_target : pc;
   end
 
   // STAGE 1 => STAGE 2: FETCH => DECODE
@@ -111,12 +117,18 @@ module datapath #(
     if(~nrst) begin
       f2dif.pc <= PC_INIT;
       f2dif.inst <= NOP;
+      f2dif.branch_predict <= 0;
+      f2dif.branch_target <= 0;
     end else if (f2dif.flush) begin
       f2dif.pc <= f2dif.pc;
       f2dif.inst <= NOP;
+      f2dif.branch_predict <= 0;
+      f2dif.branch_target <= 0;
     end else if (f2dif.en) begin
-      f2dif.pc <= pc;
+      f2dif.pc <= buif.fetch_predict ? buif.fetch_target : pc;
       f2dif.inst <= cpu_ram_if.iload;
+      f2dif.branch_predict <= buif.fetch_predict;
+      f2dif.branch_target <= buif.fetch_target;
     end
   end
 
@@ -150,6 +162,8 @@ module datapath #(
       d2eif.mult_half <= '0;
       d2eif.mult_signed_a <= '0;
       d2eif.mult_signed_b <= '0;
+      d2eif.branch_predict <= 0;
+      d2eif.branch_target <= 0;
     end else if (d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
@@ -171,6 +185,8 @@ module datapath #(
       d2eif.mult_half <= '0;
       d2eif.mult_signed_a <= '0;
       d2eif.mult_signed_b <= '0;
+      d2eif.branch_predict <= 0;
+      d2eif.branch_target <= 0;
     end else if (d2eif.en) begin
       d2eif.pc <= f2dif.pc;
       d2eif.halt <= ctrlif.halt;
@@ -192,6 +208,8 @@ module datapath #(
       d2eif.mult_half <= ctrlif.mult_half;
       d2eif.mult_signed_a <= ctrlif.mult_signed_a;
       d2eif.mult_signed_b <= ctrlif.mult_signed_b;
+      d2eif.branch_predict <= f2dif.branch_predict;
+      d2eif.branch_target <= f2dif.branch_target;
     end
   end
 
@@ -265,6 +283,8 @@ module datapath #(
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
       e2mif.alu_zero <= '0;
+      e2mif.branch_predict <= 0;
+      e2mif.branch_target <= 0;
     end else if (e2mif.flush) begin
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= '0;
@@ -278,6 +298,8 @@ module datapath #(
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
       e2mif.alu_zero <= '0;
+      e2mif.branch_predict <= 0;
+      e2mif.branch_target <= 0;
     end else if (e2mif.en) begin
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= d2eif.halt;
@@ -291,6 +313,8 @@ module datapath #(
       e2mif.pc_plus_imm <= (d2eif.pc + {d2eif.immediate[31:1], 1'b0});
       e2mif.alu_out <= d2eif.mult ? (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]) : aluif.out;
       e2mif.alu_zero <= aluif.zero;
+      e2mif.branch_predict <= d2eif.branch_predict;
+      e2mif.branch_target <= d2eif.branch_target;
     end
   end
 
@@ -401,55 +425,92 @@ module datapath #(
   // Program Counter Control
   always_comb begin
     pc_n = pc;
-    hazif.branch = 0;
 
-    // Branch signal
-    casez(e2mif.pc_ctrl)
-      2'b01: begin
+    // Give prior assumptions to branch unit
+    buif.mem_predict = e2mif.branch_predict;
+    buif.mem_target = e2mif.branch_target;
+    buif.mem_pc = e2mif.pc;
+
+    // Default to telling BU no branch
+    buif.mem_branch = 1'b0;
+    buif.mem_taken = 1'b0;
+    buif.mem_target_res = e2mif.pc + 32'd4;
+    
+    // Branch resolution
+    casez({e2mif.en, e2mif.pc_ctrl})
+      3'b101: begin
+        buif.mem_branch = 1'b1;
+        buif.mem_target_res = e2mif.pc_plus_imm;
         if(e2mif.branch_pol ^ e2mif.alu_zero) begin
-          hazif.branch = 1;
+          // Resolve to taken
+          buif.mem_taken = 1'b1;
         end
       end
-      2'b10: begin
-        hazif.branch = 1;
+      3'b110: begin
+        // Unconditional
+        buif.mem_branch = 1'b1;
+        buif.mem_taken = 1'b1;
+        buif.mem_target_res = e2mif.pc_plus_imm;
       end
-      2'b11: begin
-        hazif.branch = 1;
+      3'b111: begin
+        // Unconditional
+        buif.mem_branch = 1'b1;
+        buif.mem_taken = 1'b1;
+        buif.mem_target_res = e2mif.alu_out;
       end
       default: begin
-        hazif.branch = 0;
+        // Default to telling BU no branch
+        buif.mem_branch = 1'b0;
+        buif.mem_taken = 1'b0;
+        buif.mem_target_res = e2mif.pc + 32'd4;
       end
     endcase
 
     // Create the next PC state when the fetch stage is ready to proceed
-    casez({f2dif.en, e2mif.pc_ctrl})
-      3'b100: begin
-        // Increment
+    if (f2dif.en) begin
+      // The branch predictor thought we shouldn't branch but we need to
+      if (~e2mif.branch_predict && buif.mem_flush) begin
+        // We may have to jump to the resolved target address
+        casez(e2mif.pc_ctrl)
+          2'b01: begin
+            pc_n = e2mif.pc_plus_imm;
+          end
+          2'b10: begin
+            pc_n = e2mif.pc_plus_imm;
+          end
+          2'b11: begin
+            pc_n = e2mif.alu_out;
+          end
+          default: begin
+            pc_n = pc + 32'd4;
+          end
+        endcase
+      end else if (buif.mem_flush) begin
+        // The branch predictor either predicted a false branch, or the wrong destination
+        casez(e2mif.pc_ctrl)
+          2'b01: begin
+            pc_n = e2mif.pc_plus_imm;
+          end
+          2'b10: begin
+            pc_n = e2mif.pc_plus_imm;
+          end
+          2'b11: begin
+            pc_n = e2mif.alu_out;
+          end
+          default: begin
+            // False branch: go to the next instruction after the original branch
+            pc_n = e2mif.pc + 32'd4;
+          end
+        endcase
+      end else if (buif.fetch_predict) begin
+        // If a flush isn't occuring, but we are making a prediction, we have to
+        // update the PC to the predicted target address
+        pc_n = buif.fetch_target + 32'd4;
+      end else begin
+        // The branch predictor was correct, just continue execution
         pc_n = pc + 32'd4;
       end
-      3'b101: begin
-        // If a branch is requested, test whether the branch
-        // should be taken. If so, take the branch.
-        if(e2mif.branch_pol ^ e2mif.alu_zero) begin
-          pc_n = e2mif.pc_plus_imm;
-        end else begin
-          // Branch not taken
-          pc_n = pc + 32'd4;
-        end
-      end
-      3'b110: begin
-        // Unconditional JAL requested
-        pc_n = e2mif.pc_plus_imm;
-        
-      end
-      3'b111: begin
-        // Unconditional JALR requested
-        pc_n = e2mif.alu_out;
-      end
-      default: begin
-        pc_n = pc;
-      end
-    endcase
+    end
   end
 
   always_ff @(posedge clk, negedge nrst) begin

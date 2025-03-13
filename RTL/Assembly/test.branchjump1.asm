@@ -11,7 +11,7 @@ _start:
   add x4, x4, x3
   addi x4, x4, 0x300
    ori   x10, x0, 0x080
-   ori   x16, x0, %lo(braR)
+   ori   x16, x0, %lo(jmpR)
    beq   x0, x0, braZ
    sw    x4, 0(x10)
  braZ:

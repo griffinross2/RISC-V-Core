@@ -78,6 +78,7 @@ module system_tb;
   end
 
   // Run CPU
+  integer num_cycles = 0;
   initial begin
     cpu_ram_if.override_ctrl = 0;
     nrst = 1;
@@ -85,9 +86,12 @@ module system_tb;
     nrst = 0;
     #10;
     nrst = 1;
+
+    num_cycles = 0;
   
     while(!halt) begin
       @(posedge clk);
+      num_cycles++;
     end
 
     // Zero memory dump IF
@@ -100,6 +104,9 @@ module system_tb;
 
     // Take control of the memory
     cpu_ram_if.override_ctrl = 1;
+
+    // Print cycles and time
+    $display("CPU halted after %d cycles, %.2f ns",num_cycles, $realtime());
 
     dump_memory();
 

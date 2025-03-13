@@ -24,6 +24,12 @@ interface fetch_to_decode_if;
   /* Instruction */
   /***************/
   word_t inst;
+
+  /***************/
+  /* Branch Unit */
+  /***************/
+  logic branch_predict;
+  word_t branch_target;
 endinterface
 
 `endif // FETCH_TO_DECODE_IF_VH

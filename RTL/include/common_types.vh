@@ -188,6 +188,14 @@ package common_types_pkg;
         RAM_DONE
     } ram_state_t;
 
+    // Branch prediction states
+    typedef enum logic [1:0] { 
+        STRONG_NOT_TAKEN, 
+        WEAK_NOT_TAKEN, 
+        WEAK_TAKEN, 
+        STRONG_TAKEN
+    } branch_pred_t;
+
 endpackage
 
 `endif // COMMON_TYPES_VH

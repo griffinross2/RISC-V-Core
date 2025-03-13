@@ -53,7 +53,7 @@ module hazard_unit (
         // Also gate with branch signal, if the branch signal is high
         // we don't need to worry about the stall anyway because we
         // will be about to flush those instructions.
-        else if(~hazif.ihit & ~hazif.branch) begin
+        else if(~hazif.ihit & ~hazif.branch_flush) begin
             // Give NOP to FETCH/DECODE
             hazif.f2dif_en = 0;
             hazif.d2eif_en = 0;
@@ -83,7 +83,7 @@ module hazard_unit (
         // Also gate with branch signal, if the branch signal is high
         // we don't need to worry about the load-use anyway because we
         // will be about to flush those instructions.
-        else if(hazif.d2eif_dread & ~hazif.branch) begin
+        else if(hazif.d2eif_dread & ~hazif.branch_flush) begin
             // If nonzero destination from load equals rs1 or rs2
             if(hazif.d2eif_rd != 0 && (hazif.d2eif_rd == hazif.f2dif_rs1 || hazif.d2eif_rd == hazif.f2dif_rs2)) begin
                 // Stall fetch to decode
@@ -110,17 +110,13 @@ module hazard_unit (
         /* Control Hazards */
         /*******************/
 
-        // Currently predicting branch is not taken. This requires minimal effort,
-        // because we just need to keep executing instructions until the branch is resolved.
-        // If the branch occurs, we just flush the pipeline and jump. Since none of the
-        // invalid instructions would have made it past execute, they will not have
-        // affected the state of the computer.
+        // We need to flush when the branch_flush signal is asserted by the branch unit.
 
         // The signal to branch comes from the memory stage after the instruction has
         // passed the execute stage. Therefore, if we get a branch, assert the flush signal
         // for fetch2decode, decode2execute, and execute2memory to make sure they are clear on
         // the next cycle.
-        if(hazif.branch & hazif.ihit) begin
+        if(hazif.branch_flush & hazif.ihit) begin
             hazif.f2dif_flush = 1;
             hazif.d2eif_flush = 1;
             hazif.e2mif_flush = 1;

@@ -55,7 +55,11 @@ interface decode_to_execute_if;
   word_t rdat1;
   word_t rdat2;
 
-  // Interface to hazard unit
+  /***************/
+  /* Branch Unit */
+  /***************/
+  logic branch_predict;
+  word_t branch_target;
 endinterface
 
 `endif // DECODE_TO_EXECUTE_IF_VH
