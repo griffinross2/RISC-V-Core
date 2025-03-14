@@ -31,15 +31,15 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
                     addr = (record_addr + i)
 
-                    # Write to the row floor(addr/4) at position 2*(addr%4)
-                    hex_strings[addr//4] = hex_strings[addr//4][:2*(addr%4)] + data + hex_strings[addr//4][2*(addr%4) + 2:]
+                    # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
+                    hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
 
     return '\n'.join(hex_strings)
 
 def assemble(asm_file):
     march = "rv32im"
     os.system("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file))
-    os.system("riscv-none-elf-objcopy -O ihex --reverse-bytes=4 {asm_file_start}.o {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
+    os.system("riscv-none-elf-objcopy -O ihex {asm_file_start}.o {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
     # os.system("wsl -e riscv32-unknown-elf-as -march={march} -mabi=ilp32f -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file))
     # os.system("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O binary --reverse-bytes=4 --remove-section=.riscv.attributes {asm_file_start}.o {asm_file_start}.bin".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
 
