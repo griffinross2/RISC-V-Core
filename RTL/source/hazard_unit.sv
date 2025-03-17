@@ -56,7 +56,7 @@ module hazard_unit (
         else if(~hazif.ihit & ~hazif.branch_flush) begin
             // Give NOP to FETCH/DECODE
             hazif.f2dif_en = 0;
-            hazif.d2eif_en = 0;
+            hazif.d2eif_en = 1;
             hazif.d2eif_flush = 1;
         end
 
@@ -88,9 +88,8 @@ module hazard_unit (
             if(hazif.d2eif_rd != 0 && (hazif.d2eif_rd == hazif.f2dif_rs1 || hazif.d2eif_rd == hazif.f2dif_rs2)) begin
                 // Stall fetch to decode
                 hazif.f2dif_en = 0;
-                // Stall decode to execute
-                hazif.d2eif_en = 0;
                 // Give execute a bubble 
+                hazif.d2eif_en = 1;
                 hazif.d2eif_flush = 1;
             end
         end
@@ -100,9 +99,8 @@ module hazard_unit (
             hazif.f2dif_en = 0;
             // Stall decode to execute
             hazif.d2eif_en = 0;
-            // Stall execute to memory
-            hazif.e2mif_en = 0;
             // Give memory a bubble
+            hazif.e2mif_en = 1;
             hazif.e2mif_flush = 1;
         end
 

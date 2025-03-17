@@ -119,7 +119,7 @@ module datapath #(
       f2dif.inst <= NOP;
       f2dif.branch_predict <= 0;
       f2dif.branch_target <= 0;
-    end else if (f2dif.flush) begin
+    end else if (f2dif.en & f2dif.flush) begin
       f2dif.pc <= f2dif.pc;
       f2dif.inst <= NOP;
       f2dif.branch_predict <= 0;
@@ -164,7 +164,7 @@ module datapath #(
       d2eif.mult_signed_b <= '0;
       d2eif.branch_predict <= 0;
       d2eif.branch_target <= 0;
-    end else if (d2eif.flush) begin
+    end else if (d2eif.en & d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
       d2eif.alu_op <= ALU_ADD;
@@ -285,7 +285,7 @@ module datapath #(
       e2mif.alu_zero <= '0;
       e2mif.branch_predict <= 0;
       e2mif.branch_target <= 0;
-    end else if (e2mif.flush) begin
+    end else if (e2mif.en & e2mif.flush) begin
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= '0;
       e2mif.rd <= '0;
@@ -392,7 +392,7 @@ module datapath #(
       m2wif.reg_wr_src <= '0;
       m2wif.alu_out <= '0;
       m2wif.dload <= '0;
-    end else if (m2wif.flush) begin
+    end else if (m2wif.en & m2wif.flush) begin
         m2wif.pc <= e2mif.pc;
         m2wif.halt <= '0;
         m2wif.rd <= '0;
@@ -435,32 +435,33 @@ module datapath #(
     buif.mem_branch = 1'b0;
     buif.mem_taken = 1'b0;
     buif.mem_target_res = e2mif.pc + 32'd4;
+
+    // Signal to handle this branch instruction
+    if(e2mif.en & |e2mif.pc_ctrl) begin
+      buif.mem_branch = 1'b1;
+    end
     
     // Branch resolution
-    casez({e2mif.en, e2mif.pc_ctrl})
-      3'b101: begin
-        buif.mem_branch = 1'b1;
+    casez(e2mif.pc_ctrl)
+      2'b01: begin
         buif.mem_target_res = e2mif.pc_plus_imm;
         if(e2mif.branch_pol ^ e2mif.alu_zero) begin
           // Resolve to taken
           buif.mem_taken = 1'b1;
         end
       end
-      3'b110: begin
+      2'b10: begin
         // Unconditional
-        buif.mem_branch = 1'b1;
         buif.mem_taken = 1'b1;
         buif.mem_target_res = e2mif.pc_plus_imm;
       end
-      3'b111: begin
+      2'b11: begin
         // Unconditional
-        buif.mem_branch = 1'b1;
         buif.mem_taken = 1'b1;
         buif.mem_target_res = e2mif.alu_out;
       end
       default: begin
         // Default to telling BU no branch
-        buif.mem_branch = 1'b0;
         buif.mem_taken = 1'b0;
         buif.mem_target_res = e2mif.pc + 32'd4;
       end
@@ -469,7 +470,7 @@ module datapath #(
     // Create the next PC state when the fetch stage is ready to proceed
     if (f2dif.en) begin
       // The branch predictor thought we shouldn't branch but we need to
-      if (~e2mif.branch_predict && buif.mem_flush) begin
+      if (~e2mif.branch_predict & buif.mem_branch_miss) begin
         // We may have to jump to the resolved target address
         casez(e2mif.pc_ctrl)
           2'b01: begin
@@ -485,7 +486,7 @@ module datapath #(
             pc_n = pc + 32'd4;
           end
         endcase
-      end else if (buif.mem_flush) begin
+      end else if (e2mif.branch_predict & buif.mem_branch_miss) begin
         // The branch predictor either predicted a false branch, or the wrong destination
         casez(e2mif.pc_ctrl)
           2'b01: begin

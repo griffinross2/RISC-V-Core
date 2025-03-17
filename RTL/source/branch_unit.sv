@@ -40,6 +40,10 @@ module branch_unit #(
     
     always_comb begin
         // Next state
+        // Default to no change
+        prediction_buffer_n = prediction_buffer;
+        target_buffer_n = target_buffer;
+        buif.mem_flush = 0;
 
         // If the branch signal is high (branch resolved)
         // Update the prediction buffer and target buffer
@@ -74,32 +78,24 @@ module branch_unit #(
 
             // Update the target buffer
             target_buffer_n[buif.mem_pc[BTB_BITS+1:2]] = buif.mem_target_res;
-        end else begin
-            // Default to no change
-            prediction_buffer_n = prediction_buffer;
-            target_buffer_n = target_buffer;
         end
 
         // Output logic
-
-        // If a branch inst in memory stage
-        if (buif.mem_branch) begin
-            // An incorrect branch was taken
-            // We predicted taken AND  (it was not taken    OR    we jumped to the wrong place)
-            if (buif.mem_predict && (buif.mem_taken == 1'b0 || buif.mem_target_res != buif.mem_target)) begin
-                // Flush the pipeline
-                buif.mem_flush = 1;
-            // We predicted not taken      AND    it was taken
-            end else if (~buif.mem_predict && buif.mem_taken == 1'b1) begin
-                // Flush the pipeline
-                buif.mem_flush = 1;
-            end else begin
-                // Correct prediction, continue
-                buif.mem_flush = 0;
-            end
+        // An incorrect branch was taken
+        // We predicted taken AND  (it was not taken    OR    we jumped to the wrong place)
+        if (buif.mem_predict && (buif.mem_taken == 1'b0 || buif.mem_target_res != buif.mem_target)) begin
+            // Flush the pipeline
+            buif.mem_flush = 1;
+            buif.mem_branch_miss = 1;
+        // We predicted not taken      AND    it was taken
+        end else if (~buif.mem_predict && buif.mem_taken == 1'b1) begin
+            // Flush the pipeline
+            buif.mem_flush = 1;
+            buif.mem_branch_miss = 1;
         end else begin
-            // Not a branch inst, continue
+            // Correct prediction, continue
             buif.mem_flush = 0;
+            buif.mem_branch_miss = 0;
         end
 
         // Get target and prediction for the fetch stage

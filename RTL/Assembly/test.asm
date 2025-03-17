@@ -12,7 +12,7 @@ _start:
     beq x1, x2, branch
     ebreak
 branch:
-    la ra, jump
+    addi ra, x0, 52
     jalr ra, 0(ra)
 jump:
     addi x3, x0, 1

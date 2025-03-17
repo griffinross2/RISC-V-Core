@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "*.sv": "systemverilog",
-        "*.vh": "systemverilog",
-    },
-    "editor.fontLigatures": "'calt', 'liga', 'ss01'"
-}
