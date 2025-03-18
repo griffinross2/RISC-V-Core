@@ -36,6 +36,8 @@ always_comb begin
     ctrlif.alu_src1 = 1'b0;
     ctrlif.alu_src2 = 1'b0;
     ctrlif.reg_wr_src = 2'd0;
+    ctrlif.reg_wr_mem = 2'b00;
+    ctrlif.reg_wr_mem_signed = 1'b0;
     ctrlif.pc_ctrl = 2'd0;
     ctrlif.branch_pol = 1'b0;
     ctrlif.mult = 1'b0;
@@ -132,7 +134,37 @@ always_comb begin
             ctrlif.rs1 = i_inst.rs1;
             ctrlif.rd = i_inst.rd;
 
-            // Only handle LW, not other types
+            case (funct3_ld_i_t'(i_inst.funct3))
+                LW: begin
+                    // Read a word and don't need to sign-extend
+                    ctrlif.reg_wr_mem = 2'b10;
+                    ctrlif.reg_wr_mem_signed = 1'b0;
+                end 
+                LH: begin
+                    // Read a halfword and sign-extend
+                    ctrlif.reg_wr_mem = 2'b01;
+                    ctrlif.reg_wr_mem_signed = 1'b1;
+                end
+                LB: begin
+                    // Read a byte and sign-extend
+                    ctrlif.reg_wr_mem = 2'b00;
+                    ctrlif.reg_wr_mem_signed = 1'b1;
+                end
+                LBU: begin
+                    // Read a byte and don't need to sign-extend
+                    ctrlif.reg_wr_mem = 2'b00;
+                    ctrlif.reg_wr_mem_signed = 1'b0;
+                end
+                LHU: begin
+                    // Read a halfword and don't need to sign-extend
+                    ctrlif.reg_wr_mem = 2'b01;
+                    ctrlif.reg_wr_mem_signed = 1'b0;
+                end
+                default: begin
+                    // Illegal instruction
+                    ctrlif.halt = 1'b1;
+                end
+            endcase
 
             ctrlif.alu_op = ALU_ADD;    // Add the offset
 

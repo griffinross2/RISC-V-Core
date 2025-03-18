@@ -154,6 +154,8 @@ module datapath #(
       d2eif.alu_src1 <= '0;
       d2eif.alu_src2 <= '0;
       d2eif.reg_wr_src <= '0;
+      d2eif.reg_wr_mem <= '0;
+      d2eif.reg_wr_mem_signed <= '0;
       d2eif.branch_pol <= '0;
       d2eif.pc_ctrl <= '0;
       d2eif.rdat1 <= '0;
@@ -177,6 +179,8 @@ module datapath #(
       d2eif.alu_src1 <= '0;
       d2eif.alu_src2 <= '0;
       d2eif.reg_wr_src <= '0;
+      d2eif.reg_wr_mem <= '0;
+      d2eif.reg_wr_mem_signed <= '0;
       d2eif.branch_pol <= '0;
       d2eif.pc_ctrl <= '0;
       d2eif.rdat1 <= '0;
@@ -200,6 +204,8 @@ module datapath #(
       d2eif.alu_src1 <= ctrlif.alu_src1;
       d2eif.alu_src2 <= ctrlif.alu_src2;
       d2eif.reg_wr_src <= ctrlif.reg_wr_src;
+      d2eif.reg_wr_mem <= ctrlif.reg_wr_mem;
+      d2eif.reg_wr_mem_signed <= ctrlif.reg_wr_mem_signed;
       d2eif.branch_pol <= ctrlif.branch_pol;
       d2eif.pc_ctrl <= ctrlif.pc_ctrl;
       d2eif.rdat1 <= rfif.rdat1;
@@ -227,7 +233,50 @@ module datapath #(
       end
       2'd2: begin
         casez(m2wif.reg_wr_src)
-          2'd1: forwarded_rdat1 = m2wif.dload;
+          2'd1: begin
+            // Memory writeback
+            casez(m2wif.reg_wr_mem)
+              2'd0: begin
+                // LB/LBU
+                if(m2wif.reg_wr_mem_signed) begin
+                  casez(m2wif.alu_out[1:0])
+                    // Alignment
+                    2'b00: forwarded_rdat1 = {{24{m2wif.dload[7]}}, m2wif.dload[7:0]};
+                    2'b01: forwarded_rdat1 = {{24{m2wif.dload[15]}}, m2wif.dload[15:8]};
+                    2'b10: forwarded_rdat1 = {{24{m2wif.dload[23]}}, m2wif.dload[23:16]};
+                    2'b11: forwarded_rdat1 = {{24{m2wif.dload[31]}}, m2wif.dload[31:24]};
+                  endcase
+                end else begin
+                  casez(m2wif.alu_out[1:0])
+                    // Alignment
+                    2'b00: forwarded_rdat1 = {24'b0, m2wif.dload[7:0]};
+                    2'b01: forwarded_rdat1 = {24'b0, m2wif.dload[15:8]};
+                    2'b10: forwarded_rdat1 = {24'b0, m2wif.dload[23:16]};
+                    2'b11: forwarded_rdat1 = {24'b0, m2wif.dload[31:24]};
+                  endcase
+                end
+              end
+              2'd1: begin
+                // LH/LHU
+                if(m2wif.reg_wr_mem_signed) begin
+                  casez(m2wif.alu_out[1])
+                    // Alignment
+                    1'b0: forwarded_rdat1 = {{16{m2wif.dload[15]}}, m2wif.dload[15:0]};
+                    1'b1: forwarded_rdat1 = {{16{m2wif.dload[31]}}, m2wif.dload[31:16]};
+                  endcase
+                end else begin
+                  casez(m2wif.alu_out[1])
+                    // Alignment
+                    1'b0: forwarded_rdat1 = {16'b0, m2wif.dload[15:0]};
+                    1'b1: forwarded_rdat1 = {16'b0, m2wif.dload[31:16]};
+                  endcase
+                end
+              end
+              // LW
+              2'd2: forwarded_rdat1 = m2wif.dload[31:0];
+              default: forwarded_rdat1 = m2wif.alu_out;
+            endcase
+          end
           2'd2: forwarded_rdat1 = m2wif.pc + 32'd4;
           default: forwarded_rdat1 = m2wif.alu_out;
         endcase
@@ -245,7 +294,50 @@ module datapath #(
       end
       2'd2: begin
         casez(m2wif.reg_wr_src)
-          2'd1: forwarded_rdat2 = m2wif.dload;
+          2'd1: begin
+            // Memory writeback
+            casez(m2wif.reg_wr_mem)
+              2'd0: begin
+                // LB/LBU
+                if(m2wif.reg_wr_mem_signed) begin
+                  casez(m2wif.alu_out[1:0])
+                    // Alignment
+                    2'b00: forwarded_rdat2 = {{24{m2wif.dload[7]}}, m2wif.dload[7:0]};
+                    2'b01: forwarded_rdat2 = {{24{m2wif.dload[15]}}, m2wif.dload[15:8]};
+                    2'b10: forwarded_rdat2 = {{24{m2wif.dload[23]}}, m2wif.dload[23:16]};
+                    2'b11: forwarded_rdat2 = {{24{m2wif.dload[31]}}, m2wif.dload[31:24]};
+                  endcase
+                end else begin
+                  casez(m2wif.alu_out[1:0])
+                    // Alignment
+                    2'b00: forwarded_rdat2 = {24'b0, m2wif.dload[7:0]};
+                    2'b01: forwarded_rdat2 = {24'b0, m2wif.dload[15:8]};
+                    2'b10: forwarded_rdat2 = {24'b0, m2wif.dload[23:16]};
+                    2'b11: forwarded_rdat2 = {24'b0, m2wif.dload[31:24]};
+                  endcase
+                end
+              end
+              2'd1: begin
+                // LH/LHU
+                if(m2wif.reg_wr_mem_signed) begin
+                  casez(m2wif.alu_out[1])
+                    // Alignment
+                    1'b0: forwarded_rdat2 = {{16{m2wif.dload[15]}}, m2wif.dload[15:0]};
+                    1'b1: forwarded_rdat2 = {{16{m2wif.dload[31]}}, m2wif.dload[31:16]};
+                  endcase
+                end else begin
+                  casez(m2wif.alu_out[1])
+                    // Alignment
+                    1'b0: forwarded_rdat2 = {16'b0, m2wif.dload[15:0]};
+                    1'b1: forwarded_rdat2 = {16'b0, m2wif.dload[31:16]};
+                  endcase
+                end 
+              end
+              // LW
+              2'd2: forwarded_rdat2 = m2wif.dload[31:0];
+              default: forwarded_rdat2 = m2wif.alu_out;
+            endcase
+          end
           2'd2: forwarded_rdat2 = m2wif.pc + 32'd4;
           default: forwarded_rdat2 = m2wif.alu_out;
         endcase
@@ -277,6 +369,8 @@ module datapath #(
       e2mif.dwrite <= '0;
       e2mif.dread <= '0;
       e2mif.reg_wr_src <= '0;
+      e2mif.reg_wr_mem <= '0;
+      e2mif.reg_wr_mem_signed <= '0;
       e2mif.branch_pol <= '0;
       e2mif.pc_ctrl <= '0;
       e2mif.rdat2 <= '0;
@@ -292,6 +386,8 @@ module datapath #(
       e2mif.dwrite <= '0;
       e2mif.dread <= '0;
       e2mif.reg_wr_src <= '0;
+      e2mif.reg_wr_mem <= '0;
+      e2mif.reg_wr_mem_signed <= '0;
       e2mif.branch_pol <= '0;
       e2mif.pc_ctrl <= '0;
       e2mif.rdat2 <= '0;
@@ -307,6 +403,8 @@ module datapath #(
       e2mif.dwrite <= d2eif.dwrite;
       e2mif.dread <= d2eif.dread;
       e2mif.reg_wr_src <= d2eif.reg_wr_src;
+      e2mif.reg_wr_mem <= d2eif.reg_wr_mem;
+      e2mif.reg_wr_mem_signed <= d2eif.reg_wr_mem_signed;
       e2mif.branch_pol <= d2eif.branch_pol;
       e2mif.pc_ctrl <= d2eif.pc_ctrl;
       e2mif.rdat2 <= forwarded_rdat2;
@@ -390,6 +488,8 @@ module datapath #(
       m2wif.halt <= '0;
       m2wif.rd <= '0;
       m2wif.reg_wr_src <= '0;
+      m2wif.reg_wr_mem <= '0;
+      m2wif.reg_wr_mem_signed <= '0;
       m2wif.alu_out <= '0;
       m2wif.dload <= '0;
     end else if (m2wif.en & m2wif.flush) begin
@@ -397,6 +497,8 @@ module datapath #(
         m2wif.halt <= '0;
         m2wif.rd <= '0;
         m2wif.reg_wr_src <= '0;
+        m2wif.reg_wr_mem <= '0;
+        m2wif.reg_wr_mem_signed <= '0;
         m2wif.alu_out <= '0;
         m2wif.dload <= '0;
     end else if (m2wif.en) begin
@@ -404,6 +506,8 @@ module datapath #(
         m2wif.halt <= e2mif.halt;
         m2wif.rd <= e2mif.rd;
         m2wif.reg_wr_src <= e2mif.reg_wr_src;
+        m2wif.reg_wr_mem <= e2mif.reg_wr_mem;
+        m2wif.reg_wr_mem_signed <= e2mif.reg_wr_mem_signed;
         m2wif.alu_out <= e2mif.alu_out;
         m2wif.dload <= cpu_ram_if.dload;
     end
@@ -416,7 +520,50 @@ module datapath #(
     // Writeback source mux (0 - alu, 1 - memory, 2 - pc + 4)
     casez(m2wif.reg_wr_src)
       2'd0: rfif.wdat = m2wif.alu_out;
-      2'd1: rfif.wdat = m2wif.dload;
+      2'd1: begin
+        // Memory writeback
+        casez(m2wif.reg_wr_mem)
+          2'd0: begin
+            // LB/LBU
+            if(m2wif.reg_wr_mem_signed) begin
+              casez(m2wif.alu_out[1:0])
+                // Alignment
+                2'b00: rfif.wdat = {{24{m2wif.dload[7]}}, m2wif.dload[7:0]};
+                2'b01: rfif.wdat = {{24{m2wif.dload[15]}}, m2wif.dload[15:8]};
+                2'b10: rfif.wdat = {{24{m2wif.dload[23]}}, m2wif.dload[23:16]};
+                2'b11: rfif.wdat = {{24{m2wif.dload[31]}}, m2wif.dload[31:24]};
+              endcase
+            end else begin
+              casez(m2wif.alu_out[1:0])
+                // Alignment
+                2'b00: rfif.wdat = {24'b0, m2wif.dload[7:0]};
+                2'b01: rfif.wdat = {24'b0, m2wif.dload[15:8]};
+                2'b10: rfif.wdat = {24'b0, m2wif.dload[23:16]};
+                2'b11: rfif.wdat = {24'b0, m2wif.dload[31:24]};
+              endcase
+            end
+          end
+          2'd1: begin
+            // LH/LHU
+            if(m2wif.reg_wr_mem_signed) begin
+              casez(m2wif.alu_out[1])
+                // Alignment
+                1'b0: rfif.wdat = {{16{m2wif.dload[15]}}, m2wif.dload[15:0]};
+                1'b1: rfif.wdat = {{16{m2wif.dload[31]}}, m2wif.dload[31:16]};
+              endcase
+            end else begin
+              casez(m2wif.alu_out[1])
+                // Alignment
+                1'b0: rfif.wdat = {16'b0, m2wif.dload[15:0]};
+                1'b1: rfif.wdat = {16'b0, m2wif.dload[31:16]};
+              endcase
+            end
+          end
+          // LW
+          2'd2: rfif.wdat = m2wif.dload[31:0];
+          default: rfif.wdat = m2wif.alu_out;
+        endcase
+      end
       2'd2: rfif.wdat = m2wif.pc + 32'd4;
       default: rfif.wdat = m2wif.alu_out;
     endcase

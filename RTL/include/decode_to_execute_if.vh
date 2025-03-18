@@ -45,6 +45,8 @@ interface decode_to_execute_if;
   logic     alu_src2;       // 0 - rs2, 1 - immediate
   // Register write source (ALU output or memory)
   logic [1:0] reg_wr_src;   // 0 - alu, 1 - memory, 2 - pc + 4
+  logic [1:0] reg_wr_mem;   // 0 - byte, 1 - halfword, 2 - word
+  logic reg_wr_mem_signed;  // 0 - unsigned, 1 - signed
   // Branch/jump control
   logic     branch_pol;     // 0 - branch if alu.zero = 1, branch if alu.zero - 0
   logic [1:0] pc_ctrl;      // 0 - PC increment, 1 - PC branch, 2 - JAL, 3 - JALR

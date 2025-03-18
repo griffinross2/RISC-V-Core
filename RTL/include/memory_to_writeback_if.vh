@@ -28,6 +28,8 @@ interface memory_to_writeback_if;
   reg_t rd;
   // Register write source (ALU output or memory)
   logic [1:0] reg_wr_src;   // 0 - alu, 1 - memory, 2 - pc + 4
+  logic [1:0] reg_wr_mem;   // 0 - byte, 1 - halfword, 2 - word
+  logic reg_wr_mem_signed;  // 0 - unsigned, 1 - signed
 
   /*******/
   /* ALU */

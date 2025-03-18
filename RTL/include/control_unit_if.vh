@@ -30,6 +30,8 @@ interface control_unit_if;
   logic     alu_src2;       // 0 - rs2, 1 - immediate
   // Register write source (ALU output or memory)
   logic [1:0] reg_wr_src;   // 0 - alu, 1 - memory, 2 - pc + 4
+  logic [1:0] reg_wr_mem;   // 0 - byte, 1 - halfword, 2 - word
+  logic reg_wr_mem_signed;  // 0 - unsigned, 1 - signed
   // Branch/jump control
   logic     branch_pol;     // 0 - branch if alu.zero = 1, branch if alu.zero - 0
   logic [1:0] pc_ctrl;      // 0 - PC increment, 1 - PC branch, 2 - JAL, 3 - JALR
@@ -45,7 +47,7 @@ interface control_unit_if;
             dread, dwrite,                                  // Request Unit
             immediate,                                      // Immediate Generator
             alu_src1, alu_src2,                             // ALU source mux
-            reg_wr_src,                                     // Reg File writeback source
+            reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
             halt                                            // Halt
   );
@@ -57,7 +59,7 @@ interface control_unit_if;
             dread, dwrite,                                  // Request Unit
             immediate,                                      // Immediate Generator
             alu_src1, alu_src2,                             // ALU source mux
-            reg_wr_src,                                     // Reg File writeback source
+            reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
             halt,                                           // Halt
     output  inst
