@@ -38,7 +38,7 @@ def convert_intel_hex_to_vivado_mem(file_path):
     return '\n'.join(hex_strings)
 
 def assemble(asm_file):
-    march = "rv32im"
+    march = "rv32im_zicsr"
     subprocess.run("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file), shell=True)
     subprocess.run("riscv-none-elf-ld -T linkerscript.ld -o {asm_file_start}.elf {asm_file_start}.o".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
     subprocess.run("riscv-none-elf-objcopy -O ihex {asm_file_start}.elf {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)

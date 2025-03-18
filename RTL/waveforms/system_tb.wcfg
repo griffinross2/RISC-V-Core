@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2,391.158 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,575.559 ns"></ZoomEndTime>
-      <Cursor1Time time="2,471.258 ns"></Cursor1Time>
+      <ZoomStartTime time="134.525 ns"></ZoomStartTime>
+      <ZoomEndTime time="319.726 ns"></ZoomEndTime>
+      <Cursor1Time time="172.525 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="392"></NameColumnWidth>
-      <ValueColumnWidth column_width="255"></ValueColumnWidth>
+      <ValueColumnWidth column_width="247"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="19" />
+   <WVObjectSize size="21" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -495,7 +495,6 @@
    <wvobject fp_name="group119" type="group">
       <obj_property name="label">Branch Unit Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_branch" type="logic">
          <obj_property name="ElementShortName">mem_branch</obj_property>
          <obj_property name="ObjectShortName">mem_branch</obj_property>
@@ -560,11 +559,9 @@
    <wvobject fp_name="group645" type="group">
       <obj_property name="label">Register File</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/rf0/registers" type="array">
          <obj_property name="ElementShortName">registers[1:31][31:0]</obj_property>
          <obj_property name="ObjectShortName">registers[1:31][31:0]</obj_property>
-         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/rf0/registers_n" type="array">
          <obj_property name="ElementShortName">registers_n[1:31][31:0]</obj_property>
@@ -594,6 +591,63 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/aluif/zero" type="logic">
          <obj_property name="ElementShortName">zero</obj_property>
          <obj_property name="ObjectShortName">zero</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group178" type="group">
+      <obj_property name="label">CSR Interface</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_write" type="logic">
+         <obj_property name="ElementShortName">csr_write</obj_property>
+         <obj_property name="ObjectShortName">csr_write</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_waddr" type="array">
+         <obj_property name="ElementShortName">csr_waddr[11:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_waddr[11:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_raddr" type="array">
+         <obj_property name="ElementShortName">csr_raddr[11:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_raddr[11:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_wdata" type="array">
+         <obj_property name="ElementShortName">csr_wdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_wdata[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_rdata" type="array">
+         <obj_property name="ElementShortName">csr_rdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_rdata[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group186" type="group">
+      <obj_property name="label">CSR Registers</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mstatus" type="array">
+         <obj_property name="ElementShortName">mstatus[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mstatus[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mstatush" type="array">
+         <obj_property name="ElementShortName">mstatush[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mstatush[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mtvec" type="array">
+         <obj_property name="ElementShortName">mtvec[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mtvec[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mip" type="array">
+         <obj_property name="ElementShortName">mip[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mip[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mie" type="array">
+         <obj_property name="ElementShortName">mie[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mie[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mepc" type="array">
+         <obj_property name="ElementShortName">mepc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mepc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mcause" type="array">
+         <obj_property name="ElementShortName">mcause[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mcause[31:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

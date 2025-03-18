@@ -60,7 +60,7 @@ package common_types_pkg;
         LUI       = 7'b0110111,
         AUIPC     = 7'b0010111,
         LR_SC     = 7'b0101111,
-        ENV       = 7'b1110011
+        SYSTEM    = 7'b1110011
     } opcode_t;
   
     typedef enum logic [FUNCT3_W-1:0] {
@@ -94,8 +94,14 @@ package common_types_pkg;
     } funct3_ld_i_t;
 
     typedef enum logic [FUNCT3_W-1:0] {
-        ENV_CALL_BREAK  = 3'h0
-    } funct3_env_i_t;
+        ENV_CALL_BREAK  = 3'h0,
+        CSRRW           = 3'h1,
+        CSRRS           = 3'h2,
+        CSRRC           = 3'h3,
+        CSRRWI          = 3'h5,
+        CSRRSI          = 3'h6,
+        CSRRCI          = 3'h7
+    } funct3_system_i_t;
 
     typedef enum logic [FUNCT3_W-1:0] {
         SB      = 3'h0,
@@ -126,7 +132,7 @@ package common_types_pkg;
     typedef enum logic [IMM_W_I-1:0] {
         ECALL   = 12'h0,
         EBREAK  = 12'h1
-    } imm_env_i_t;
+    } imm_system_i_t;
 
     // uj type
     typedef struct packed {
@@ -195,6 +201,18 @@ package common_types_pkg;
         WEAK_TAKEN, 
         STRONG_TAKEN
     } branch_pred_t;
+
+    // CSR address assignments
+    typedef enum logic [11:0] {
+        MSTATUS     = 12'h300,
+        MSTATUSH    = 12'h310,
+        MTVEC       = 12'h305,
+        MIP         = 12'h344,
+        MIE         = 12'h304,
+        MEPC        = 12'h341,
+        MCAUSE      = 12'h342,
+        MSCRATCH    = 12'h340
+    } csr_addr_t;
 
 endpackage
 

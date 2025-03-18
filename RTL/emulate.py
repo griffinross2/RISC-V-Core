@@ -9,7 +9,7 @@ def run_emulator(asm_file):
     # Link to start at 0x80000000
     # subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-ld -T /mnt/d/github_repos/RISC-V-Core/RTL/linkerscript_spike.ld {asm_file_start}.o -o {asm_file_start}.l".format(asm_file_start='.'.join(asm_file.split('.')[:-1])), shell=True)
     # subprocess.run("wsl -e /opt/riscv/bin/spike --isa=RV32IMA /opt/riscv/riscv32-unknown-elf/bin/pk {asm_file_start}.l".format(asm_file_start='.'.join(asm_file.split('.')[:-1])), shell=True)
-    march = "rv32im"
+    march = "rv32im_zicsr"
     subprocess.run("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file), shell=True)
     subprocess.run("riscv-none-elf-ld -T linkerscript.ld -o {asm_file_start}.elf {asm_file_start}.o".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
     subprocess.run("riscv-none-elf-objcopy -O ihex {asm_file_start}.elf meminit.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)

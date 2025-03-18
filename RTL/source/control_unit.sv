@@ -33,8 +33,8 @@ always_comb begin
     ctrlif.dread = 1'b0;
     ctrlif.dwrite = 2'b0;
     ctrlif.immediate = 32'd0;
-    ctrlif.alu_src1 = 1'b0;
-    ctrlif.alu_src2 = 1'b0;
+    ctrlif.alu_src1 = 1'd0;
+    ctrlif.alu_src2 = 1'd0;
     ctrlif.reg_wr_src = 2'd0;
     ctrlif.reg_wr_mem = 2'b00;
     ctrlif.reg_wr_mem_signed = 1'b0;
@@ -44,6 +44,10 @@ always_comb begin
     ctrlif.mult_signed_a = 1'b0;
     ctrlif.mult_signed_b = 1'b0;
     ctrlif.mult_half = 1'b0;
+    ctrlif.csr_write = 1'b0;
+    ctrlif.csr_waddr = 12'd0;
+    ctrlif.csr_wr_op = 2'b0;
+    ctrlif.csr_wr_imm = 1'b0;
 
     casez(ctrlif.inst[OP_W-1:0])
         RTYPE:
@@ -125,7 +129,7 @@ always_comb begin
             endcase
             // I-type uses a sign-extended 12-bit immediate
             ctrlif.immediate = {{20{i_inst.imm[11]}}, i_inst.imm};
-            ctrlif.alu_src2 = 1'b1;  // Second operand comes from immediate
+            ctrlif.alu_src2 = 1'd1;  // Second operand comes from immediate
         end
         ITYPE_LW:
         begin
@@ -170,7 +174,7 @@ always_comb begin
 
             // I-type uses a sign-extended 12-bit immediate
             ctrlif.immediate = {{20{i_inst.imm[11]}}, i_inst.imm};
-            ctrlif.alu_src2 = 1'b1;  // Second operand comes from immediate
+            ctrlif.alu_src2 = 1'd1;  // Second operand comes from immediate
 
             // Tell memory to read data
             ctrlif.dread = 1'b1;
@@ -189,7 +193,7 @@ always_comb begin
 
             // I-type uses a sign-extended 12-bit immediate
             ctrlif.immediate = {{20{i_inst.imm[11]}}, i_inst.imm};
-            ctrlif.alu_src2 = 1'b1;  // Second operand comes from immediate
+            ctrlif.alu_src2 = 1'd1;  // Second operand comes from immediate
 
             // Write PC + 4 back to Reg File
             ctrlif.reg_wr_src = 2'd2;
@@ -207,7 +211,7 @@ always_comb begin
 
             // S-type uses a sign-extended 12-bit immediate (split in two)
             ctrlif.immediate = {{20{s_inst.imm2[6]}}, s_inst.imm2, s_inst.imm1};
-            ctrlif.alu_src2 = 1'b1;  // Second operand comes from immediate
+            ctrlif.alu_src2 = 1'd1;  // Second operand comes from immediate
 
             // Tell memory to write data
             casez(s_inst.funct3)
@@ -230,7 +234,7 @@ always_comb begin
 
             // U-type uses a 20-bit immediate
             ctrlif.immediate = {u_inst.imm, 12'b0};
-            ctrlif.alu_src2 = 1'b1;  // Second operand comes from immediate
+            ctrlif.alu_src2 = 1'd1;  // Second operand comes from immediate
         end
         AUIPC:
         begin
@@ -242,8 +246,8 @@ always_comb begin
 
             // U-type uses a 20-bit immediate
             ctrlif.immediate = {u_inst.imm, 12'b0};
-            ctrlif.alu_src1 = 1'b1; // First operand comes from PC
-            ctrlif.alu_src2 = 1'b1; // Second operand comes from immediate
+            ctrlif.alu_src1 = 1'd1; // First operand comes from PC
+            ctrlif.alu_src2 = 1'd1; // Second operand comes from immediate
         end
         BTYPE:
         begin
@@ -306,13 +310,13 @@ always_comb begin
             // Write PC + 4 back to the destination register
             ctrlif.reg_wr_src = 2'd2;
         end
-        ENV:
+        SYSTEM:
         begin
             // I-type instruction
             i_inst = i_t'(ctrlif.inst);
-            casez(funct3_env_i_t'(i_inst.funct3))
+            casez(funct3_system_i_t'(i_inst.funct3))
                 ENV_CALL_BREAK: begin
-                    casez(i_inst.imm)
+                    casez(imm_system_i_t'(i_inst.imm))
                         // NOP
                         ECALL: begin end
                         // Halt
@@ -320,6 +324,66 @@ always_comb begin
                         // Illegal instruction
                         default: ctrlif.halt = 1'b1;
                     endcase
+                end
+                CSRRW: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd0;
+                    ctrlif.csr_wr_imm = 1'b0;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
+                end
+                CSRRS: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd1;
+                    ctrlif.csr_wr_imm = 1'b0;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
+                end
+                CSRRC: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd2;
+                    ctrlif.csr_wr_imm = 1'b0;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
+                end
+                CSRRWI: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd0;
+                    ctrlif.csr_wr_imm = 1'b1;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
+                end
+                CSRRSI: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd1;
+                    ctrlif.csr_wr_imm = 1'b1;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
+                end
+                CSRRCI: begin
+                    ctrlif.csr_write = 1'b1;
+                    ctrlif.csr_waddr = i_inst.imm;
+                    ctrlif.csr_wr_op = 2'd2;
+                    ctrlif.csr_wr_imm = 1'b1;
+                    ctrlif.rs1 = i_inst.rs1;
+                    ctrlif.rd = i_inst.rd;
+
+                    // ALU is not used
                 end
                 // Illegal instruction
                 default: ctrlif.halt = 1'b1;

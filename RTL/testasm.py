@@ -30,9 +30,8 @@ def diff_files(file1, file2):
     f2_lines = f2.readlines()
 
     diff = difflib.ndiff(f1_lines, f2_lines)
-    diff_str = ''.join(x for x in diff if x.startswith('- '))
-    # print(diff_str)
-
+    diff_str = ''.join(x for x in diff if x.startswith('- ') or x.startswith('+ '))
+    
     f1.close()
     f2.close()
 

@@ -12,6 +12,7 @@ import common_types_pkg::*;
 `include "hazard_unit_if.vh"
 `include "forward_unit_if.vh"
 `include "branch_unit_if.vh"
+`include "csr_if.vh"
 
 // interface (pipeline)
 `include "fetch_to_decode_if.vh"
@@ -41,6 +42,7 @@ module datapath #(
   hazard_unit_if hazif();
   forward_unit_if fuif();
   branch_unit_if buif();
+  csr_if csrif();
 
   // Module instantiation
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
@@ -50,6 +52,7 @@ module datapath #(
   (* keep_hierarchy = "yes" *) hazard_unit haz0(hazif);
   (* keep_hierarchy = "yes" *) forward_unit for0(fuif);
   (* keep_hierarchy = "yes" *) branch_unit bu0(clk, nrst, buif);
+  (* keep_hierarchy = "yes" *) csr csr0(clk, nrst, csrif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();
@@ -166,6 +169,10 @@ module datapath #(
       d2eif.mult_signed_b <= '0;
       d2eif.branch_predict <= 0;
       d2eif.branch_target <= 0;
+      d2eif.csr_write <= '0;
+      d2eif.csr_waddr <= '0;
+      d2eif.csr_wr_op <= '0;
+      d2eif.csr_wr_imm <= '0;
     end else if (d2eif.en & d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
@@ -191,6 +198,10 @@ module datapath #(
       d2eif.mult_signed_b <= '0;
       d2eif.branch_predict <= 0;
       d2eif.branch_target <= 0;
+      d2eif.csr_write <= '0;
+      d2eif.csr_waddr <= '0;
+      d2eif.csr_wr_op <= '0;
+      d2eif.csr_wr_imm <= '0;
     end else if (d2eif.en) begin
       d2eif.pc <= f2dif.pc;
       d2eif.halt <= ctrlif.halt;
@@ -216,10 +227,15 @@ module datapath #(
       d2eif.mult_signed_b <= ctrlif.mult_signed_b;
       d2eif.branch_predict <= f2dif.branch_predict;
       d2eif.branch_target <= f2dif.branch_target;
+      d2eif.csr_write <= ctrlif.csr_write;
+      d2eif.csr_waddr <= ctrlif.csr_waddr;
+      d2eif.csr_wr_op <= ctrlif.csr_wr_op;
+      d2eif.csr_wr_imm <= ctrlif.csr_wr_imm;
     end
   end
 
   // STAGE 3: EXECUTE
+  word_t execute_alu_out;
   always_comb begin
 
     // forwarding unit a (0 - rdat1, 1 - e2m alu_out, 2 - m2w alu_out)
@@ -358,6 +374,35 @@ module datapath #(
     mulif.en = d2eif.mult;
     mulif.is_signed_a = d2eif.mult_signed_a;
     mulif.is_signed_b = d2eif.mult_signed_b;
+
+    // CSR calculation
+    csrif.csr_raddr = d2eif.csr_waddr;
+    casez(d2eif.csr_wr_op)
+      2'd0: begin
+        // Move (either rs1 or immediate)
+        csrif.csr_wdata = d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1;
+      end
+      2'd1: begin
+        // Set (either rs1 or immediate)
+        csrif.csr_wdata = csrif.csr_rdata | (d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1);
+      end
+      2'd2: begin
+        // Clear (either rs1 or immediate)
+        csrif.csr_wdata = csrif.csr_rdata & ~(d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1);
+      end
+      default: begin
+        // Don't modify
+        csrif.csr_wdata = csrif.csr_rdata;
+      end
+    endcase
+
+    // Also writeback CSR here
+    csrif.csr_waddr = d2eif.csr_waddr;
+    csrif.csr_write = d2eif.csr_write & d2eif.en;
+
+    execute_alu_out = aluif.out;
+    if(d2eif.mult) execute_alu_out = (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]);
+    else if(d2eif.csr_write) execute_alu_out = csrif.csr_rdata;
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY
@@ -409,7 +454,7 @@ module datapath #(
       e2mif.pc_ctrl <= d2eif.pc_ctrl;
       e2mif.rdat2 <= forwarded_rdat2;
       e2mif.pc_plus_imm <= (d2eif.pc + {d2eif.immediate[31:1], 1'b0});
-      e2mif.alu_out <= d2eif.mult ? (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]) : aluif.out;
+      e2mif.alu_out <= execute_alu_out;
       e2mif.alu_zero <= aluif.zero;
       e2mif.branch_predict <= d2eif.branch_predict;
       e2mif.branch_target <= d2eif.branch_target;
@@ -515,6 +560,8 @@ module datapath #(
 
   // STAGE 5: WRITEBACK
   always_comb begin
+    // Register File writeback
+
     rfif.wsel = m2wif.rd;
     rfif.wen = 1; // If not writing, rd will be 0 anyway
     // Writeback source mux (0 - alu, 1 - memory, 2 - pc + 4)

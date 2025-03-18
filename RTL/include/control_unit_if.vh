@@ -37,6 +37,11 @@ interface control_unit_if;
   logic [1:0] pc_ctrl;      // 0 - PC increment, 1 - PC branch, 2 - JAL, 3 - JALR
   // Halt
   logic halt;
+  // CSR
+  logic csr_write;
+  logic [11:0] csr_waddr;
+  logic [1:0] csr_wr_op;    // 0 - move, 1 - set, 2 - clear
+  logic csr_wr_imm;         // 0 - rs1 value, 1 - immediate in rs1
 
   // control ports
   modport control_unit (
@@ -49,7 +54,8 @@ interface control_unit_if;
             alu_src1, alu_src2,                             // ALU source mux
             reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
-            halt                                            // Halt
+            halt,                                           // Halt
+            csr_write, csr_waddr, csr_wr_op, csr_wr_imm     // CSR
   );
   // control tb
   modport tb (
@@ -62,6 +68,7 @@ interface control_unit_if;
             reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
             halt,                                           // Halt
+            csr_write, csr_waddr, csr_wr_op, csr_wr_imm,    // CSR
     output  inst
   );
 endinterface
