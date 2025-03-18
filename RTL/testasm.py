@@ -63,14 +63,14 @@ def run_test():
 
         # Assemble the file
         try:
-            subprocess.run("python assemble.py \"Assembly/{}\"".format(file), shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run("python assemble.py \"Assembly/{}\"".format(file), shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception as e:
             print("Error assembling file: {}".format(e))
             sys.exit(1)
 
         # Emulate the file
         try:
-            subprocess.run("python emulate.py \"Assembly/{}.asm\"".format('.'.join(file.split('.')[:-1])), shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run("python emulate.py \"Assembly/{}.asm\"".format('.'.join(file.split('.')[:-1])), shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception as e:
             print("Error emulating file: {}".format(e))
             sys.exit(1)

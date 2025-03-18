@@ -12,13 +12,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="52,931.419 ns"></ZoomStartTime>
-      <ZoomEndTime time="53,381.020 ns"></ZoomEndTime>
-      <Cursor1Time time="53,067.619 ns"></Cursor1Time>
+      <ZoomStartTime time="2,391.158 ns"></ZoomStartTime>
+      <ZoomEndTime time="2,575.559 ns"></ZoomEndTime>
+      <Cursor1Time time="2,471.258 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="208"></NameColumnWidth>
-      <ValueColumnWidth column_width="95"></ValueColumnWidth>
+      <NameColumnWidth column_width="392"></NameColumnWidth>
+      <ValueColumnWidth column_width="255"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="19" />
    <wvobject fp_name="/system_tb/clk" type="logic">
@@ -519,6 +519,10 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_predict" type="logic">
          <obj_property name="ElementShortName">mem_predict</obj_property>
          <obj_property name="ObjectShortName">mem_predict</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_branch_miss" type="logic">
+         <obj_property name="ElementShortName">mem_branch_miss</obj_property>
+         <obj_property name="ObjectShortName">mem_branch_miss</obj_property>
       </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/buif/mem_flush" type="logic">
          <obj_property name="ElementShortName">mem_flush</obj_property>

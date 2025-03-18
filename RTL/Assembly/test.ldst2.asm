@@ -12,11 +12,11 @@ _start:
   lui   x7, 0xFEEDB
       lui x9, 0xFFFFF
     
-  ori   x4, x0, 0xF00 
+  ori   x4, x0, -256 
     nop 
   sub x4, x4, x9
   
-  ori   x10, x0, 0x0800
+  ori   x10, x0, -2048
       sub x10, x10, x9
   
   lui x8, 0xEEF

@@ -1,6 +1,7 @@
 # Script to assemble the assembly file and convert a memory file for the fpga
 
 import os
+import subprocess
 import sys
 
 def convert_intel_hex_to_vivado_mem(file_path):
@@ -38,10 +39,11 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
 def assemble(asm_file):
     march = "rv32im"
-    os.system("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file))
-    os.system("riscv-none-elf-objcopy -O ihex {asm_file_start}.o {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
-    # os.system("wsl -e riscv32-unknown-elf-as -march={march} -mabi=ilp32f -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file))
-    # os.system("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O binary --reverse-bytes=4 --remove-section=.riscv.attributes {asm_file_start}.o {asm_file_start}.bin".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
+    subprocess.run("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file), shell=True)
+    subprocess.run("riscv-none-elf-ld -T linkerscript.ld -o {asm_file_start}.elf {asm_file_start}.o".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
+    subprocess.run("riscv-none-elf-objcopy -O ihex {asm_file_start}.elf {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
+    # os.system("wsl -e /opt/riscv/bin/riscv32-unknown-elf-as -march={march} -mabi=ilp32d -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file))
+    # os.system("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O ihex {asm_file_start}.o {asm_file_start}.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])))
 
 if __name__ == "__main__":
     if(len(sys.argv) < 2):

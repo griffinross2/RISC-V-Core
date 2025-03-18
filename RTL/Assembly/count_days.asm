@@ -54,4 +54,5 @@ loop:
 exit:
     addi    sp,    sp,    -4        # Reserve space for result
     sw      x7,     0(sp)           # First result
-    ebreak
+    
+    ret

@@ -9,6 +9,9 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 
+// Switch to always not taken for comparison
+// `define ALWAYS_NOT_TAKEN
+
 module branch_unit #(
     parameter BTB_BITS=8            // Number of bits in the BTB
 ) (
@@ -100,6 +103,7 @@ module branch_unit #(
 
         // Get target and prediction for the fetch stage
         buif.fetch_target = target_buffer[buif.fetch_pc[BTB_BITS+1:2]];
+        `ifndef ALWAYS_NOT_TAKEN
         case (prediction_buffer[buif.fetch_pc[BTB_BITS+1:2]])
             STRONG_TAKEN, WEAK_TAKEN: begin
                 // If the prediction is taken, fetch from the target buffer
@@ -110,6 +114,10 @@ module branch_unit #(
                 buif.fetch_predict = 0;
             end
         endcase
+        `endif
+        `ifdef ALWAYS_NOT_TAKEN
+        buif.fetch_predict = 0;
+        `endif
     end
 
 endmodule

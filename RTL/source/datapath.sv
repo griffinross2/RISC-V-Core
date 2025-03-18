@@ -109,7 +109,7 @@ module datapath #(
     cpu_ram_if.iren = 1'b1;
     // If branch is predicted, fetch from the predicted target address
     buif.fetch_pc = pc;
-    cpu_ram_if.iaddr = buif.fetch_predict ? buif.fetch_target : pc;
+    cpu_ram_if.iaddr = pc;
   end
 
   // STAGE 1 => STAGE 2: FETCH => DECODE
@@ -125,7 +125,7 @@ module datapath #(
       f2dif.branch_predict <= 0;
       f2dif.branch_target <= 0;
     end else if (f2dif.en) begin
-      f2dif.pc <= buif.fetch_predict ? buif.fetch_target : pc;
+      f2dif.pc <= pc;
       f2dif.inst <= cpu_ram_if.iload;
       f2dif.branch_predict <= buif.fetch_predict;
       f2dif.branch_target <= buif.fetch_target;
@@ -490,7 +490,12 @@ module datapath #(
         // The branch predictor either predicted a false branch, or the wrong destination
         casez(e2mif.pc_ctrl)
           2'b01: begin
-            pc_n = e2mif.pc_plus_imm;
+            if(e2mif.branch_pol ^ e2mif.alu_zero) begin
+              pc_n = e2mif.pc_plus_imm;
+            end else begin
+              // False branch
+              pc_n = e2mif.pc + 32'd4;
+            end
           end
           2'b10: begin
             pc_n = e2mif.pc_plus_imm;
@@ -506,7 +511,7 @@ module datapath #(
       end else if (buif.fetch_predict) begin
         // If a flush isn't occuring, but we are making a prediction, we have to
         // update the PC to the predicted target address
-        pc_n = buif.fetch_target + 32'd4;
+        pc_n = buif.fetch_target;
       end else begin
         // The branch predictor was correct, just continue execution
         pc_n = pc + 32'd4;

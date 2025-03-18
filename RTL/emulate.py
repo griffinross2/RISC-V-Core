@@ -11,7 +11,8 @@ def run_emulator(asm_file):
     # subprocess.run("wsl -e /opt/riscv/bin/spike --isa=RV32IMA /opt/riscv/riscv32-unknown-elf/bin/pk {asm_file_start}.l".format(asm_file_start='.'.join(asm_file.split('.')[:-1])), shell=True)
     march = "rv32im"
     subprocess.run("riscv-none-elf-as -march={march} -mabi=ilp32 -o {asm_file_start}.o {asm_file}".format(march=march, asm_file_start='.'.join(sys.argv[1].split('.')[:-1]), asm_file=asm_file), shell=True)
-    subprocess.run("riscv-none-elf-objcopy -O ihex {asm_file_start}.o meminit.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
+    subprocess.run("riscv-none-elf-ld -T linkerscript.ld -o {asm_file_start}.elf {asm_file_start}.o".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
+    subprocess.run("riscv-none-elf-objcopy -O ihex {asm_file_start}.elf meminit.hex".format(asm_file_start='.'.join(sys.argv[1].split('.')[:-1])), shell=True)
     subprocess.run(".\\RISC-V-Emulator\\build\\Debug\\RISCV_Emulator.exe", shell=True)
 
 if __name__ == "__main__":
