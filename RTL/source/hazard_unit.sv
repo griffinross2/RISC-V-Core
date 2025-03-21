@@ -103,6 +103,16 @@ module hazard_unit (
             hazif.e2mif_en = 1;
             hazif.e2mif_flush = 1;
         end
+        // CSR instruction should be completed before execute continues
+        else if(hazif.mem_csr | hazif.wb_csr) begin
+            // Stall fetch to decode
+            hazif.f2dif_en = 0;
+            // Stall decode to execute
+            hazif.d2eif_en = 0;
+            // Give memory a bubble
+            hazif.e2mif_en = 1;
+            hazif.e2mif_flush = 1;
+        end
 
         /*******************/
         /* Control Hazards */

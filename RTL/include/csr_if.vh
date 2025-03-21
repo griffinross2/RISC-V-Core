@@ -16,17 +16,30 @@ interface csr_if;
   logic [WORD_W-1:0] csr_wdata;
   logic [WORD_W-1:0] csr_rdata;
 
+  // CSR hw override signals
+  logic csr_exception;
+  word_t csr_exception_cause;
+  word_t csr_exception_pc;
+
+  // CSR output control signals
+  logic csr_mie;
+
   // CSR port
   modport csr (
     input   csr_write, csr_waddr, csr_wdata,
             csr_raddr,
-    output  csr_rdata
+            csr_exception, csr_exception_cause, csr_exception_pc,
+    output  csr_rdata,
+            csr_mie
+
   );
   // tb port
   modport tb (
     input   csr_rdata,
+            csr_mie,
     output  csr_write, csr_waddr, csr_wdata,
-            csr_raddr
+            csr_raddr,
+            csr_exception, csr_exception_cause, csr_exception_pc
   );
 endinterface
 

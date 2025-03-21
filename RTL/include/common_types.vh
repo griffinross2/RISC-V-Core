@@ -214,6 +214,33 @@ package common_types_pkg;
         MSCRATCH    = 12'h340
     } csr_addr_t;
 
+    // CSR bit assignments
+    typedef struct packed {
+        logic           sd;
+        logic [5:0]     wpri1;
+        logic           sdt;
+        logic           spelp;
+        logic           tsr;
+        logic           tw;
+        logic           tvm;
+        logic           mxr;
+        logic           sum;
+        logic           mprv;
+        logic [1:0]     xs;
+        logic [1:0]     fs;
+        logic [1:0]     mpp;
+        logic [1:0]     vs;
+        logic           spp;
+        logic           mpie;
+        logic           ube;
+        logic           spie;
+        logic           wpri2;
+        logic           mie;
+        logic           wpri3;
+        logic           sie;
+        logic           wpri4;
+    } csr_mstatus_t;
+
 endpackage
 
 `endif // COMMON_TYPES_VH

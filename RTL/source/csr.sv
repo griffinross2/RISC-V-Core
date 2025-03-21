@@ -14,7 +14,7 @@ module csr (
 );
 
 // CSR registers
-word_t mstatus;
+csr_mstatus_t mstatus;
 word_t mstatush;
 word_t mtvec;
 word_t mip;
@@ -23,7 +23,7 @@ word_t mepc;
 word_t mcause;
 word_t mscratch;
 
-word_t mstatus_n;
+csr_mstatus_t mstatus_n;
 word_t mstatush_n;
 word_t mtvec_n;
 word_t mip_n;
@@ -32,10 +32,13 @@ word_t mepc_n;
 word_t mcause_n;
 word_t mscratch_n;
 
+// Start with interrupts enabled
+localparam MSTATUS_INIT = 32'h00000008;
+
 // FF
 always_ff @(posedge clk, negedge nrst) begin
     if (~nrst) begin
-        mstatus <= 0;
+        mstatus <= MSTATUS_INIT;
         mstatush <= 0;
         mtvec <= 0;
         mip <= 0;
@@ -92,6 +95,24 @@ always_comb begin
             default: mcause_n = mcause;
         endcase
     end
+
+    // Hardware overrides anything here
+    if (csr_if.csr_exception) begin
+        // Save the current MIE in MPIE
+        mstatus_n.mpie = mstatus.mie;
+        
+        // Disable interrupts
+        mstatus_n = mstatus & ~32'h8;
+
+        // Set exception cause and PC
+        mcause_n = csr_if.csr_exception_cause;
+        mepc_n = csr_if.csr_exception_pc;
+    end
+end
+
+// Output
+always_comb begin
+    csr_if.csr_mie = mstatus.mie;
 end
 
 endmodule

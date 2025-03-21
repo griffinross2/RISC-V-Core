@@ -55,6 +55,8 @@ interface decode_to_execute_if;
   logic [11:0] csr_waddr;
   logic [1:0] csr_wr_op;    // 0 - move, 1 - set, 2 - clear
   logic csr_wr_imm;         // 0 - rs1 value, 1 - immediate in rs1
+  // Exception
+  logic illegal_inst;
 
   /*****************/
   /* Register File */

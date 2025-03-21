@@ -43,6 +43,7 @@ module datapath #(
   forward_unit_if fuif();
   branch_unit_if buif();
   csr_if csrif();
+  exception_unit_if euif();
 
   // Module instantiation
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
@@ -53,27 +54,26 @@ module datapath #(
   (* keep_hierarchy = "yes" *) forward_unit for0(fuif);
   (* keep_hierarchy = "yes" *) branch_unit bu0(clk, nrst, buif);
   (* keep_hierarchy = "yes" *) csr csr0(clk, nrst, csrif);
+  (* keep_hierarchy = "yes" *) exception_unit eu0(clk, nrst, euif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();
   execute_to_memory_if    e2mif();
   memory_to_writeback_if  m2wif();
 
-  // Hazard Unit to Pipeline
+  // Hazard and Exception Unit to Pipeline
   always_comb begin
     // Enable signals
-    // If any following stage is stalled, the preceeding ones will be stalled.
-    // Otherwise, the stages could crash into eachother.
     f2dif.en = hazif.f2dif_en;
     d2eif.en = hazif.d2eif_en;
     e2mif.en = hazif.e2mif_en;
     m2wif.en = hazif.m2wif_en;
 
-    // Flush signals
-    f2dif.flush = hazif.f2dif_flush;
-    d2eif.flush = hazif.d2eif_flush;
-    e2mif.flush = hazif.e2mif_flush;
-    m2wif.flush = hazif.m2wif_flush;
+    // Flush signals, from hazard or exception units
+    f2dif.flush = hazif.f2dif_flush | euif.f2dif_flush;
+    d2eif.flush = hazif.d2eif_flush | euif.d2eif_flush;
+    e2mif.flush = hazif.e2mif_flush | euif.e2mif_flush;
+    m2wif.flush = hazif.m2wif_flush | euif.m2wif_flush;
     
     // Signals from other modules to the hazard unit
     hazif.halt = m2wif.halt;
@@ -88,14 +88,31 @@ module datapath #(
     hazif.d2eif_mult = d2eif.mult;
     hazif.mult_ready = mulif.ready;
     hazif.branch_flush = buif.mem_flush;
+    hazif.mem_csr = e2mif.csr_write;
+    hazif.wb_csr = m2wif.csr_write;
+
+    // Signals from other modules to the exception unit
+    euif.e2mif_pc = e2mif.pc;
+    euif.illegal_inst = e2mif.illegal_inst;
   end
 
   // Forwarding Unit to Pipeline
   always_comb begin
-    fuif.id_rsel1 = d2eif.rs1;
-    fuif.id_rsel2 = d2eif.rs2;
+    fuif.ex_rsel1 = d2eif.rs1;
+    fuif.ex_rsel2 = d2eif.rs2;
     fuif.mem_rd = e2mif.rd;
     fuif.wb_rd = m2wif.rd;
+  end
+
+  // Command and Status Registers to Exception Unit
+  always_comb begin
+    // Tell the CSR details about the exception/interrupt
+    csrif.csr_exception = euif.exception;
+    csrif.csr_exception_cause = euif.exception_cause;
+    csrif.csr_exception_pc = euif.exception_pc;
+
+    // Tell the exception unit about whether interrupts are enabled
+    euif.interrupt_en = csrif.csr_mie;
   end
 
   // PC
@@ -173,6 +190,7 @@ module datapath #(
       d2eif.csr_waddr <= '0;
       d2eif.csr_wr_op <= '0;
       d2eif.csr_wr_imm <= '0;
+      d2eif.illegal_inst <= '0;
     end else if (d2eif.en & d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
@@ -202,6 +220,7 @@ module datapath #(
       d2eif.csr_waddr <= '0;
       d2eif.csr_wr_op <= '0;
       d2eif.csr_wr_imm <= '0;
+      d2eif.illegal_inst <= '0;
     end else if (d2eif.en) begin
       d2eif.pc <= f2dif.pc;
       d2eif.halt <= ctrlif.halt;
@@ -231,15 +250,15 @@ module datapath #(
       d2eif.csr_waddr <= ctrlif.csr_waddr;
       d2eif.csr_wr_op <= ctrlif.csr_wr_op;
       d2eif.csr_wr_imm <= ctrlif.csr_wr_imm;
+      d2eif.illegal_inst <= ctrlif.illegal_inst;
     end
   end
 
   // STAGE 3: EXECUTE
   word_t execute_alu_out;
   always_comb begin
-
     // forwarding unit a (0 - rdat1, 1 - e2m alu_out, 2 - m2w alu_out)
-    casez (fuif.forward_a)
+    casez (fuif.forward_a_to_ex)
       2'd0: forwarded_rdat1 = d2eif.rdat1;
       2'd1: begin
         casez(e2mif.reg_wr_src)
@@ -300,7 +319,7 @@ module datapath #(
       default: forwarded_rdat1 = d2eif.rdat1;
     endcase
     // forwarding unit b (0 - rdat2, 1 - e2m alu_out, 2 - m2w alu_out)
-    casez (fuif.forward_b)
+    casez (fuif.forward_b_to_ex)
       2'd0: forwarded_rdat2 = d2eif.rdat2;
       2'd1: begin
         casez(e2mif.reg_wr_src)
@@ -375,34 +394,8 @@ module datapath #(
     mulif.is_signed_a = d2eif.mult_signed_a;
     mulif.is_signed_b = d2eif.mult_signed_b;
 
-    // CSR calculation
-    csrif.csr_raddr = d2eif.csr_waddr;
-    casez(d2eif.csr_wr_op)
-      2'd0: begin
-        // Move (either rs1 or immediate)
-        csrif.csr_wdata = d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1;
-      end
-      2'd1: begin
-        // Set (either rs1 or immediate)
-        csrif.csr_wdata = csrif.csr_rdata | (d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1);
-      end
-      2'd2: begin
-        // Clear (either rs1 or immediate)
-        csrif.csr_wdata = csrif.csr_rdata & ~(d2eif.csr_wr_imm ? {27'd0, d2eif.rs1} : forwarded_rdat1);
-      end
-      default: begin
-        // Don't modify
-        csrif.csr_wdata = csrif.csr_rdata;
-      end
-    endcase
-
-    // Also writeback CSR here
-    csrif.csr_waddr = d2eif.csr_waddr;
-    csrif.csr_write = d2eif.csr_write & d2eif.en;
-
     execute_alu_out = aluif.out;
     if(d2eif.mult) execute_alu_out = (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]);
-    else if(d2eif.csr_write) execute_alu_out = csrif.csr_rdata;
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY
@@ -411,6 +404,7 @@ module datapath #(
       e2mif.pc <= PC_INIT;
       e2mif.halt <= '0;
       e2mif.rd <= '0;
+      e2mif.rs1 <= '0;
       e2mif.dwrite <= '0;
       e2mif.dread <= '0;
       e2mif.reg_wr_src <= '0;
@@ -418,16 +412,23 @@ module datapath #(
       e2mif.reg_wr_mem_signed <= '0;
       e2mif.branch_pol <= '0;
       e2mif.pc_ctrl <= '0;
+      e2mif.rdat1 <= '0;
       e2mif.rdat2 <= '0;
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
       e2mif.alu_zero <= '0;
       e2mif.branch_predict <= 0;
       e2mif.branch_target <= 0;
+      e2mif.csr_write <= '0;
+      e2mif.csr_waddr <= '0;
+      e2mif.csr_wr_op <= '0;
+      e2mif.csr_wr_imm <= '0;
+      e2mif.illegal_inst <= '0;
     end else if (e2mif.en & e2mif.flush) begin
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= '0;
       e2mif.rd <= '0;
+      e2mif.rs1 <= '0;
       e2mif.dwrite <= '0;
       e2mif.dread <= '0;
       e2mif.reg_wr_src <= '0;
@@ -435,12 +436,18 @@ module datapath #(
       e2mif.reg_wr_mem_signed <= '0;
       e2mif.branch_pol <= '0;
       e2mif.pc_ctrl <= '0;
+      e2mif.rdat1 <= '0;
       e2mif.rdat2 <= '0;
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
       e2mif.alu_zero <= '0;
       e2mif.branch_predict <= 0;
       e2mif.branch_target <= 0;
+      e2mif.csr_write <= '0;
+      e2mif.csr_waddr <= '0;
+      e2mif.csr_wr_op <= '0;
+      e2mif.csr_wr_imm <= '0;
+      e2mif.illegal_inst <= '0;
     end else if (e2mif.en) begin
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= d2eif.halt;
@@ -452,12 +459,18 @@ module datapath #(
       e2mif.reg_wr_mem_signed <= d2eif.reg_wr_mem_signed;
       e2mif.branch_pol <= d2eif.branch_pol;
       e2mif.pc_ctrl <= d2eif.pc_ctrl;
+      e2mif.rdat1 <= forwarded_rdat1;
       e2mif.rdat2 <= forwarded_rdat2;
       e2mif.pc_plus_imm <= (d2eif.pc + {d2eif.immediate[31:1], 1'b0});
       e2mif.alu_out <= execute_alu_out;
       e2mif.alu_zero <= aluif.zero;
       e2mif.branch_predict <= d2eif.branch_predict;
       e2mif.branch_target <= d2eif.branch_target;
+      e2mif.csr_write <= d2eif.csr_write;
+      e2mif.csr_waddr <= d2eif.csr_waddr;
+      e2mif.csr_wr_op <= d2eif.csr_wr_op;
+      e2mif.csr_wr_imm <= d2eif.csr_wr_imm;
+      e2mif.illegal_inst <= d2eif.illegal_inst;
     end
   end
 
@@ -532,41 +545,84 @@ module datapath #(
       m2wif.pc <= PC_INIT;
       m2wif.halt <= '0;
       m2wif.rd <= '0;
+      m2wif.rs1 <= '0;
       m2wif.reg_wr_src <= '0;
       m2wif.reg_wr_mem <= '0;
       m2wif.reg_wr_mem_signed <= '0;
       m2wif.alu_out <= '0;
       m2wif.dload <= '0;
+      m2wif.rdat1 <= '0;
+      m2wif.csr_write <= '0;
+      m2wif.csr_waddr <= '0;
+      m2wif.csr_wr_op <= '0;
+      m2wif.csr_wr_imm <= '0;
     end else if (m2wif.en & m2wif.flush) begin
         m2wif.pc <= e2mif.pc;
         m2wif.halt <= '0;
         m2wif.rd <= '0;
+        m2wif.rs1 <= '0;
         m2wif.reg_wr_src <= '0;
         m2wif.reg_wr_mem <= '0;
         m2wif.reg_wr_mem_signed <= '0;
         m2wif.alu_out <= '0;
         m2wif.dload <= '0;
+        m2wif.rdat1 <= '0;
+        m2wif.csr_write <= '0;
+        m2wif.csr_waddr <= '0;
+        m2wif.csr_wr_op <= '0;
+        m2wif.csr_wr_imm <= '0;
     end else if (m2wif.en) begin
         m2wif.pc <= e2mif.pc;
         m2wif.halt <= e2mif.halt;
         m2wif.rd <= e2mif.rd;
+        m2wif.rs1 <= e2mif.rs1;
         m2wif.reg_wr_src <= e2mif.reg_wr_src;
         m2wif.reg_wr_mem <= e2mif.reg_wr_mem;
         m2wif.reg_wr_mem_signed <= e2mif.reg_wr_mem_signed;
-        m2wif.alu_out <= e2mif.alu_out;
+        m2wif.alu_out <= e2mif.csr_write ? csrif.csr_rdata : e2mif.alu_out;
         m2wif.dload <= cpu_ram_if.dload;
+        m2wif.rdat1 <= e2mif.rdat1;
+        m2wif.csr_write <= e2mif.csr_write;
+        m2wif.csr_waddr <= e2mif.csr_waddr;
+        m2wif.csr_wr_op <= e2mif.csr_wr_op;
+        m2wif.csr_wr_imm <= e2mif.csr_wr_imm;
     end
   end
 
   // STAGE 5: WRITEBACK
   always_comb begin
+    // CSR calculation
+    csrif.csr_raddr = m2wif.csr_waddr;
+    casez(m2wif.csr_wr_op)
+      2'd0: begin
+        // Move (either rs1 or immediate)
+        csrif.csr_wdata = m2wif.csr_wr_imm ? {27'd0, m2wif.rs1} : m2wif.rdat1;
+      end
+      2'd1: begin
+        // Set (either rs1 or immediate)
+        csrif.csr_wdata = csrif.csr_rdata | (m2wif.csr_wr_imm ? {27'd0, m2wif.rs1} : m2wif.rdat1);
+      end
+      2'd2: begin
+        // Clear (either rs1 or immediate)
+        csrif.csr_wdata = csrif.csr_rdata & ~(m2wif.csr_wr_imm ? {27'd0, m2wif.rs1} : m2wif.rdat1);
+      end
+      default: begin
+        // Don't modify
+        csrif.csr_wdata = csrif.csr_rdata;
+      end
+    endcase
+
+    // Also writeback CSR here
+    csrif.csr_waddr = m2wif.csr_waddr;
+    csrif.csr_write = m2wif.csr_write & m2wif.en;
+
     // Register File writeback
 
     rfif.wsel = m2wif.rd;
     rfif.wen = 1; // If not writing, rd will be 0 anyway
     // Writeback source mux (0 - alu, 1 - memory, 2 - pc + 4)
     casez(m2wif.reg_wr_src)
-      2'd0: rfif.wdat = m2wif.alu_out;
+      2'd0: rfif.wdat = m2wif.csr_write ? csrif.csr_rdata : m2wif.alu_out;
       2'd1: begin
         // Memory writeback
         casez(m2wif.reg_wr_mem)
@@ -709,6 +765,11 @@ module datapath #(
       end else begin
         // The branch predictor was correct, just continue execution
         pc_n = pc + 32'd4;
+      end
+
+      // If an exception occured, jump to the exception handler
+      if(euif.exception) begin
+        pc_n = euif.exception_target;
       end
     end
   end

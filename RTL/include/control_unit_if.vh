@@ -35,8 +35,9 @@ interface control_unit_if;
   // Branch/jump control
   logic     branch_pol;     // 0 - branch if alu.zero = 1, branch if alu.zero - 0
   logic [1:0] pc_ctrl;      // 0 - PC increment, 1 - PC branch, 2 - JAL, 3 - JALR
-  // Halt
+  // Exception control
   logic halt;
+  logic illegal_inst;
   // CSR
   logic csr_write;
   logic [11:0] csr_waddr;
@@ -54,7 +55,7 @@ interface control_unit_if;
             alu_src1, alu_src2,                             // ALU source mux
             reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
-            halt,                                           // Halt
+            halt, illegal_inst,                             // Exception Control
             csr_write, csr_waddr, csr_wr_op, csr_wr_imm     // CSR
   );
   // control tb
@@ -67,7 +68,7 @@ interface control_unit_if;
             alu_src1, alu_src2,                             // ALU source mux
             reg_wr_src, reg_wr_mem, reg_wr_mem_signed,      // Reg File writeback source
             branch_pol, pc_ctrl,                            // Program Counter
-            halt,                                           // Halt
+            halt, illegal_inst,                             // Exception Control
             csr_write, csr_waddr, csr_wr_op, csr_wr_imm,    // CSR
     output  inst
   );

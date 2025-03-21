@@ -10,22 +10,38 @@ import common_types_pkg::*;
 interface exception_unit_if;
 
   // From decode
-  word_t f2dif_pc;
+  word_t e2mif_pc;
   logic illegal_inst;
 
-  // To hazard
+  // To CSR/datapath
   logic exception;
-  logic exception_target;
+  logic interrupt;  // 0: exception, 1: interrupt
+  word_t exception_pc;
+  word_t exception_cause;
+  word_t exception_target;
+
+  // Flush signals
+  logic f2dif_flush;
+  logic d2eif_flush;
+  logic e2mif_flush;
+  logic m2wif_flush;
+
+  // From CSR
+  logic interrupt_en;
 
   // exception ports
   modport exception_unit (
-    input   illegal_inst, f2dif_pc,
-    output  exception, exception_target
+    input   illegal_inst, e2mif_pc,
+            interrupt_en,
+    output  exception, exception_pc, exception_cause, exception_target, interrupt,
+            f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush
   );
   // exception tb
   modport tb (
-    input   exception, exception_target,
-    output  illegal_inst, f2dif_pc
+    input   exception, exception_pc, exception_cause, exception_target, interrupt,
+            f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush,
+    output  illegal_inst, e2mif_pc,
+            interrupt_en
   );
 endinterface
 

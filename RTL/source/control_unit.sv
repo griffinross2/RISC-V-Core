@@ -48,6 +48,7 @@ always_comb begin
     ctrlif.csr_waddr = 12'd0;
     ctrlif.csr_wr_op = 2'b0;
     ctrlif.csr_wr_imm = 1'b0;
+    ctrlif.illegal_inst = 1'b0;
 
     casez(ctrlif.inst[OP_W-1:0])
         RTYPE:
@@ -96,6 +97,7 @@ always_comb begin
                 end
                 default: begin
                     // Illegal instruction
+                    ctrlif.illegal_inst = 1'b1;
                     ctrlif.halt = 1'b1;
                 end
             endcase
@@ -166,6 +168,7 @@ always_comb begin
                 end
                 default: begin
                     // Illegal instruction
+                    ctrlif.illegal_inst = 1'b1;
                     ctrlif.halt = 1'b1;
                 end
             endcase
@@ -220,6 +223,7 @@ always_comb begin
                 SB: ctrlif.dwrite = 2'b01;
                 default: begin
                     // Illegal instruction
+                    ctrlif.illegal_inst = 1'b1;
                     ctrlif.halt = 1'b1;
                 end
             endcase
@@ -290,6 +294,7 @@ always_comb begin
                 end
                 default: begin
                     // Illegal instruction
+                    ctrlif.illegal_inst = 1'b1;
                     ctrlif.halt = 1'b1;
                 end
             endcase
@@ -322,7 +327,10 @@ always_comb begin
                         // Halt
                         EBREAK: ctrlif.halt = 1'b1;
                         // Illegal instruction
-                        default: ctrlif.halt = 1'b1;
+                        default: begin
+                            ctrlif.illegal_inst = 1'b1;
+                            ctrlif.halt = 1'b1;
+                        end
                     endcase
                 end
                 CSRRW: begin
@@ -386,11 +394,15 @@ always_comb begin
                     // ALU is not used
                 end
                 // Illegal instruction
-                default: ctrlif.halt = 1'b1;
+                default: begin
+                    ctrlif.illegal_inst = 1'b1;
+                    ctrlif.halt = 1'b1;
+                end
             endcase
         end
         default: begin
             // Illegal instruction
+            ctrlif.illegal_inst = 1'b1;
             ctrlif.halt = 1'b1;
         end
     endcase

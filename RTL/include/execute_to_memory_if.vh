@@ -26,6 +26,7 @@ interface execute_to_memory_if;
   logic halt;
   // Register file
   reg_t rd;
+  reg_t rs1;
   // Memory control
   logic     dread;
   logic [1:0] dwrite;
@@ -36,10 +37,18 @@ interface execute_to_memory_if;
   // Branch/jump control
   logic     branch_pol;     // 0 - branch if alu.zero = 1, branch if alu.zero - 0
   logic [1:0] pc_ctrl;      // 0 - PC increment, 1 - PC branch, 2 - JAL, 3 - JALR
+  // CSR
+  logic csr_write;
+  logic [11:0] csr_waddr;
+  logic [1:0] csr_wr_op;    // 0 - move, 1 - set, 2 - clear
+  logic csr_wr_imm;         // 0 - rs1 value, 1 - immediate in rs1
+  // Exception
+  logic illegal_inst;
 
   /*****************/
   /* Register File */
   /*****************/
+  word_t rdat1;
   word_t rdat2;
 
   /*******/

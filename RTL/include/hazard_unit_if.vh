@@ -29,6 +29,9 @@ interface hazard_unit_if;
   logic e2mif_flush;    // Flush execute to memory
   logic m2wif_flush;    // Flush memory to writeback
 
+  logic mem_csr;        // CSR instruction in memory stage
+  logic wb_csr;         // CSR instruction in writeback stage
+
   // hazard ports
   modport hazard_unit (
     input   halt,             // Input from control unit
@@ -41,6 +44,8 @@ interface hazard_unit_if;
             f2dif_rs2,        // DECODE STAGE source register 2
             d2eif_mult,       // EXECUTE STAGE multiplier signals
             mult_ready,       // EXECUTE STAGE multiplier signals
+            mem_csr,          // CSR instruction in memory stage
+            wb_csr,           // CSR instruction in writeback stage
     output  f2dif_en,         // Output to pipeline
             d2eif_en,         // Output to pipeline
             e2mif_en,         // Output to pipeline
@@ -69,7 +74,9 @@ interface hazard_unit_if;
             f2dif_rs1,
             f2dif_rs2,
             d2eif_mult,
-            mult_ready
+            mult_ready,
+            mem_csr,
+            wb_csr
   );
 endinterface
 

@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="134.525 ns"></ZoomStartTime>
-      <ZoomEndTime time="319.726 ns"></ZoomEndTime>
-      <Cursor1Time time="172.525 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="910.934 ns"></ZoomEndTime>
+      <Cursor1Time time="182.200 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="392"></NameColumnWidth>
-      <ValueColumnWidth column_width="247"></ValueColumnWidth>
+      <ValueColumnWidth column_width="215"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="21" />
+   <WVObjectSize size="23" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -36,6 +36,10 @@
    <wvobject fp_name="/system_tb/halt" type="logic">
       <obj_property name="ElementShortName">halt</obj_property>
       <obj_property name="ObjectShortName">halt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/ctrlif/illegal_inst" type="logic">
+      <obj_property name="ElementShortName">illegal_inst</obj_property>
+      <obj_property name="ObjectShortName">illegal_inst</obj_property>
    </wvobject>
    <wvobject fp_name="group165" type="group">
       <obj_property name="label">Program Counter</obj_property>
@@ -362,22 +366,6 @@
    <wvobject fp_name="group78" type="group">
       <obj_property name="label">Forwarding Unit</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/forward_a" type="array">
-         <obj_property name="ElementShortName">forward_a[1:0]</obj_property>
-         <obj_property name="ObjectShortName">forward_a[1:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/forward_b" type="array">
-         <obj_property name="ElementShortName">forward_b[1:0]</obj_property>
-         <obj_property name="ObjectShortName">forward_b[1:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/id_rsel1" type="array">
-         <obj_property name="ElementShortName">id_rsel1[4:0]</obj_property>
-         <obj_property name="ObjectShortName">id_rsel1[4:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/id_rsel2" type="array">
-         <obj_property name="ElementShortName">id_rsel2[4:0]</obj_property>
-         <obj_property name="ObjectShortName">id_rsel2[4:0]</obj_property>
-      </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/fuif/mem_rd" type="array">
          <obj_property name="ElementShortName">mem_rd[4:0]</obj_property>
          <obj_property name="ObjectShortName">mem_rd[4:0]</obj_property>
@@ -617,13 +605,30 @@
          <obj_property name="ElementShortName">csr_rdata[31:0]</obj_property>
          <obj_property name="ObjectShortName">csr_rdata[31:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_exception" type="logic">
+         <obj_property name="ElementShortName">csr_exception</obj_property>
+         <obj_property name="ObjectShortName">csr_exception</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_exception_cause" type="array">
+         <obj_property name="ElementShortName">csr_exception_cause[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_exception_cause[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_exception_pc" type="array">
+         <obj_property name="ElementShortName">csr_exception_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">csr_exception_pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csrif/csr_mie" type="logic">
+         <obj_property name="ElementShortName">csr_mie</obj_property>
+         <obj_property name="ObjectShortName">csr_mie</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group186" type="group">
       <obj_property name="label">CSR Registers</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mstatus" type="array">
-         <obj_property name="ElementShortName">mstatus[31:0]</obj_property>
-         <obj_property name="ObjectShortName">mstatus[31:0]</obj_property>
+         <obj_property name="ElementShortName">mstatus</obj_property>
+         <obj_property name="ObjectShortName">mstatus</obj_property>
       </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mstatush" type="array">
          <obj_property name="ElementShortName">mstatush[31:0]</obj_property>
@@ -648,6 +653,59 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/csr0/mcause" type="array">
          <obj_property name="ElementShortName">mcause[31:0]</obj_property>
          <obj_property name="ObjectShortName">mcause[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group224" type="group">
+      <obj_property name="label">Exception Unit IF</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/e2mif_pc" type="array">
+         <obj_property name="ElementShortName">e2mif_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">e2mif_pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/illegal_inst" type="logic">
+         <obj_property name="ElementShortName">illegal_inst</obj_property>
+         <obj_property name="ObjectShortName">illegal_inst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/exception" type="logic">
+         <obj_property name="ElementShortName">exception</obj_property>
+         <obj_property name="ObjectShortName">exception</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/interrupt" type="logic">
+         <obj_property name="ElementShortName">interrupt</obj_property>
+         <obj_property name="ObjectShortName">interrupt</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/exception_pc" type="array">
+         <obj_property name="ElementShortName">exception_pc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">exception_pc[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/exception_cause" type="array">
+         <obj_property name="ElementShortName">exception_cause[31:0]</obj_property>
+         <obj_property name="ObjectShortName">exception_cause[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/exception_target" type="array">
+         <obj_property name="ElementShortName">exception_target[31:0]</obj_property>
+         <obj_property name="ObjectShortName">exception_target[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/f2dif_flush" type="logic">
+         <obj_property name="ElementShortName">f2dif_flush</obj_property>
+         <obj_property name="ObjectShortName">f2dif_flush</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/d2eif_flush" type="logic">
+         <obj_property name="ElementShortName">d2eif_flush</obj_property>
+         <obj_property name="ObjectShortName">d2eif_flush</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/e2mif_flush" type="logic">
+         <obj_property name="ElementShortName">e2mif_flush</obj_property>
+         <obj_property name="ObjectShortName">e2mif_flush</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/m2wif_flush" type="logic">
+         <obj_property name="ElementShortName">m2wif_flush</obj_property>
+         <obj_property name="ObjectShortName">m2wif_flush</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/interrupt_en" type="logic">
+         <obj_property name="ElementShortName">interrupt_en</obj_property>
+         <obj_property name="ObjectShortName">interrupt_en</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
