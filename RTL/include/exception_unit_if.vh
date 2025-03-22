@@ -28,11 +28,13 @@ interface exception_unit_if;
 
   // From CSR
   logic interrupt_en;
+  logic [1:0] mtvec_mode;
+  word_t mtvec_base;
 
   // exception ports
   modport exception_unit (
     input   illegal_inst, e2mif_pc,
-            interrupt_en,
+            interrupt_en, mtvec_mode, mtvec_base,
     output  exception, exception_pc, exception_cause, exception_target, interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush
   );
@@ -41,7 +43,7 @@ interface exception_unit_if;
     input   exception, exception_pc, exception_cause, exception_target, interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush,
     output  illegal_inst, e2mif_pc,
-            interrupt_en
+            interrupt_en, mtvec_mode, mtvec_base
   );
 endinterface
 

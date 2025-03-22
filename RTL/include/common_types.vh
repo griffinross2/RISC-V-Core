@@ -241,6 +241,11 @@ package common_types_pkg;
         logic           wpri4;
     } csr_mstatus_t;
 
+    typedef struct packed {
+        logic [29:0]    base;
+        logic [1:0]     mode;
+    } csr_mtvec_t;
+
 endpackage
 
 `endif // COMMON_TYPES_VH

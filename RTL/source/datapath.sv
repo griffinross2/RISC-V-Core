@@ -113,6 +113,8 @@ module datapath #(
 
     // Tell the exception unit about whether interrupts are enabled
     euif.interrupt_en = csrif.csr_mie;
+    euif.mtvec_mode = csrif.csr_mtvec_mode;
+    euif.mtvec_base = {csrif.csr_mtvec_base, 2'b0};
   end
 
   // PC

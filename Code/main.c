@@ -4,6 +4,9 @@ void main(void) {
     int c = a + b;
     *((int *)0x4000) = c;
 
+    // Illegal instruction
+    // asm(".word 0x00000000");
+
     // Halt
     asm("ebreak");
 }

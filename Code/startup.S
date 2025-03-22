@@ -7,6 +7,10 @@ _start:
     lui sp,%hi(_stack_top)
     addi sp,sp,%lo(_stack_top)
 
+    # Set vectored interrupts and enable
+    csrs mtvec,0x1
+    csrs mstatus,0x8
+
     # Go to main
     jal main
 

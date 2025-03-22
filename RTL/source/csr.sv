@@ -16,7 +16,7 @@ module csr (
 // CSR registers
 csr_mstatus_t mstatus;
 word_t mstatush;
-word_t mtvec;
+csr_mtvec_t mtvec;
 word_t mip;
 word_t mie;
 word_t mepc;
@@ -25,22 +25,19 @@ word_t mscratch;
 
 csr_mstatus_t mstatus_n;
 word_t mstatush_n;
-word_t mtvec_n;
+csr_mtvec_t mtvec_n;
 word_t mip_n;
 word_t mie_n;
 word_t mepc_n;
 word_t mcause_n;
 word_t mscratch_n;
 
-// Start with interrupts enabled
-localparam MSTATUS_INIT = 32'h00000008;
-
 // FF
 always_ff @(posedge clk, negedge nrst) begin
     if (~nrst) begin
-        mstatus <= MSTATUS_INIT;
+        mstatus <= 0;
         mstatush <= 0;
-        mtvec <= 0;
+        mtvec <= {30'h2000, 2'h0};  // Start with base = 0x8000, mode = Direct
         mip <= 0;
         mie <= 0;
         mepc <= 0;
@@ -113,6 +110,8 @@ end
 // Output
 always_comb begin
     csr_if.csr_mie = mstatus.mie;
+    csr_if.csr_mtvec_mode = mtvec.mode;
+    csr_if.csr_mtvec_base = mtvec.base;
 end
 
 endmodule

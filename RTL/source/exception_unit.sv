@@ -10,14 +10,11 @@ module exception_unit (
     exception_unit_if.exception_unit euif
 );
 
-// Exception handler
-localparam EXCEPTION_HANDLER = 32'h8000;
-
 always_comb begin
     euif.exception = 0;
     euif.exception_pc = euif.e2mif_pc;
     euif.exception_cause = 0;
-    euif.exception_target = EXCEPTION_HANDLER;
+    euif.exception_target = euif.mtvec_base;
     euif.interrupt = 0;
     
     euif.f2dif_flush = 0;
@@ -38,6 +35,13 @@ always_comb begin
         euif.d2eif_flush = 1;
         euif.e2mif_flush = 1;
         euif.m2wif_flush = 1;
+    end
+
+    if (euif.interrupt) begin
+        if (euif.mtvec_mode == 2'd1) begin
+            // Vectored interrupt mode: target address is mtvec_base + 4*cause
+            euif.exception_target = euif.mtvec_base + (euif.exception_cause << 2);
+        end
     end
 end
 

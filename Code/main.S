@@ -7,45 +7,47 @@ Disassembly of section .text:
 00000000 <_start>:
    0:	00010137          	lui	sp,0x10
    4:	00010113          	mv	sp,sp
-   8:	008000ef          	jal	10 <main>
+   8:	3050e073          	csrsi	mtvec,1
+   c:	30046073          	csrsi	mstatus,8
+  10:	008000ef          	jal	18 <main>
 
-0000000c <_forever>:
-   c:	0000006f          	j	c <_forever>
+00000014 <_forever>:
+  14:	0000006f          	j	14 <_forever>
 
-00000010 <main>:
-  10:	fe010113          	addi	sp,sp,-32 # ffe0 <_stack_bottom+0x3e0>
-  14:	00112e23          	sw	ra,28(sp)
-  18:	00812c23          	sw	s0,24(sp)
-  1c:	02010413          	addi	s0,sp,32
-  20:	00200793          	li	a5,2
-  24:	fef42623          	sw	a5,-20(s0)
-  28:	00300793          	li	a5,3
-  2c:	fef42423          	sw	a5,-24(s0)
-  30:	fec42703          	lw	a4,-20(s0)
-  34:	fe842783          	lw	a5,-24(s0)
-  38:	00f707b3          	add	a5,a4,a5
-  3c:	fef42223          	sw	a5,-28(s0)
-  40:	000047b7          	lui	a5,0x4
-  44:	fe442703          	lw	a4,-28(s0)
-  48:	00e7a023          	sw	a4,0(a5) # 4000 <Exception_Handler+0x3f9c>
-  4c:	00100073          	ebreak
-  50:	00000013          	nop
-  54:	01c12083          	lw	ra,28(sp)
-  58:	01812403          	lw	s0,24(sp)
-  5c:	02010113          	addi	sp,sp,32
-  60:	00008067          	ret
+00000018 <main>:
+  18:	fe010113          	addi	sp,sp,-32 # ffe0 <_stack_bottom+0x3e0>
+  1c:	00112e23          	sw	ra,28(sp)
+  20:	00812c23          	sw	s0,24(sp)
+  24:	02010413          	addi	s0,sp,32
+  28:	00200793          	li	a5,2
+  2c:	fef42623          	sw	a5,-20(s0)
+  30:	00300793          	li	a5,3
+  34:	fef42423          	sw	a5,-24(s0)
+  38:	fec42703          	lw	a4,-20(s0)
+  3c:	fe842783          	lw	a5,-24(s0)
+  40:	00f707b3          	add	a5,a4,a5
+  44:	fef42223          	sw	a5,-28(s0)
+  48:	000047b7          	lui	a5,0x4
+  4c:	fe442703          	lw	a4,-28(s0)
+  50:	00e7a023          	sw	a4,0(a5) # 4000 <Exception_Handler+0x3f94>
+  54:	00100073          	ebreak
+  58:	00000013          	nop
+  5c:	01c12083          	lw	ra,28(sp)
+  60:	01812403          	lw	s0,24(sp)
+  64:	02010113          	addi	sp,sp,32
+  68:	00008067          	ret
 
-00000064 <Exception_Handler>:
-  64:	ff010113          	addi	sp,sp,-16
-  68:	00112623          	sw	ra,12(sp)
-  6c:	00812423          	sw	s0,8(sp)
-  70:	01010413          	addi	s0,sp,16
-  74:	0000006f          	j	74 <Exception_Handler+0x10>
+0000006c <Exception_Handler>:
+  6c:	ff010113          	addi	sp,sp,-16
+  70:	00112623          	sw	ra,12(sp)
+  74:	00812423          	sw	s0,8(sp)
+  78:	01010413          	addi	s0,sp,16
+  7c:	0000006f          	j	7c <Exception_Handler+0x10>
 
 Disassembly of section .ehandler:
 
 00008000 <_Exception_Handler>:
-    8000:	864f806f          	j	64 <Exception_Handler>
+    8000:	86cf806f          	j	6c <Exception_Handler>
 
 Disassembly of section .comment:
 
@@ -76,12 +78,14 @@ Disassembly of section .comment:
 Disassembly of section .riscv.attributes:
 
 00000000 <.riscv.attributes>:
-   0:	2941                	.insn	2, 0x2941
+   0:	3641                	.insn	2, 0x3641
    2:	0000                	.insn	2, 0x
    4:	7200                	.insn	2, 0x7200
    6:	7369                	.insn	2, 0x7369
-   8:	01007663          	bgeu	zero,a6,14 <main+0x4>
-   c:	001f 0000 1004      	.insn	6, 0x10040000001f
+   8:	01007663          	bgeu	zero,a6,14 <_forever>
+   c:	002c                	.insn	2, 0x002c
+   e:	0000                	.insn	2, 0x
+  10:	1004                	.insn	2, 0x1004
   12:	7205                	.insn	2, 0x7205
   14:	3376                	.insn	2, 0x3376
   16:	6932                	.insn	2, 0x6932
@@ -89,6 +93,14 @@ Disassembly of section .riscv.attributes:
   1a:	5f31                	.insn	2, 0x5f31
   1c:	326d                	.insn	2, 0x326d
   1e:	3070                	.insn	2, 0x3070
-  20:	7a5f 6d6d 6c75      	.insn	6, 0x6c756d6d7a5f
-  26:	7031                	.insn	2, 0x7031
-  28:	0030                	.insn	2, 0x0030
+  20:	7a5f 6369 7273      	.insn	6, 0x727363697a5f
+  26:	7032                	.insn	2, 0x7032
+  28:	5f30                	.insn	2, 0x5f30
+  2a:	6d7a                	.insn	2, 0x6d7a
+  2c:	756d                	.insn	2, 0x756d
+  2e:	316c                	.insn	2, 0x316c
+  30:	3070                	.insn	2, 0x3070
+  32:	0800                	.insn	2, 0x0800
+  34:	0a01                	.insn	2, 0x0a01
+  36:	Address 0x36 is out of bounds.
+
