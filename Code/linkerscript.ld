@@ -7,15 +7,11 @@ MEMORY {
 SECTIONS {
     .text : {
         *(.text.startup)
-        *(.vectors)
+        _svectors = .;
+        *(.text.vectors)
         *(.text*)
         *(.rodata*)
         . = ALIGN(4);
-    } > RAM
-
-    .ehandler 0x8000 : {
-        KEEP(*(.ehandler))
-        _Exception_Handler = .;
     } > RAM
 
     .data : {
