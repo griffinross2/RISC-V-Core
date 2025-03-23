@@ -8,7 +8,7 @@ def generate_tcl(toplevel, synthesize=False):
         add_waveform = True
         print("Waveform file found. Adding waveform to simulation.")
     string = """
-    create_project -name .temp -force -part xc7s25ftgb196-1
+    create_project -name .temp -force -part xc7s50csga324-2
 
     set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 
@@ -48,7 +48,10 @@ def generate_tcl(toplevel, synthesize=False):
     set_property xsim.view {{ ./waveforms/{toplevel}.wcfg }} [get_filesets sim_1]
     """.format(toplevel=toplevel) if add_waveform else "") + ("""
     set_param general.maxThreads 12
-    synth_design -top {toplevel} -part xc7s25ftgb196-1 -flatten_hierarchy rebuilt -include_dirs {{../../include}} -mode out_of_context""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
+    synth_design -top {toplevel} -part xc7s50csga324-2 -flatten_hierarchy rebuilt -include_dirs {{../../include}} -mode out_of_context""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
+    
+    create_clock -period 10 [get_nets clk] -name clk
+    
     launch_simulation -mode """ + ("post-synthesis -type functional" if synthesize else "behavioral") + """
     log_wave -r /
     run all
