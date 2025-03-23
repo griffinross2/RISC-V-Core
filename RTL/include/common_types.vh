@@ -246,6 +246,14 @@ package common_types_pkg;
         logic [1:0]     mode;
     } csr_mtvec_t;
 
+    // AHB-Lite
+    typedef enum logic [1:0] {
+        HTRANS_IDLE = 2'b00,
+        HTRANS_BUSY = 2'b01,
+        HTRANS_NONSEQ = 2'b10,
+        HTRANS_SEQ = 2'b11
+    } htrans_t;
+
 endpackage
 
 `endif // COMMON_TYPES_VH
