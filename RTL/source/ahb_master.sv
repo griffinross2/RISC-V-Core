@@ -12,7 +12,7 @@ import common_types_pkg::*;
 module ahb_master (
     input logic clk, nrst,
     ahb_master_if.ahb_master amif,
-    ahb_bus_if.master abif
+    ahb_bus_if.master_to_mux abif
 );
 
 word_t hwdata_n;
@@ -30,13 +30,26 @@ transfer_t data_transfer;
 // Transfer in addr phase (next data phase)
 transfer_t addr_transfer;
 
+logic ihit_reg, dhit_reg;
+logic ihit_n, dhit_n;
+word_t iload_reg, dload_reg;
+word_t iload_n, dload_n;
+
 always_ff @(posedge clk, negedge nrst) begin
     if (~nrst) begin
         abif.hwdata <= '0;
         data_transfer <= TRANSFER_IDLE;
+        iload_reg <= '0;
+        dload_reg <= '0;
+        ihit_reg <= 1'b0;
+        dhit_reg <= 1'b0;
     end else begin
         abif.hwdata <= hwdata_n;
-        data_transfer <= addr_transfer;
+        data_transfer <= abif.hready ? addr_transfer : data_transfer;
+        iload_reg <= iload_n;
+        dload_reg <= dload_n;
+        ihit_reg <= ihit_n;
+        dhit_reg <= dhit_n;
     end
 end
 
@@ -46,32 +59,54 @@ always_comb begin
     addr_transfer = data_transfer;
     
     // Output signals
-    amif.ihit = 1'b0;
-    amif.dhit = 1'b0;
-    amif.iload = '0;
-    amif.dload = '0;
+    ihit_n = ihit_reg;
+    dhit_n = dhit_reg;
+    amif.iload = abif.hrdata;
+    amif.dload = abif.hrdata;
+    iload_n = iload_reg;
+    dload_n = dload_reg;
 
-    if (abif.hready) begin
+    abif.haddr = '0;
+    abif.hburst = '0;
+    abif.hsize = '0;
+    abif.htrans = HTRANS_IDLE;
+    hwdata_n = '0;
+    abif.hwrite = '0;
+    addr_transfer = data_transfer;
+
+    if (abif.hready && nrst) begin
         // Finish the current transaction
         casez (data_transfer)
             TRANSFER_IREAD: begin
-                amif.iload = abif.hrdata;
-                amif.ihit = 1'b1;
+                ihit_n = 1'b1;
+                dhit_n = 1'b0;
             end
             TRANSFER_DREAD: begin
-                amif.dload = abif.hrdata;
-                amif.dhit = 1'b1;
+                dhit_n = 1'b1;
             end
             TRANSFER_DWRITE: begin
-                amif.dhit = 1'b1;
+                dhit_n = 1'b1;
             end
             default: begin
                 // Idle, do nothing
             end
         endcase
+    end
 
+    if (nrst) begin
         // Start a new transaction
-        if (amif.dread) begin
+        if (amif.iread) begin
+            abif.haddr = amif.iaddr;
+            abif.hburst = 3'b000;
+            abif.hsize = 2'b10;
+            abif.htrans = HTRANS_NONSEQ;
+            hwdata_n = '0;
+            abif.hwrite = 1'b0;
+            addr_transfer = TRANSFER_IREAD;
+
+            ihit_n = 1'b0;
+            dhit_n = 1'b0;
+        end else if (amif.dread) begin
             abif.haddr = amif.daddr;
             abif.hburst = 3'b000;
             abif.hsize = 2'b10;
@@ -79,6 +114,8 @@ always_comb begin
             hwdata_n = '0;
             abif.hwrite = 1'b0;
             addr_transfer = TRANSFER_DREAD;
+
+            dhit_n = 1'b0;
         end else if (|amif.dwrite) begin
             abif.haddr = amif.daddr;
             abif.hburst = 3'b000;
@@ -92,14 +129,8 @@ always_comb begin
             hwdata_n = amif.dstore;
             abif.hwrite = 1'b1;
             addr_transfer = TRANSFER_DWRITE;
-        end else if (amif.iread) begin
-            abif.haddr = amif.iaddr;
-            abif.hburst = 3'b000;
-            abif.hsize = 2'b10;
-            abif.htrans = HTRANS_NONSEQ;
-            hwdata_n = '0;
-            abif.hwrite = 1'b0;
-            addr_transfer = TRANSFER_IREAD;
+
+            dhit_n = 1'b0;
         end else begin
             abif.haddr = '0;
             abif.hburst = '0;
@@ -109,6 +140,30 @@ always_comb begin
             abif.hwrite = '0;
             addr_transfer = TRANSFER_IDLE;
         end
+    end
+end
+
+always_comb begin
+    // Hit output
+    amif.ihit = ihit_reg;
+    amif.dhit = dhit_reg;
+
+    if (abif.hready && nrst) begin
+        // Finish the current transaction
+        casez (data_transfer)
+            TRANSFER_IREAD: begin
+                amif.ihit = 1'b1;
+            end
+            TRANSFER_DREAD: begin
+                amif.dhit = 1'b1;
+            end
+            TRANSFER_DWRITE: begin
+                amif.dhit = 1'b1;
+            end
+            default: begin
+                // Idle, do nothing
+            end
+        endcase
     end
 end
 

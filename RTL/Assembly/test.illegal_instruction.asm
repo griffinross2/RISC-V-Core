@@ -15,7 +15,7 @@ _start:
     li x5, 4321
     li x6, 8765
     add x7, x5, x6
-    sw x7, 0x108(x0)
+    sw x7, 0x10C(x0)
 
     ebreak
 

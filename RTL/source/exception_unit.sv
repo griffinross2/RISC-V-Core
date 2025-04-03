@@ -15,7 +15,7 @@ always_comb begin
     euif.exception_pc = euif.e2mif_pc;
     euif.exception_cause = 0;
     euif.exception_target = euif.mtvec_base;
-    euif.interrupt = 0;
+    euif.is_interrupt = 0;
     
     euif.f2dif_flush = 0;
     euif.d2eif_flush = 0;
@@ -37,7 +37,7 @@ always_comb begin
         euif.m2wif_flush = 1;
     end
 
-    if (euif.interrupt) begin
+    if (euif.is_interrupt) begin
         if (euif.mtvec_mode == 2'd1) begin
             // Vectored interrupt mode: target address is mtvec_base + 4*cause
             euif.exception_target = euif.mtvec_base + (euif.exception_cause << 2);

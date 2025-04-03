@@ -43,3 +43,4 @@ _start:
     sw x15, 0x310(x0)
     sw x16, 0x314(x0)
     
+    ebreak

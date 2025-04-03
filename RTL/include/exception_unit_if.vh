@@ -15,7 +15,7 @@ interface exception_unit_if;
 
   // To CSR/datapath
   logic exception;
-  logic interrupt;  // 0: exception, 1: interrupt
+  logic is_interrupt; // 0: exception, 1: interrupt
   word_t exception_pc;
   word_t exception_cause;
   word_t exception_target;
@@ -35,12 +35,12 @@ interface exception_unit_if;
   modport exception_unit (
     input   illegal_inst, e2mif_pc,
             interrupt_en, mtvec_mode, mtvec_base,
-    output  exception, exception_pc, exception_cause, exception_target, interrupt,
+    output  exception, exception_pc, exception_cause, exception_target, is_interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush
   );
   // exception tb
   modport tb (
-    input   exception, exception_pc, exception_cause, exception_target, interrupt,
+    input   exception, exception_pc, exception_cause, exception_target, is_interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush,
     output  illegal_inst, e2mif_pc,
             interrupt_en, mtvec_mode, mtvec_base

@@ -23,7 +23,7 @@ interface fetch_to_decode_if;
   /***************/
   /* Instruction */
   /***************/
-  word_t inst;
+  logic inst_latch; // set to 1 initially, 0 after hready
 
   /***************/
   /* Branch Unit */

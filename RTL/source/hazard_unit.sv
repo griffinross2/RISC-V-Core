@@ -28,15 +28,8 @@ module hazard_unit (
             hazif.m2wif_en = 0;
         end
 
-        // Structural hazard - stall the pipeline to wait for a data write
-        if(hazif.dwrite & ~hazif.dhit) begin
-            hazif.f2dif_en = 0;
-            hazif.d2eif_en = 0;
-            hazif.e2mif_en = 0;
-            hazif.m2wif_en = 0;
-        end
-        // Structural hazard - stall the pipeline to wait for a data read
-        else if(hazif.dread & ~hazif.dhit) begin
+        // Structural hazard - stall the pipeline to wait for a data write/read
+        if((hazif.dwrite | hazif.dread) & (~hazif.dhit | ~hazif.ihit)) begin
             hazif.f2dif_en = 0;
             hazif.d2eif_en = 0;
             hazif.e2mif_en = 0;
@@ -53,12 +46,12 @@ module hazard_unit (
         // Also gate with branch signal, if the branch signal is high
         // we don't need to worry about the stall anyway because we
         // will be about to flush those instructions.
-        else if(~hazif.ihit & ~hazif.branch_flush) begin
-            // Give NOP to FETCH/DECODE
-            hazif.f2dif_en = 0;
-            hazif.d2eif_en = 1;
-            hazif.d2eif_flush = 1;
-        end
+        // else if(~hazif.ihit & ~hazif.branch_flush) begin
+        //     // Give NOP to FETCH/DECODE
+        //     hazif.f2dif_en = 0;
+        //     hazif.d2eif_en = 1;
+        //     hazif.d2eif_flush = 1;
+        // end
 
         /*******************/
         /* Load Use Hazard */
@@ -104,14 +97,12 @@ module hazard_unit (
             hazif.e2mif_flush = 1;
         end
         // CSR instruction should be completed before execute continues
-        else if(hazif.mem_csr | hazif.wb_csr) begin
+        else if(hazif.ex_csr | hazif.mem_csr | hazif.wb_csr) begin
             // Stall fetch to decode
             hazif.f2dif_en = 0;
-            // Stall decode to execute
-            hazif.d2eif_en = 0;
-            // Give memory a bubble
-            hazif.e2mif_en = 1;
-            hazif.e2mif_flush = 1;
+            // Give execute a bubble
+            hazif.d2eif_en = 1;
+            hazif.d2eif_flush = 1;
         end
 
         /*******************/

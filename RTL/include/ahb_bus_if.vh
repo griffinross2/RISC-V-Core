@@ -13,17 +13,29 @@ interface ahb_bus_if;
     word_t hwdata;
     word_t hrdata;
     logic hready;
+    logic hreadyout;
     logic hresp;
     logic hwrite;
+    logic hsel;
 
-    modport master (
+    modport master_to_mux (
         input hrdata, hready, hresp,
         output haddr, hburst, hsize, htrans, hwdata, hwrite
     );
 
-    modport slave (
-        input haddr, hburst, hsize, htrans, hwdata, hwrite,
-        output hrdata, hready, hresp
+    modport mux_to_master (
+        output hrdata, hready, hresp,
+        input haddr, hburst, hsize, htrans, hwdata, hwrite
+    );
+
+    modport mux_to_slave (
+        input hrdata, hreadyout, hresp,
+        output haddr, hburst, hsize, htrans, hwdata, hwrite, hsel, hready
+    );
+
+    modport slave_to_mux (
+        input haddr, hburst, hsize, htrans, hwdata, hwrite, hsel, hready,
+        output hrdata, hreadyout, hresp
     );
 endinterface
 

@@ -48,9 +48,9 @@ def generate_tcl(toplevel, synthesize=False):
     set_property xsim.view {{ ./waveforms/{toplevel}.wcfg }} [get_filesets sim_1]
     """.format(toplevel=toplevel) if add_waveform else "") + ("""
     set_param general.maxThreads 12
-    synth_design -top {toplevel} -part xc7s50csga324-2 -flatten_hierarchy rebuilt -include_dirs {{../../include}} -mode out_of_context""".format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
-    
+    synth_design -top {toplevel} -part xc7s50csga324-2 -flatten_hierarchy rebuilt -include_dirs {{../../include}} -mode out_of_context
     create_clock -period 10 [get_nets clk] -name clk
+    """.format(toplevel=(toplevel.replace("_tb", ""))) if synthesize else "") + """
     
     launch_simulation -mode """ + ("post-synthesis -type functional" if synthesize else "behavioral") + """
     log_wave -r /

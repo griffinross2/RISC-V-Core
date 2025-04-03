@@ -51,6 +51,8 @@ module system_tb;
       cpu_ram_if.iaddr = i << 2;
       @(posedge clk);
       cpu_ram_if.iren = 1;
+      @(posedge clk);
+      cpu_ram_if.iren = 0;
       @(negedge clk);
       wait(~cpu_ram_if.iwait);
       if (cpu_ram_if.iload != 0) begin

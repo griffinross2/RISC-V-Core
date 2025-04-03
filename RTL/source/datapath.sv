@@ -2,7 +2,6 @@
 
 `include "common_types.vh"
 import common_types_pkg::*;
-`include "cpu_ram_if.vh"
 
 // interfaces (module)
 `include "control_unit_if.vh"
@@ -10,9 +9,12 @@ import common_types_pkg::*;
 `include "multiplier_if.vh"
 `include "register_file_if.vh"
 `include "hazard_unit_if.vh"
+`include "exception_unit_if.vh"
 `include "forward_unit_if.vh"
 `include "branch_unit_if.vh"
 `include "csr_if.vh"
+`include "ahb_master_if.vh"
+`include "ahb_bus_if.vh"
 
 // interface (pipeline)
 `include "fetch_to_decode_if.vh"
@@ -25,7 +27,7 @@ module datapath #(
 )(
   input logic clk, nrst,
   output logic halt,
-  cpu_ram_if.cpu cpu_ram_if
+  ahb_bus_if.master_to_mux abif
 );
   parameter NOP = 32'h00000013;
 
@@ -44,6 +46,7 @@ module datapath #(
   branch_unit_if buif();
   csr_if csrif();
   exception_unit_if euif();
+  ahb_master_if amif();
 
   // Module instantiation
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
@@ -55,6 +58,7 @@ module datapath #(
   (* keep_hierarchy = "yes" *) branch_unit bu0(clk, nrst, buif);
   (* keep_hierarchy = "yes" *) csr csr0(clk, nrst, csrif);
   (* keep_hierarchy = "yes" *) exception_unit eu0(clk, nrst, euif);
+  (* keep_hierarchy = "yes" *) ahb_master am0(clk, nrst, amif, abif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();
@@ -79,8 +83,8 @@ module datapath #(
     hazif.halt = m2wif.halt;
     hazif.dread = e2mif.dread;
     hazif.dwrite = |e2mif.dwrite;
-    hazif.dhit = ~cpu_ram_if.dwait;
-    hazif.ihit = ~cpu_ram_if.iwait;
+    hazif.ihit = amif.ihit;
+    hazif.dhit = amif.dhit;
     hazif.d2eif_dread = d2eif.dread;
     hazif.f2dif_rs1 = ctrlif.rs1;
     hazif.f2dif_rs2 = ctrlif.rs2;
@@ -88,6 +92,8 @@ module datapath #(
     hazif.d2eif_mult = d2eif.mult;
     hazif.mult_ready = mulif.ready;
     hazif.branch_flush = buif.mem_flush;
+    
+    hazif.ex_csr = d2eif.csr_write;
     hazif.mem_csr = e2mif.csr_write;
     hazif.wb_csr = m2wif.csr_write;
 
@@ -128,35 +134,68 @@ module datapath #(
 
   // STAGE 1: FETCH
   always_comb begin
-    cpu_ram_if.iren = 1'b1;
+    amif.iread = 1'b1;
+    if((e2mif.dread | |e2mif.dwrite) & amif.ihit & ~amif.dhit) begin
+      // If we already got the next instruction, don't assert iren (let dread/write thru)
+      amif.iread = 1'b0;
+    end
     // If branch is predicted, fetch from the predicted target address
     buif.fetch_pc = pc;
-    cpu_ram_if.iaddr = pc;
+    amif.iaddr = pc;
   end
 
   // STAGE 1 => STAGE 2: FETCH => DECODE
   always_ff @(posedge clk, negedge nrst) begin
     if(~nrst) begin
       f2dif.pc <= PC_INIT;
-      f2dif.inst <= NOP;
       f2dif.branch_predict <= 0;
       f2dif.branch_target <= 0;
+      f2dif.inst_latch <= 0;
     end else if (f2dif.en & f2dif.flush) begin
       f2dif.pc <= f2dif.pc;
-      f2dif.inst <= NOP;
       f2dif.branch_predict <= 0;
       f2dif.branch_target <= 0;
+      f2dif.inst_latch <= 0;
     end else if (f2dif.en) begin
       f2dif.pc <= pc;
-      f2dif.inst <= cpu_ram_if.iload;
       f2dif.branch_predict <= buif.fetch_predict;
       f2dif.branch_target <= buif.fetch_target;
+      f2dif.inst_latch <= 1;
+    end else begin
+      if(amif.ihit | f2dif.flush) begin
+        f2dif.inst_latch <= 0;
+      end
     end
   end
 
   // STAGE 2: DECODE
+
+  // Latch the instruction if the pipeline is stalled after the AHB-Lite is ready
+  // so that it won't be lost.
+  word_t inst;
+  always_ff @(posedge clk, negedge nrst) begin
+    if(~nrst) begin
+      inst <= NOP;
+    end else if (f2dif.flush) begin
+      inst <= NOP;
+    end else if (f2dif.inst_latch) begin
+      inst <= amif.iload;
+    end
+  end
+
   always_comb begin
-    ctrlif.inst = f2dif.inst;
+    ctrlif.inst = NOP;  // Default
+    if(f2dif.inst_latch) begin
+      // Get instruction from AHB bus
+      ctrlif.inst = amif.iload;
+    end else begin
+      // The pipeline is stalled, so we need to use the instruction
+      // saved from the bus. That or we flushed.
+      ctrlif.inst = inst;
+    end
+  end
+
+  always_comb begin
     rfif.rsel1 = ctrlif.rs1;
     rfif.rsel2 = ctrlif.rs2;
   end
@@ -456,6 +495,8 @@ module datapath #(
       e2mif.rd <= d2eif.rd;
       e2mif.dwrite <= d2eif.dwrite;
       e2mif.dread <= d2eif.dread;
+      e2mif.dwrite_short <= d2eif.dwrite;
+      e2mif.dread_short <= d2eif.dread;
       e2mif.reg_wr_src <= d2eif.reg_wr_src;
       e2mif.reg_wr_mem <= d2eif.reg_wr_mem;
       e2mif.reg_wr_mem_signed <= d2eif.reg_wr_mem_signed;
@@ -473,72 +514,66 @@ module datapath #(
       e2mif.csr_wr_op <= d2eif.csr_wr_op;
       e2mif.csr_wr_imm <= d2eif.csr_wr_imm;
       e2mif.illegal_inst <= d2eif.illegal_inst;
+    end else if (amif.dhit) begin
+      // Ensure local memory signals only cause one transaction
+      e2mif.dwrite_short <= '0;
+      e2mif.dread_short <= '0;
     end
   end
 
   // STAGE 4: MEMORY
   always_comb begin
     // Memory address for ld/st is the sum from ALU
-    cpu_ram_if.daddr = e2mif.alu_out;
+    amif.daddr = e2mif.alu_out;
     
     // Memory data to store is from rs2:
     // Align the data to the proper part of the word
-    // Memory control:
-    // Map the store width to the enable signals
-    casez(e2mif.dwrite)
+    amif.dwrite = e2mif.dwrite_short;
+    casez(e2mif.dwrite_short)
       // No store
       2'b00: begin
-        cpu_ram_if.dwen = 4'b0000;
-        cpu_ram_if.dstore = e2mif.rdat2;
+        amif.dstore = e2mif.rdat2;
       end
       // Byte store
       2'b01: begin
         // Alignment
-        casez(cpu_ram_if.daddr[1:0])
+        casez(amif.daddr[1:0])
           2'b00: begin
-            cpu_ram_if.dwen = 4'b0001;
-            cpu_ram_if.dstore = {24'd0, e2mif.rdat2[7:0]};
+            amif.dstore = {24'd0, e2mif.rdat2[7:0]};
           end
           2'b01: begin
-            cpu_ram_if.dwen = 4'b0010;
-            cpu_ram_if.dstore = {16'd0, e2mif.rdat2[7:0], 8'd0};
+            amif.dstore = {16'd0, e2mif.rdat2[7:0], 8'd0};
           end
           2'b10: begin
-            cpu_ram_if.dwen = 4'b0100;
-            cpu_ram_if.dstore = {8'd0, e2mif.rdat2[7:0], 16'd0};
+            amif.dstore = {8'd0, e2mif.rdat2[7:0], 16'd0};
           end
           2'b11: begin
-            cpu_ram_if.dwen = 4'b1000;
-            cpu_ram_if.dstore = {e2mif.rdat2[7:0], 24'd0};
+            amif.dstore = {e2mif.rdat2[7:0], 24'd0};
           end
         endcase
       end
       // Halfword store
       2'b10: begin
         // Alignment
-        casez(cpu_ram_if.daddr[1:0])
+        casez(amif.daddr[1:0])
           2'b00, 2'b01: begin
-            cpu_ram_if.dwen = 4'b0011;
-            cpu_ram_if.dstore = {16'd0, e2mif.rdat2[15:0]};
+            amif.dstore = {16'd0, e2mif.rdat2[15:0]};
           end
           2'b10, 2'b11: begin
-            cpu_ram_if.dwen = 4'b1100;
-            cpu_ram_if.dstore = {e2mif.rdat2[15:0], 16'd0};
+            amif.dstore = {e2mif.rdat2[15:0], 16'd0};
           end
         endcase
       end
       // Word store
       2'b11: begin
-        cpu_ram_if.dwen = 4'b1111;
-        cpu_ram_if.dstore = e2mif.rdat2;
+        amif.dstore = e2mif.rdat2;
       end
       default: begin
-        cpu_ram_if.dwen = 4'b0000;
-        cpu_ram_if.dstore = e2mif.rdat2;
+        amif.dstore = e2mif.rdat2;
       end
     endcase
 
-    cpu_ram_if.dren = e2mif.dread;
+    amif.dread = e2mif.dread_short;
   end
 
   // STAGE 4 => STAGE 5: MEMORY => WRITEBACK
@@ -582,7 +617,7 @@ module datapath #(
         m2wif.reg_wr_mem <= e2mif.reg_wr_mem;
         m2wif.reg_wr_mem_signed <= e2mif.reg_wr_mem_signed;
         m2wif.alu_out <= e2mif.csr_write ? csrif.csr_rdata : e2mif.alu_out;
-        m2wif.dload <= cpu_ram_if.dload;
+        m2wif.dload <= amif.dload;
         m2wif.rdat1 <= e2mif.rdat1;
         m2wif.csr_write <= e2mif.csr_write;
         m2wif.csr_waddr <= e2mif.csr_waddr;

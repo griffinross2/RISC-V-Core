@@ -7,3 +7,5 @@ _start:
     sh x2, 0x106(x0)
     sb x1, 0x108(x0)
     sb x2, 0x109(x0)
+
+    ebreak

@@ -7,7 +7,8 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 `include "ram_dump_if.vh"
-`include "cpu_ram_if.vh"
+`include "ahb_master_if.vh"
+`include "ahb_bus_if.vh"
 `include "ram_if.vh"
 
 module system (
@@ -28,41 +29,89 @@ assign cpuclk = clk;
 // end
 
 // Interfaces
-cpu_ram_if mem_ctrl_ram_if();
-cpu_ram_if cpu_ram_if();
+ahb_master_if debug_master_if();
+
+ahb_bus_if multiplexor_abif();
+ahb_bus_if debug_abif();
+ahb_bus_if cpu_abif();
+ahb_bus_if def_abif();
+ahb_bus_if ram_abif();
+
 ram_if ram_if();
 
-// Connect control from TB or CPU to memory controller
-assign mem_ctrl_ram_if.iren = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.iren : cpu_ram_if.iren;
-assign mem_ctrl_ram_if.dren = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.dren : cpu_ram_if.dren;
-assign mem_ctrl_ram_if.dwen = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.dwen : cpu_ram_if.dwen;
-assign mem_ctrl_ram_if.iaddr = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.iaddr : cpu_ram_if.iaddr;
-assign mem_ctrl_ram_if.daddr = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.daddr : cpu_ram_if.daddr;
-assign mem_ctrl_ram_if.dstore = cpu_ram_debug_if.override_ctrl ? cpu_ram_debug_if.dstore : cpu_ram_if.dstore;
+// Debug AHB interface
+assign debug_master_if.iread = cpu_ram_debug_if.iren;
+assign debug_master_if.dread = cpu_ram_debug_if.dren;
+always_comb begin
+    casez (cpu_ram_debug_if.dwen)
+        4'b0001, 4'b0010, 4'b0100, 4'b1000: debug_master_if.dwrite = 2'b01;
+        4'b1100, 4'b0011: debug_master_if.dwrite = 2'b10;
+        4'b1111: debug_master_if.dwrite = 2'b11;
+        default: debug_master_if.dwrite = 2'b00; // No write
+    endcase
+end
+assign debug_master_if.iaddr = cpu_ram_debug_if.iaddr;
+assign debug_master_if.daddr = cpu_ram_debug_if.daddr;
+assign debug_master_if.dstore = cpu_ram_debug_if.dstore;
 
-// Connect memory controller outputs to CPU and TB
-assign cpu_ram_if.iwait = mem_ctrl_ram_if.iwait;
-assign cpu_ram_if.dwait = mem_ctrl_ram_if.dwait;
-assign cpu_ram_if.iload = mem_ctrl_ram_if.iload;
-assign cpu_ram_if.dload = mem_ctrl_ram_if.dload;
+assign cpu_ram_debug_if.iwait = ~debug_master_if.ihit;
+assign cpu_ram_debug_if.dwait = ~debug_master_if.dhit;
+assign cpu_ram_debug_if.iload = debug_master_if.iload;
+assign cpu_ram_debug_if.dload = debug_master_if.dload;
 
-assign cpu_ram_debug_if.iwait = mem_ctrl_ram_if.iwait;
-assign cpu_ram_debug_if.dwait = mem_ctrl_ram_if.dwait;
-assign cpu_ram_debug_if.iload = mem_ctrl_ram_if.iload;
-assign cpu_ram_debug_if.dload = mem_ctrl_ram_if.dload;
+// Connect control from TB or CPU to AHB bus
+assign multiplexor_abif.haddr = cpu_ram_debug_if.override_ctrl ? debug_abif.haddr : cpu_abif.haddr;
+assign multiplexor_abif.hburst = cpu_ram_debug_if.override_ctrl ? debug_abif.hburst : cpu_abif.hburst;
+assign multiplexor_abif.hsize = cpu_ram_debug_if.override_ctrl ? debug_abif.hsize : cpu_abif.hsize;
+assign multiplexor_abif.htrans = cpu_ram_debug_if.override_ctrl ? debug_abif.htrans : cpu_abif.htrans;
+assign multiplexor_abif.hwdata = cpu_ram_debug_if.override_ctrl ? debug_abif.hwdata : cpu_abif.hwdata;
+assign multiplexor_abif.hwrite = cpu_ram_debug_if.override_ctrl ? debug_abif.hwrite : cpu_abif.hwrite;
+
+// Connect AHB bus to TB and CPU
+assign cpu_abif.hrdata = multiplexor_abif.hrdata;
+assign cpu_abif.hready = multiplexor_abif.hready;
+assign cpu_abif.hresp = multiplexor_abif.hresp;
+assign debug_abif.hrdata = multiplexor_abif.hrdata;
+assign debug_abif.hready = multiplexor_abif.hready;
+assign debug_abif.hresp = multiplexor_abif.hresp;
+
+// Debug AHB master
+ahb_master debug_master (
+    .clk(clk),
+    .nrst(nrst),
+    .amif(debug_master_if),
+    .abif(debug_abif)
+);
 
 // CPU
 cpu cpu_inst(
     .clk(cpuclk),
     .nrst(nrst),
     .halt(halt),
-    .cpu_ram_if(cpu_ram_if)
+    .abif(cpu_abif)
+);
+
+// AHB multiplexor
+ahb_multiplexor ahb_mux_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .abif_to_master(multiplexor_abif),
+    .abif_to_def(def_abif),
+    .abif_to_ram(ram_abif)
+);
+
+// AHB default slave
+ahb_default_slave ahb_slave_def (
+    .clk(clk),
+    .nrst(nrst),
+    .abif(def_abif)
 );
 
 // Memory controller
 memory_control memory_control_inst (
+    .clk(clk),
     .nrst(nrst),
-    .cpu_ram_if(mem_ctrl_ram_if),
+    .ahb_bus_if(ram_abif),
     .ram_if(ram_if)
 );
 
