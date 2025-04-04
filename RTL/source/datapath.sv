@@ -124,7 +124,7 @@ module datapath #(
   end
 
   // PC
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       pc <= PC_INIT;
     end else begin
@@ -145,7 +145,7 @@ module datapath #(
   end
 
   // STAGE 1 => STAGE 2: FETCH => DECODE
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       f2dif.pc <= PC_INIT;
       f2dif.branch_predict <= 0;
@@ -173,7 +173,7 @@ module datapath #(
   // Latch the instruction if the pipeline is stalled after the AHB-Lite is ready
   // so that it won't be lost.
   word_t inst;
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       inst <= NOP;
     end else if (f2dif.flush) begin
@@ -201,7 +201,7 @@ module datapath #(
   end
 
   // STAGE 2 => STAGE 3: DECODE => EXECUTE
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       d2eif.pc <= PC_INIT;
       d2eif.halt <= '0;
@@ -440,7 +440,7 @@ module datapath #(
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       e2mif.pc <= PC_INIT;
       e2mif.halt <= '0;
@@ -577,7 +577,7 @@ module datapath #(
   end
 
   // STAGE 4 => STAGE 5: MEMORY => WRITEBACK
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       m2wif.pc <= PC_INIT;
       m2wif.halt <= '0;
@@ -811,7 +811,7 @@ module datapath #(
     end
   end
 
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if(~nrst) begin
       halt <= '0;
     end else begin

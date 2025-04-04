@@ -30,7 +30,7 @@ module branch_unit #(
     word_t target_buffer_n [0:(1<<BTB_BITS)-1];
 
     // State machine
-    always_ff @(posedge clk, negedge nrst) begin
+    always_ff @(posedge clk) begin
         if (~nrst) begin
             prediction_buffer <= '{default: STRONG_NOT_TAKEN};
             target_buffer <= '{default: '0};

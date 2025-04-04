@@ -12,7 +12,8 @@ module ahb_multiplexor (
     input logic clk, nrst,
     ahb_bus_if.mux_to_master abif_to_master,
     ahb_bus_if.mux_to_slave abif_to_def,
-    ahb_bus_if.mux_to_slave abif_to_ram
+    ahb_bus_if.mux_to_slave abif_to_ram,
+    ahb_bus_if.mux_to_slave abif_to_uart
 );
 
     integer sel_i;
@@ -22,7 +23,7 @@ module ahb_multiplexor (
     htrans_t htrans_reg;
     logic readyout;
 
-    always_ff @(posedge clk, negedge nrst) begin
+    always_ff @(posedge clk) begin
         if (~nrst) begin
             haddr_reg <= '0;
             htrans_reg <= HTRANS_IDLE;
@@ -40,24 +41,26 @@ module ahb_multiplexor (
         // Default slave
         sel_i = 0;
 
-        // Default response
-        abif_to_master.hrdata = '0;
-        abif_to_master.hresp = 1'b0;
-        readyout = '1;
-
         // Select the appropriate slave based on the address
         abif_to_def.hsel = 1'b0;
         abif_to_ram.hsel = 1'b0;
+        abif_to_uart.hsel = 1'b0;
 
         // RAM address range = 0x0000_0000 to 0x0000_FFFF
         if (abif_to_master.htrans != HTRANS_IDLE && abif_to_master.haddr < 32'h0001_0000) begin
             abif_to_ram.hsel = 1'b1;
             sel_i = 1;
+        // UART address range = 0x0002_0000 to 0x0002_000C
+        end else if (abif_to_master.htrans != HTRANS_IDLE && abif_to_master.haddr >= 32'h0002_0000 && abif_to_master.haddr < 32'h0002_0010) begin
+            abif_to_uart.hsel = 1'b1;
+            sel_i = 2;
         end else begin
             abif_to_def.hsel = 1'b1;
             sel_i = 0;
         end
+    end
 
+    always_comb begin
         casez(sel_i_reg)
             0: begin // Default slave
                 abif_to_master.hrdata = abif_to_def.hrdata;
@@ -71,15 +74,24 @@ module ahb_multiplexor (
                 abif_to_master.hresp = abif_to_ram.hresp;
             end
 
+            2: begin // UART slave
+                abif_to_master.hrdata = abif_to_uart.hrdata;
+                readyout = abif_to_uart.hreadyout;
+                abif_to_master.hresp = abif_to_uart.hresp;
+            end
+
             default: begin // Invalid address, default to default slave
                 abif_to_master.hrdata = abif_to_def.hrdata;
                 readyout = abif_to_def.hreadyout;
                 abif_to_master.hresp = abif_to_def.hresp;
             end
         endcase
-
+    
         // Send ready output
         abif_to_master.hready = readyout;
+    end
+
+    always_comb begin
 
         // Send signals to all slaves
         abif_to_def.hwdata = abif_to_master.hwdata;
@@ -97,5 +109,13 @@ module ahb_multiplexor (
         abif_to_ram.htrans = abif_to_master.htrans;
         abif_to_ram.hwrite = abif_to_master.hwrite;
         abif_to_ram.hready = readyout;
+
+        abif_to_uart.hwdata = abif_to_master.hwdata;
+        abif_to_uart.haddr = abif_to_master.haddr;
+        abif_to_uart.hburst = abif_to_master.hburst;
+        abif_to_uart.hsize = abif_to_master.hsize;
+        abif_to_uart.htrans = abif_to_master.htrans;
+        abif_to_uart.hwrite = abif_to_master.hwrite;
+        abif_to_uart.hready = readyout;
     end
 endmodule

@@ -1711,7 +1711,7 @@ logic [2:0] weight_2_61_reg;
 logic weight_2_62_reg;
 
 // First pipeline stage
-always_ff @(posedge clk, negedge nrst) begin
+always_ff @(posedge clk) begin
     if (~nrst | multiplier_if.ready) begin
         en_reg_1 <= '0;
         weight_2_0_reg <= '0;
@@ -2513,7 +2513,7 @@ logic [1:0] weight_4_61_reg;
 logic [1:0] weight_4_62_reg;
 
 // Second pipeline stage
-always_ff @(posedge clk, negedge nrst) begin
+always_ff @(posedge clk) begin
     if (~nrst | multiplier_if.ready) begin
         en_reg_2 <= '0;
         weight_4_0_reg <= '0;
@@ -3134,7 +3134,7 @@ logic [1:0] weight_6_61_reg;
 logic [1:0] weight_6_62_reg;
 
 // Second pipeline stage
-always_ff @(posedge clk, negedge nrst) begin
+always_ff @(posedge clk) begin
     if (~nrst | multiplier_if.ready) begin
         en_reg_3 <= '0;
         weight_6_0_reg <= '0;

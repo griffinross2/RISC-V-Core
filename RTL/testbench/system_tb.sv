@@ -17,10 +17,16 @@ module system_tb;
   // RAM dump IF
   ram_dump_if cpu_ram_if();
 
+  // UART
+  logic rxd;
+  logic txd;
+
   // System
   system system_inst (
     .clk(clk),
     .nrst(nrst),
+    .rxd(rxd),
+    .txd(txd),
     .halt(halt),
     .cpu_ram_debug_if(cpu_ram_if)
   );
@@ -82,6 +88,7 @@ module system_tb;
   // Run CPU
   integer num_cycles = 0;
   initial begin
+    rxd = 1;
     cpu_ram_if.override_ctrl = 0;
     nrst = 1;
     #10;

@@ -13,6 +13,8 @@ import common_types_pkg::*;
 
 module system (
     input logic clk, nrst,
+    input logic rxd,
+    output logic txd,
     output logic halt,
     ram_dump_if.tb cpu_ram_debug_if
 );
@@ -20,7 +22,7 @@ module system (
 // cpuclk
 logic cpuclk;
 assign cpuclk = clk;
-// always_ff @(posedge clk, negedge nrst) begin
+// always_ff @(posedge clk) begin
 //     if(~nrst) begin
 //         cpuclk <= 1'b0;
 //     end else begin
@@ -36,6 +38,7 @@ ahb_bus_if debug_abif();
 ahb_bus_if cpu_abif();
 ahb_bus_if def_abif();
 ahb_bus_if ram_abif();
+ahb_bus_if uart_abif();
 
 ram_if ram_if();
 
@@ -97,7 +100,8 @@ ahb_multiplexor ahb_mux_inst (
     .nrst(nrst),
     .abif_to_master(multiplexor_abif),
     .abif_to_def(def_abif),
-    .abif_to_ram(ram_abif)
+    .abif_to_ram(ram_abif),
+    .abif_to_uart(uart_abif)
 );
 
 // AHB default slave
@@ -113,6 +117,15 @@ memory_control memory_control_inst (
     .nrst(nrst),
     .ahb_bus_if(ram_abif),
     .ram_if(ram_if)
+);
+
+// UART
+ahb_uart_slave uart_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .rxd(rxd),
+    .txd(txd),
+    .abif(uart_abif)
 );
 
 // Shared Instruction-Data RAM

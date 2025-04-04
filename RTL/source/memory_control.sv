@@ -17,7 +17,7 @@ module memory_control (
   logic [1:0] hsize_reg;
   logic hwrite_reg;
 
-  always_ff @(posedge clk, negedge nrst) begin
+  always_ff @(posedge clk) begin
     if (~nrst) begin
       haddr_reg <= '0;
       hsel_reg <= 1'b0;

@@ -33,7 +33,7 @@ word_t mcause_n;
 word_t mscratch_n;
 
 // FF
-always_ff @(posedge clk, negedge nrst) begin
+always_ff @(posedge clk) begin
     if (~nrst) begin
         mstatus <= 0;
         mstatush <= 0;

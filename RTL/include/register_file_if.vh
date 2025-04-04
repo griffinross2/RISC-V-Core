@@ -10,8 +10,8 @@ interface register_file_if;
     logic wen;
 
     modport register_file (
-        input wdat, wsel, wen,
-        output rdat1, rdat2, rsel1, rsel2
+        input wdat, wsel, wen, rsel1, rsel2,
+        output rdat1, rdat2
     );
 endinterface
 

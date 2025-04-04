@@ -35,7 +35,7 @@ logic ihit_n, dhit_n;
 word_t iload_reg, dload_reg;
 word_t iload_n, dload_n;
 
-always_ff @(posedge clk, negedge nrst) begin
+always_ff @(posedge clk) begin
     if (~nrst) begin
         abif.hwdata <= '0;
         data_transfer <= TRANSFER_IDLE;

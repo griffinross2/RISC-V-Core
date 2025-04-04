@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="430.800 ns"></ZoomStartTime>
-      <ZoomEndTime time="522.001 ns"></ZoomEndTime>
-      <Cursor1Time time="472.200 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="397.601 ns"></ZoomEndTime>
+      <Cursor1Time time="109.800 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="392"></NameColumnWidth>
-      <ValueColumnWidth column_width="183"></ValueColumnWidth>
+      <ValueColumnWidth column_width="171"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="26" />
+   <WVObjectSize size="28" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -659,10 +659,6 @@
          <obj_property name="ElementShortName">exception</obj_property>
          <obj_property name="ObjectShortName">exception</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/interrupt" type="logic">
-         <obj_property name="ElementShortName">interrupt</obj_property>
-         <obj_property name="ObjectShortName">interrupt</obj_property>
-      </wvobject>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/exception_pc" type="array">
          <obj_property name="ElementShortName">exception_pc[31:0]</obj_property>
          <obj_property name="ObjectShortName">exception_pc[31:0]</obj_property>
@@ -887,6 +883,204 @@
       <wvobject fp_name="/system_tb/system_inst/debug_master/dload_n" type="array">
          <obj_property name="ElementShortName">dload_n[31:0]</obj_property>
          <obj_property name="ObjectShortName">dload_n[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group237" type="group">
+      <obj_property name="label">UART Slave</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/rxd" type="logic">
+         <obj_property name="ElementShortName">rxd</obj_property>
+         <obj_property name="ObjectShortName">rxd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/txd" type="logic">
+         <obj_property name="ElementShortName">txd</obj_property>
+         <obj_property name="ObjectShortName">txd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/bit_period" type="array">
+         <obj_property name="ElementShortName">bit_period[15:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_period[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/tx_data" type="array">
+         <obj_property name="ElementShortName">tx_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">tx_data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/rx_data" type="array">
+         <obj_property name="ElementShortName">rx_data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">rx_data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/tx_busy" type="logic">
+         <obj_property name="ElementShortName">tx_busy</obj_property>
+         <obj_property name="ObjectShortName">tx_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/tx_done" type="logic">
+         <obj_property name="ElementShortName">tx_done</obj_property>
+         <obj_property name="ObjectShortName">tx_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/rx_busy" type="logic">
+         <obj_property name="ElementShortName">rx_busy</obj_property>
+         <obj_property name="ObjectShortName">rx_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/rx_done" type="logic">
+         <obj_property name="ElementShortName">rx_done</obj_property>
+         <obj_property name="ObjectShortName">rx_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/tx_start" type="logic">
+         <obj_property name="ElementShortName">tx_start</obj_property>
+         <obj_property name="ObjectShortName">tx_start</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/cfgr" type="array">
+         <obj_property name="ElementShortName">cfgr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">cfgr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/txdr" type="array">
+         <obj_property name="ElementShortName">txdr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">txdr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/rxdr" type="array">
+         <obj_property name="ElementShortName">rxdr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rxdr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/sr" type="array">
+         <obj_property name="ElementShortName">sr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">sr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/cfgr_n" type="array">
+         <obj_property name="ElementShortName">cfgr_n[15:0]</obj_property>
+         <obj_property name="ObjectShortName">cfgr_n[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/txdr_n" type="array">
+         <obj_property name="ElementShortName">txdr_n[7:0]</obj_property>
+         <obj_property name="ObjectShortName">txdr_n[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/hsize_reg" type="array">
+         <obj_property name="ElementShortName">hsize_reg[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hsize_reg[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/wen" type="array">
+         <obj_property name="ElementShortName">wen[1:0]</obj_property>
+         <obj_property name="ObjectShortName">wen[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/wen_n" type="array">
+         <obj_property name="ElementShortName">wen_n[1:0]</obj_property>
+         <obj_property name="ObjectShortName">wen_n[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/ren" type="array">
+         <obj_property name="ElementShortName">ren[3:0]</obj_property>
+         <obj_property name="ObjectShortName">ren[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/hrdata_n" type="array">
+         <obj_property name="ElementShortName">hrdata_n[31:0]</obj_property>
+         <obj_property name="ObjectShortName">hrdata_n[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/BASE_ADDR" type="array">
+         <obj_property name="ElementShortName">BASE_ADDR[31:0]</obj_property>
+         <obj_property name="ObjectShortName">BASE_ADDR[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/haddr" type="array">
+         <obj_property name="ElementShortName">haddr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">haddr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hburst" type="array">
+         <obj_property name="ElementShortName">hburst[2:0]</obj_property>
+         <obj_property name="ObjectShortName">hburst[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hsize" type="array">
+         <obj_property name="ElementShortName">hsize[1:0]</obj_property>
+         <obj_property name="ObjectShortName">hsize[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/htrans" type="array">
+         <obj_property name="ElementShortName">htrans[1:0]</obj_property>
+         <obj_property name="ObjectShortName">htrans[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hwdata" type="array">
+         <obj_property name="ElementShortName">hwdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">hwdata[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hrdata" type="array">
+         <obj_property name="ElementShortName">hrdata[31:0]</obj_property>
+         <obj_property name="ObjectShortName">hrdata[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hready" type="logic">
+         <obj_property name="ElementShortName">hready</obj_property>
+         <obj_property name="ObjectShortName">hready</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hreadyout" type="logic">
+         <obj_property name="ElementShortName">hreadyout</obj_property>
+         <obj_property name="ObjectShortName">hreadyout</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hresp" type="logic">
+         <obj_property name="ElementShortName">hresp</obj_property>
+         <obj_property name="ObjectShortName">hresp</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hwrite" type="logic">
+         <obj_property name="ElementShortName">hwrite</obj_property>
+         <obj_property name="ObjectShortName">hwrite</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_abif/hsel" type="logic">
+         <obj_property name="ElementShortName">hsel</obj_property>
+         <obj_property name="ObjectShortName">hsel</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group262" type="group">
+      <obj_property name="label">Uart TX</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/bit_period" type="array">
+         <obj_property name="ElementShortName">bit_period[15:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_period[15:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/data" type="array">
+         <obj_property name="ElementShortName">data[7:0]</obj_property>
+         <obj_property name="ObjectShortName">data[7:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/start" type="logic">
+         <obj_property name="ElementShortName">start</obj_property>
+         <obj_property name="ObjectShortName">start</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/serial_out" type="logic">
+         <obj_property name="ElementShortName">serial_out</obj_property>
+         <obj_property name="ObjectShortName">serial_out</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/tx_busy" type="logic">
+         <obj_property name="ElementShortName">tx_busy</obj_property>
+         <obj_property name="ObjectShortName">tx_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/tx_done" type="logic">
+         <obj_property name="ElementShortName">tx_done</obj_property>
+         <obj_property name="ObjectShortName">tx_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/state" type="array">
+         <obj_property name="ElementShortName">state[1:0]</obj_property>
+         <obj_property name="ObjectShortName">state[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/state_n" type="array">
+         <obj_property name="ElementShortName">state_n[1:0]</obj_property>
+         <obj_property name="ObjectShortName">state_n[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/bit_count" type="array">
+         <obj_property name="ElementShortName">bit_count[2:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_count[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/bit_count_n" type="array">
+         <obj_property name="ElementShortName">bit_count_n[2:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_count_n[2:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/serial_out_n" type="logic">
+         <obj_property name="ElementShortName">serial_out_n</obj_property>
+         <obj_property name="ObjectShortName">serial_out_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/tx_done_n" type="logic">
+         <obj_property name="ElementShortName">tx_done_n</obj_property>
+         <obj_property name="ObjectShortName">tx_done_n</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/bit_strobe" type="logic">
+         <obj_property name="ElementShortName">bit_strobe</obj_property>
+         <obj_property name="ObjectShortName">bit_strobe</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/bit_strobe_count" type="array">
+         <obj_property name="ElementShortName">bit_strobe_count[15:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_strobe_count[15:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>
