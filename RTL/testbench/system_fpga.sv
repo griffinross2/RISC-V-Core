@@ -9,11 +9,11 @@ module system_fpga (
   input logic ck_rst,
   input logic uart_txd_in,
   output logic UART_TXD,
-  output logic LED [0:2]
+  output logic LED [0:3]
 );
 
   // Clock and reset
-  logic clk_50;
+  (* keep = "true", dont_touch = "true", mark_debug = "true" *) reg cpuclk;
   logic nrst;
 
   // Halt signal
@@ -27,11 +27,11 @@ module system_fpga (
   logic txd;
 
   initial begin
-    clk_50 = 1'b0;
+    cpuclk = 1'b0;
   end
 
   always_ff @(posedge CLK) begin
-    clk_50 <= ~clk_50;  // Divide by 2
+    cpuclk <= ~cpuclk;
   end
 
   assign nrst = ck_rst;
@@ -40,12 +40,13 @@ module system_fpga (
   assign LED[0] = ~txd;
   assign LED[1] = ~rxd;
   assign LED[2] = halt;
+  assign LED[3] = cpuclk & nrst;
 
   assign cpu_ram_if.override_ctrl = 0;
 
   // System
   system system_inst (
-    .clk(clk_50),
+    .clk(cpuclk),
     .nrst(nrst),
     .rxd(rxd),
     .txd(txd),

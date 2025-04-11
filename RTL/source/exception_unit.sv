@@ -10,6 +10,8 @@ module exception_unit (
     exception_unit_if.exception_unit euif
 );
 
+logic [31:0] gated_interrupt_in;
+
 always_comb begin
     euif.exception = 0;
     euif.exception_pc = euif.e2mif_pc;
@@ -22,9 +24,20 @@ always_comb begin
     euif.e2mif_flush = 0;
     euif.m2wif_flush = 0;
 
+    gated_interrupt_in = euif.interrupt_in_sync & {32{euif.interrupt_en}} & euif.mie;
+
+    // Decode interrupts in priority order
+    if (gated_interrupt_in[16]) begin
+        // UART interrupt
+        euif.exception = 1;
+        euif.is_interrupt = 1;
+        euif.exception_cause = 32'd16;
+    end
+
     if (euif.illegal_inst) begin
         // Illegal instruction
         euif.exception = 1;
+        euif.is_interrupt = 0;
         euif.exception_cause = 32'd2;
     end
 

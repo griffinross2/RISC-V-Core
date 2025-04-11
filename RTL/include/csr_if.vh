@@ -22,9 +22,11 @@ interface csr_if;
   word_t csr_exception_pc;
 
   // CSR output control signals
-  logic csr_mie;
+  logic csr_interrupt_en;
+  word_t csr_mie; // Interrupt enable register
   logic [1:0] csr_mtvec_mode;
   logic [29:0] csr_mtvec_base;
+  word_t csr_mepc; // Exception program counter
 
   // CSR port
   modport csr (
@@ -32,15 +34,19 @@ interface csr_if;
             csr_raddr,
             csr_exception, csr_exception_cause, csr_exception_pc,
     output  csr_rdata,
+            csr_interrupt_en,
             csr_mie,
-            csr_mtvec_mode, csr_mtvec_base
+            csr_mtvec_mode, csr_mtvec_base,
+            csr_mepc
 
   );
   // tb port
   modport tb (
     input   csr_rdata,
+            csr_interrupt_en,
             csr_mie,
             csr_mtvec_mode, csr_mtvec_base,
+            csr_mepc,
     output  csr_write, csr_waddr, csr_wdata,
             csr_raddr,
             csr_exception, csr_exception_cause, csr_exception_pc

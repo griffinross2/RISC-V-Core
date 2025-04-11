@@ -33,5 +33,5 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
 if __name__ == '__main__':
     mem = convert_intel_hex_to_vivado_mem('main.hex')
-    with open('main.mem', 'w') as file:
+    with open('raminit.mem', 'w') as file:
         file.write(mem)

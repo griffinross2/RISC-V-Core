@@ -109,9 +109,11 @@ end
 
 // Output
 always_comb begin
-    csr_if.csr_mie = mstatus.mie;
+    csr_if.csr_interrupt_en = mstatus.mie;
+    csr_if.csr_mie = mie;
     csr_if.csr_mtvec_mode = mtvec.mode;
     csr_if.csr_mtvec_base = mtvec.base;
+    csr_if.csr_mepc = mepc;
 end
 
 endmodule

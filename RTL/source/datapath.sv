@@ -26,12 +26,14 @@ module datapath #(
   parameter PC_INIT = 0
 )(
   input logic clk, nrst,
+  input logic [31:0] interrupt_in_sync,
   output logic halt,
   ahb_bus_if.master_to_mux abif
 );
   parameter NOP = 32'h00000013;
 
-  word_t pc;
+  (* mark_debug = "true" *) word_t pc;
+
   word_t pc_n;
   word_t forwarded_rdat1;
   word_t forwarded_rdat2;
@@ -98,8 +100,8 @@ module datapath #(
     hazif.wb_csr = m2wif.csr_write;
 
     // Signals from other modules to the exception unit
-    euif.e2mif_pc = e2mif.pc;
     euif.illegal_inst = e2mif.illegal_inst;
+    euif.interrupt_in_sync = interrupt_in_sync & {32{e2mif.en}};  // Allow through when mem is finishing
   end
 
   // Forwarding Unit to Pipeline
@@ -118,7 +120,8 @@ module datapath #(
     csrif.csr_exception_pc = euif.exception_pc;
 
     // Tell the exception unit about whether interrupts are enabled
-    euif.interrupt_en = csrif.csr_mie;
+    euif.interrupt_en = csrif.csr_interrupt_en;
+    euif.mie = csrif.csr_mie;
     euif.mtvec_mode = csrif.csr_mtvec_mode;
     euif.mtvec_base = {csrif.csr_mtvec_base, 2'b0};
   end
@@ -493,6 +496,7 @@ module datapath #(
       e2mif.pc <= d2eif.pc;
       e2mif.halt <= d2eif.halt;
       e2mif.rd <= d2eif.rd;
+      e2mif.rs1 <= d2eif.rs1;
       e2mif.dwrite <= d2eif.dwrite;
       e2mif.dread <= d2eif.dread;
       e2mif.dwrite_short <= d2eif.dwrite;
@@ -730,22 +734,27 @@ module datapath #(
     
     // Branch resolution
     casez(e2mif.pc_ctrl)
-      2'b01: begin
+      3'b001: begin
         buif.mem_target_res = e2mif.pc_plus_imm;
         if(e2mif.branch_pol ^ e2mif.alu_zero) begin
           // Resolve to taken
           buif.mem_taken = 1'b1;
         end
       end
-      2'b10: begin
+      3'b010: begin
         // Unconditional
         buif.mem_taken = 1'b1;
         buif.mem_target_res = e2mif.pc_plus_imm;
       end
-      2'b11: begin
+      3'b011: begin
         // Unconditional
         buif.mem_taken = 1'b1;
         buif.mem_target_res = e2mif.alu_out;
+      end
+      3'b100: begin
+        // Unconditional
+        buif.mem_taken = 1'b1;
+        buif.mem_target_res = csrif.csr_mepc;
       end
       default: begin
         // Default to telling BU no branch
@@ -760,14 +769,17 @@ module datapath #(
       if (~e2mif.branch_predict & buif.mem_branch_miss) begin
         // We may have to jump to the resolved target address
         casez(e2mif.pc_ctrl)
-          2'b01: begin
+          3'b001: begin
             pc_n = e2mif.pc_plus_imm;
           end
-          2'b10: begin
+          3'b010: begin
             pc_n = e2mif.pc_plus_imm;
           end
-          2'b11: begin
+          3'b011: begin
             pc_n = e2mif.alu_out;
+          end
+          3'b100: begin
+            pc_n = csrif.csr_mepc;
           end
           default: begin
             pc_n = pc + 32'd4;
@@ -776,7 +788,7 @@ module datapath #(
       end else if (e2mif.branch_predict & buif.mem_branch_miss) begin
         // The branch predictor either predicted a false branch, or the wrong destination
         casez(e2mif.pc_ctrl)
-          2'b01: begin
+          3'b001: begin
             if(e2mif.branch_pol ^ e2mif.alu_zero) begin
               pc_n = e2mif.pc_plus_imm;
             end else begin
@@ -784,11 +796,14 @@ module datapath #(
               pc_n = e2mif.pc + 32'd4;
             end
           end
-          2'b10: begin
+          3'b010: begin
             pc_n = e2mif.pc_plus_imm;
           end
-          2'b11: begin
+          3'b011: begin
             pc_n = e2mif.alu_out;
+          end
+          3'b100: begin
+            pc_n = csrif.csr_mepc;
           end
           default: begin
             // False branch: go to the next instruction after the original branch
@@ -803,11 +818,14 @@ module datapath #(
         // The branch predictor was correct, just continue execution
         pc_n = pc + 32'd4;
       end
+    end
 
-      // If an exception occured, jump to the exception handler
-      if(euif.exception) begin
-        pc_n = euif.exception_target;
-      end
+    // Give exception cause PC
+    euif.e2mif_pc = pc_n;
+
+    // If an exception occured, jump to the exception handler
+    if(euif.exception) begin
+      pc_n = euif.exception_target;
     end
   end
 

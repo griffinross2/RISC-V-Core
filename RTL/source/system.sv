@@ -19,16 +19,14 @@ module system (
     ram_dump_if.tb cpu_ram_debug_if
 );
 
-// cpuclk
-logic cpuclk;
-assign cpuclk = clk;
-// always_ff @(posedge clk) begin
-//     if(~nrst) begin
-//         cpuclk <= 1'b0;
-//     end else begin
-//         cpuclk <= ~cpuclk;
-//     end
-// end
+// Interrupt lines
+logic [31:0] interrupt_in_sync;
+logic uart_rx_int;
+
+always_comb begin
+    interrupt_in_sync = 32'b0;
+    interrupt_in_sync[16] = uart_rx_int;
+end
 
 // Interfaces
 ahb_master_if debug_master_if();
@@ -88,8 +86,9 @@ ahb_master debug_master (
 
 // CPU
 cpu cpu_inst(
-    .clk(cpuclk),
+    .clk(clk),
     .nrst(nrst),
+    .interrupt_in_sync(interrupt_in_sync),
     .halt(halt),
     .abif(cpu_abif)
 );
@@ -125,6 +124,7 @@ ahb_uart_slave uart_inst (
     .nrst(nrst),
     .rxd(rxd),
     .txd(txd),
+    .rxi(uart_rx_int),
     .abif(uart_abif)
 );
 

@@ -13,8 +13,9 @@ module ahb_uart_slave #(
 )
 (
     input logic clk, nrst,
-    input logic rxd,
-    output logic txd,
+    input logic rxd,    // Receive data
+    output logic txd,   // Transmit data
+    output logic rxi,   // Receive interrupt
     ahb_bus_if.slave_to_mux abif
 );
 
@@ -54,7 +55,7 @@ module ahb_uart_slave #(
     /*       - Bits [7:0]: Data to send         */
     /* 0x08: RXDR - Receive Data Register  - RO */
     /*       - Bits [7:0]: Data received        */
-    /* 0x0C: TXSR - TX Status Register     - RO */
+    /* 0x0C: TXSR - TX Status Register     - RW */
     /*       - Bits [0]: TX Busy                */
     /*       - Bits [1]: TX Done                */
     /*       - Bits [2]: RX Busy                */
@@ -98,7 +99,7 @@ module ahb_uart_slave #(
         abif.hresp = 1'b0;
 
         // Decoder outputs
-        wen_n = 2'b00;
+        wen_n = 3'b00;
         ren = 4'b0000;
 
         if (abif.hsel && abif.hready) begin
@@ -239,5 +240,8 @@ module ahb_uart_slave #(
             end
         endcase
     end
+
+    // Interrupt generation
+    assign rxi = sr_rx_done;
 
 endmodule

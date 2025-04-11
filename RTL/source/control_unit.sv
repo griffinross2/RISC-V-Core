@@ -38,7 +38,7 @@ always_comb begin
     ctrlif.reg_wr_src = 2'd0;
     ctrlif.reg_wr_mem = 2'b00;
     ctrlif.reg_wr_mem_signed = 1'b0;
-    ctrlif.pc_ctrl = 2'd0;
+    ctrlif.pc_ctrl = 3'd0;
     ctrlif.branch_pol = 1'b0;
     ctrlif.mult = 1'b0;
     ctrlif.mult_signed_a = 1'b0;
@@ -188,7 +188,7 @@ always_comb begin
         JALR: begin
             // I-type instruction
             i_inst = i_t'(ctrlif.inst);
-            ctrlif.pc_ctrl = 2'd3;
+            ctrlif.pc_ctrl = 3'd3;
             ctrlif.rs1 = i_inst.rs1;
             ctrlif.rd = i_inst.rd;
 
@@ -257,7 +257,7 @@ always_comb begin
         begin
             // SB-type instruction
             b_inst = b_t'(ctrlif.inst);
-            ctrlif.pc_ctrl = 2'd1;
+            ctrlif.pc_ctrl = 3'd1;
             ctrlif.rs1 = b_inst.rs1;
             ctrlif.rs2 = b_inst.rs2;
 
@@ -306,7 +306,7 @@ always_comb begin
         begin
             // UJ-type instruction
             j_inst = j_t'(ctrlif.inst);
-            ctrlif.pc_ctrl = 2'd2;
+            ctrlif.pc_ctrl = 3'd2;
             ctrlif.rd = j_inst.rd;
 
             // UJ-type uses a sign-extended weird 20-bit immediate
@@ -320,12 +320,14 @@ always_comb begin
             // I-type instruction
             i_inst = i_t'(ctrlif.inst);
             casez(funct3_system_i_t'(i_inst.funct3))
-                ENV_CALL_BREAK: begin
+                ENV_CALL_BREAK_MRET: begin
                     casez(imm_system_i_t'(i_inst.imm))
                         // NOP
                         ECALL: begin end
                         // Halt
                         EBREAK: ctrlif.halt = 1'b1;
+                        // MRET
+                        MRET: ctrlif.pc_ctrl = 3'd4; // exception return
                         // Illegal instruction
                         default: begin
                             ctrlif.illegal_inst = 1'b1;

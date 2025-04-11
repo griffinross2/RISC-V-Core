@@ -7,6 +7,7 @@ import common_types_pkg::*;
 
 module cpu (
   input logic clk, nrst,
+  input logic [31:0] interrupt_in_sync,
   output logic halt,
   ahb_bus_if.master_to_mux abif
 );
@@ -15,6 +16,7 @@ module cpu (
 datapath datapath_inst (
   .clk(clk),
   .nrst(nrst),
+  .interrupt_in_sync(interrupt_in_sync),
   .halt(halt),
   .abif(abif)
 );

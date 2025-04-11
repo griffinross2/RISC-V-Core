@@ -38,7 +38,7 @@ xpm_memory_spram #(
 ) ram_inst (
     .clka(clk),
     .rsta(~nrst),
-    .ena((count == 0) ? (ram_if.ren | (|ram_if.wen)) : 0),
+    .ena((count == 0) ? (ram_if.ren | (|ram_if.wen)) : 1'b0),
     .wea(ram_if.wen),
     .addra(ram_if.addr[31:2]),
     .dina(ram_if.store),

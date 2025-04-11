@@ -99,6 +99,12 @@ module system_tb;
     num_cycles = 0;
   
     while(!halt) begin
+      // if(num_cycles == 1000) begin
+      //   rxd = 0; // Send start bit to trigger interrupt
+      // end else begin
+      //   rxd = 1;
+      // end
+
       @(posedge clk);
       num_cycles++;
     end

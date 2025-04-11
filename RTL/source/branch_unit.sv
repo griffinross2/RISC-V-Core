@@ -13,7 +13,7 @@ import common_types_pkg::*;
 // `define ALWAYS_NOT_TAKEN
 
 module branch_unit #(
-    parameter BTB_BITS=8            // Number of bits in the BTB
+    parameter BTB_BITS=5            // 32 entry buffers
 ) (
     input logic clk, nrst,
     branch_unit_if.branch_unit buif

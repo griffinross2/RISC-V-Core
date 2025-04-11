@@ -97,7 +97,8 @@ module hazard_unit (
             hazif.e2mif_flush = 1;
         end
         // CSR instruction should be completed before execute continues
-        else if(hazif.ex_csr | hazif.mem_csr | hazif.wb_csr) begin
+        // Don't care on flush because execute will be flushed anyway
+        else if((hazif.ex_csr | hazif.mem_csr | hazif.wb_csr) & ~hazif.branch_flush) begin
             // Stall fetch to decode
             hazif.f2dif_en = 0;
             // Give execute a bubble

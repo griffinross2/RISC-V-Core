@@ -94,7 +94,7 @@ package common_types_pkg;
     } funct3_ld_i_t;
 
     typedef enum logic [FUNCT3_W-1:0] {
-        ENV_CALL_BREAK  = 3'h0,
+        ENV_CALL_BREAK_MRET  = 3'h0,
         CSRRW           = 3'h1,
         CSRRS           = 3'h2,
         CSRRC           = 3'h3,
@@ -131,7 +131,8 @@ package common_types_pkg;
 
     typedef enum logic [IMM_W_I-1:0] {
         ECALL   = 12'h0,
-        EBREAK  = 12'h1
+        EBREAK  = 12'h1,
+        MRET = 12'h302
     } imm_system_i_t;
 
     // uj type

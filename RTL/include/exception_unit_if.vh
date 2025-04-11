@@ -30,11 +30,15 @@ interface exception_unit_if;
   logic interrupt_en;
   logic [1:0] mtvec_mode;
   word_t mtvec_base;
+  word_t mie; // Interrupt enable register
+
+  logic [31:0] interrupt_in_sync;
 
   // exception ports
   modport exception_unit (
     input   illegal_inst, e2mif_pc,
-            interrupt_en, mtvec_mode, mtvec_base,
+            interrupt_en, mtvec_mode, mtvec_base, mie,
+            interrupt_in_sync,
     output  exception, exception_pc, exception_cause, exception_target, is_interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush
   );
@@ -43,7 +47,8 @@ interface exception_unit_if;
     input   exception, exception_pc, exception_cause, exception_target, is_interrupt,
             f2dif_flush, d2eif_flush, e2mif_flush, m2wif_flush,
     output  illegal_inst, e2mif_pc,
-            interrupt_en, mtvec_mode, mtvec_base
+            interrupt_en, mtvec_mode, mtvec_base, mie,
+            interrupt_in_sync
   );
 endinterface
 
