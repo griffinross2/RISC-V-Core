@@ -204,6 +204,7 @@ module datapath #(
   end
 
   // STAGE 2 => STAGE 3: DECODE => EXECUTE
+  logic mult_en_strobe;
   always_ff @(posedge clk) begin
     if(~nrst) begin
       d2eif.pc <= PC_INIT;
@@ -235,6 +236,7 @@ module datapath #(
       d2eif.csr_wr_op <= '0;
       d2eif.csr_wr_imm <= '0;
       d2eif.illegal_inst <= '0;
+      mult_en_strobe <= 1'b1;
     end else if (d2eif.en & d2eif.flush) begin
       d2eif.pc <= d2eif.pc;
       d2eif.halt <= '0;
@@ -265,6 +267,7 @@ module datapath #(
       d2eif.csr_wr_op <= '0;
       d2eif.csr_wr_imm <= '0;
       d2eif.illegal_inst <= '0;
+      mult_en_strobe <= 1'b1;
     end else if (d2eif.en) begin
       d2eif.pc <= f2dif.pc;
       d2eif.halt <= ctrlif.halt;
@@ -295,6 +298,9 @@ module datapath #(
       d2eif.csr_wr_op <= ctrlif.csr_wr_op;
       d2eif.csr_wr_imm <= ctrlif.csr_wr_imm;
       d2eif.illegal_inst <= ctrlif.illegal_inst;
+      mult_en_strobe <= 1'b1;
+    end else begin
+      mult_en_strobe <= 1'b0;
     end
   end
 
@@ -434,7 +440,7 @@ module datapath #(
     // Multiplier Unit
     mulif.a = forwarded_rdat1;
     mulif.b = forwarded_rdat2;
-    mulif.en = d2eif.mult;
+    mulif.en = d2eif.mult & mult_en_strobe;
     mulif.is_signed_a = d2eif.mult_signed_a;
     mulif.is_signed_b = d2eif.mult_signed_b;
 
