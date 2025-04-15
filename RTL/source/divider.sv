@@ -104,7 +104,7 @@ always_comb begin
 
     divider_if.r = r;
     if (divider_if.is_signed) begin
-        divider_if.r = (divider_if.a[31] ^ divider_if.b[31]) ? ~r + 32'd1 : r;  // Correct sign
+        divider_if.r = divider_if.a[31] ? ~r + 32'd1 : r;   // Correct sign
     end
 
     case (state)

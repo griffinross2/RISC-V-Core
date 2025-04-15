@@ -33,10 +33,10 @@ begin
             $display("Unsigned division test passed: %d / %d = %d R %d -> div_by_zero and %d R %d", a, b, divider_if.q, divider_if.r, 32'hFFFFFFFF, divider_if.a);
         end
     end else begin
-        if(divider_if.q != a/b) begin
-            $fatal("Unsigned division test failed: %d / %d = %d, expected %d", a, b, divider_if.q, a/b);
+        if(divider_if.q != a/b || divider_if.r != a%b) begin
+            $fatal("Unsigned division test failed: %d / %d = %d R %d, expected %d R %d", a, b, divider_if.q, divider_if.r, a/b, a%b);
         end else begin
-            $display("Unsigned division test passed: %d / %d = %d", a, b, divider_if.q);
+            $display("Unsigned division test passed: %d / %d = %d R %d", a, b, divider_if.q, divider_if.r);
         end
     end
 
@@ -46,10 +46,21 @@ endtask
 
 task test_divide_signed;
     input logic [31:0] a, b;
+    logic signed [31:0] expected_q, expected_r;
 begin
     divider_if.a = a;
     divider_if.b = b;
     divider_if.is_signed = 1;
+    if(b == 0) begin
+        expected_q = '1;
+        expected_r = a;
+    end else if (a == 32'h80000000 && b == 32'hFFFFFFFF) begin
+        expected_q = 32'h80000000;
+        expected_r = '0;
+    end else begin
+        expected_q = $signed(a)/$signed(b);
+        expected_r = $signed(a)%$signed(b);
+    end
 
     @(negedge clk);
     divider_if.en = 1;
@@ -71,10 +82,10 @@ begin
             $display("Signed division test passed: %d / %d = %d R %d -> overflow and %d R %d", $signed(a), $signed(b), $signed(divider_if.q), $signed(divider_if.r), $signed(32'h80000000), '0);
         end
     end else begin
-        if($signed(divider_if.q) != $signed(a)/$signed(b)) begin
-            $fatal("Signed division test failed: %d / %d = %d, expected %d", $signed(a), $signed(b), $signed(divider_if.q), $signed(a)/$signed(b));
+        if($signed(divider_if.q) != expected_q || $signed(divider_if.r) != expected_r) begin
+            $fatal("Signed division test failed: %d / %d = %d R %d, expected %d R %d", $signed(a), $signed(b), $signed(divider_if.q), $signed(divider_if.r), expected_q, expected_r);
         end else begin
-            $display("Signed division test passed: %d / %d = %d", $signed(a), $signed(b), $signed(divider_if.q));
+            $display("Signed division test passed: %d / %d = %d R %d", $signed(a), $signed(b), $signed(divider_if.q), $signed(divider_if.r));
         end
     end
 
