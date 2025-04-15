@@ -138,6 +138,9 @@ initial begin
     // Overflow
     test_divide_signed(32'h80000000, 32'hFFFFFFFF);
 
+    // Test case
+    test_divide_signed(32'b10000000000000000101011000100111, 32'b01000000000000000010101101000100);
+
     for (i = 0; i <= 1000; i+=1) begin
         a = $random();
         b = $random();

@@ -7,6 +7,7 @@ import common_types_pkg::*;
 `include "control_unit_if.vh"
 `include "alu_if.vh"
 `include "multiplier_if.vh"
+`include "divider_if.vh"
 `include "register_file_if.vh"
 `include "hazard_unit_if.vh"
 `include "exception_unit_if.vh"
@@ -42,6 +43,7 @@ module datapath #(
   control_unit_if ctrlif();
   alu_if aluif();
   multiplier_if mulif();
+  divider_if divif();
   register_file_if rfif();
   hazard_unit_if hazif();
   forward_unit_if fuif();
@@ -54,6 +56,7 @@ module datapath #(
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
   (* keep_hierarchy = "yes" *) alu alu0(aluif);
   (* keep_hierarchy = "yes" *) multiplier mul0(clk, nrst, mulif);
+  (* keep_hierarchy = "yes" *) divider div0(clk, nrst, divif);
   (* keep_hierarchy = "yes" *) register_file rf0(clk, nrst, rfif);
   (* keep_hierarchy = "yes" *) hazard_unit haz0(hazif);
   (* keep_hierarchy = "yes" *) forward_unit for0(fuif);
@@ -93,6 +96,8 @@ module datapath #(
     hazif.d2eif_rd = d2eif.rd;
     hazif.d2eif_mult = d2eif.mult;
     hazif.mult_ready = mulif.ready;
+    hazif.d2eif_div = d2eif.div;
+    hazif.div_ready = divif.ready;
     hazif.branch_flush = buif.mem_flush;
     
     hazif.ex_csr = d2eif.csr_write;
@@ -229,6 +234,9 @@ module datapath #(
       d2eif.mult_half <= '0;
       d2eif.mult_signed_a <= '0;
       d2eif.mult_signed_b <= '0;
+      d2eif.div <= '0;
+      d2eif.div_rem <= '0;
+      d2eif.div_signed <= '0;
       d2eif.branch_predict <= 0;
       d2eif.branch_target <= 0;
       d2eif.csr_write <= '0;
@@ -260,6 +268,9 @@ module datapath #(
       d2eif.mult_half <= '0;
       d2eif.mult_signed_a <= '0;
       d2eif.mult_signed_b <= '0;
+      d2eif.div <= '0;
+      d2eif.div_rem <= '0;
+      d2eif.div_signed <= '0;
       d2eif.branch_predict <= 0;
       d2eif.branch_target <= 0;
       d2eif.csr_write <= '0;
@@ -291,6 +302,9 @@ module datapath #(
       d2eif.mult_half <= ctrlif.mult_half;
       d2eif.mult_signed_a <= ctrlif.mult_signed_a;
       d2eif.mult_signed_b <= ctrlif.mult_signed_b;
+      d2eif.div <= ctrlif.div;
+      d2eif.div_rem <= ctrlif.div_rem;
+      d2eif.div_signed <= ctrlif.div_signed;
       d2eif.branch_predict <= f2dif.branch_predict;
       d2eif.branch_target <= f2dif.branch_target;
       d2eif.csr_write <= ctrlif.csr_write;
@@ -444,8 +458,15 @@ module datapath #(
     mulif.is_signed_a = d2eif.mult_signed_a;
     mulif.is_signed_b = d2eif.mult_signed_b;
 
+    // Divider Unit
+    divif.a = forwarded_rdat1;
+    divif.b = forwarded_rdat2;
+    divif.en = d2eif.div & mult_en_strobe;
+    divif.is_signed = d2eif.div_signed;
+
     execute_alu_out = aluif.out;
     if(d2eif.mult) execute_alu_out = (d2eif.mult_half ? mulif.out[63:32] : mulif.out[31:0]);
+    if(d2eif.div) execute_alu_out = (d2eif.div_rem ? divif.r : divif.q);
   end
 
   // STAGE 3 => STAGE 4: EXECUTE => MEMORY

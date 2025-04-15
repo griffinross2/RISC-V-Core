@@ -19,6 +19,10 @@ interface control_unit_if;
   logic     mult;
   logic     mult_half;      // 0 - low half, 1 - high half
   logic     mult_signed_a, mult_signed_b;
+  // Divider
+  logic     div;
+  logic     div_rem;        // 0 - quotient, 1 - remainder
+  logic     div_signed;
   // Memory control
   logic     dread;
   logic [1:0] dwrite;
@@ -50,6 +54,7 @@ interface control_unit_if;
     output  rs1, rs2, rd,                                   // Register File
             alu_op,                                         // ALU
             mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
+            div, div_rem, div_signed,                       // Divider
             dread, dwrite,                                  // Request Unit
             immediate,                                      // Immediate Generator
             alu_src1, alu_src2,                             // ALU source mux
@@ -63,6 +68,7 @@ interface control_unit_if;
     input   rs1, rs2, rd,                                   // Register File
             alu_op,                                         // ALU
             mult, mult_half, mult_signed_a, mult_signed_b,  // Multiplier
+            div, div_rem, div_signed,                       // Divider
             dread, dwrite,                                  // Request Unit
             immediate,                                      // Immediate Generator
             alu_src1, alu_src2,                             // ALU source mux

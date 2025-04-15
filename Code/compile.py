@@ -53,16 +53,16 @@ if __name__ == "__main__":
 
     # Generate object files from C source files
     for c_in, c_out in zip(c_files_in_dir, c_files_out):
-        subprocess.run(f"riscv-none-elf-gcc -march=rv32i_zmmul_zicsr -mabi=ilp32 -nostdlib -ffreestanding -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
+        subprocess.run(f"riscv-none-elf-gcc -march=rv32im_zicsr -mabi=ilp32 -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
 
     # Generate object files from ASM source files
     for S_in, S_out in zip(S_files_in_dir, S_files_out):
-        subprocess.run(f"riscv-none-elf-as -march=rv32i_zmmul_zicsr -mabi=ilp32 -o build/{S_out} {src_dir}/{S_in}", shell=True)
+        subprocess.run(f"riscv-none-elf-as -march=rv32im_zicsr -mabi=ilp32 -o build/{S_out} {src_dir}/{S_in}", shell=True)
     
     # Generate object files from assembly startup file
-    subprocess.run("riscv-none-elf-as -march=rv32i_zmmul_zicsr -mabi=ilp32 -o build/startup.o startup.S", shell=True)
+    subprocess.run("riscv-none-elf-as -march=rv32im_zicsr -mabi=ilp32 -o build/startup.o startup.S", shell=True)
 
-    subprocess.run(f"riscv-none-elf-ld -T linkerscript.ld --check-sections -o build/program.elf {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/startup.o", shell=True)
+    subprocess.run(f"riscv-none-elf-gcc -Wl,--print-memory-usage -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/startup.o -o build/program.elf", shell=True)
     subprocess.run("riscv-none-elf-objdump -D build/program.elf > build/program.S", shell=True)
     subprocess.run("riscv-none-elf-objcopy -O ihex build/program.elf build/program.hex", shell=True)
 

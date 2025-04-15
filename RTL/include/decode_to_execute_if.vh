@@ -30,6 +30,10 @@ interface decode_to_execute_if;
   logic     mult;
   logic     mult_half;      // 0 - low half, 1 - high half
   logic     mult_signed_a, mult_signed_b;
+  // Divider
+  logic     div;
+  logic     div_rem;        // 0 - quotient, 1 - remainder
+  logic     div_signed;
   // Register file
   reg_t rd;
   reg_t rs1;

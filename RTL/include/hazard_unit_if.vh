@@ -18,6 +18,7 @@ interface hazard_unit_if;
   logic [REG_W-1:0] f2dif_rs1;    // DECODE STAGE source register 1
   logic [REG_W-1:0] f2dif_rs2;    // DECODE STAGE source register 2
   logic d2eif_mult, mult_ready;   // EXECUTE STAGE multiplier signals
+  logic d2eif_div, div_ready;     // EXECUTE STAGE divider signals
 
   logic f2dif_en;       // Enable fetch to decode
   logic d2eif_en;       // Enable decode to execute
@@ -45,6 +46,8 @@ interface hazard_unit_if;
             f2dif_rs2,        // DECODE STAGE source register 2
             d2eif_mult,       // EXECUTE STAGE multiplier signals
             mult_ready,       // EXECUTE STAGE multiplier signals
+            d2eif_div,        // EXECUTE STAGE divider signals
+            div_ready,        // EXECUTE STAGE divider signals
             ex_csr,           // CSR instruction in execute stage
             mem_csr,          // CSR instruction in memory stage
             wb_csr,           // CSR instruction in writeback stage
@@ -77,6 +80,8 @@ interface hazard_unit_if;
             f2dif_rs2,
             d2eif_mult,
             mult_ready,
+            d2eif_div,
+            div_ready,
             ex_csr,
             mem_csr,
             wb_csr

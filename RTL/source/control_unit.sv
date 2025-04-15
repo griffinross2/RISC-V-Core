@@ -44,6 +44,9 @@ always_comb begin
     ctrlif.mult_signed_a = 1'b0;
     ctrlif.mult_signed_b = 1'b0;
     ctrlif.mult_half = 1'b0;
+    ctrlif.div = 1'b0;
+    ctrlif.div_rem = 1'b0;
+    ctrlif.div_signed = 1'b0;
     ctrlif.csr_write = 1'b0;
     ctrlif.csr_waddr = 12'd0;
     ctrlif.csr_wr_op = 2'b0;
@@ -61,39 +64,59 @@ always_comb begin
             ctrlif.rd = r_inst.rd;
 
             casez({r_inst.funct3, r_inst.funct7})
-                {ADD_SUB_MUL, ADD}: ctrlif.alu_op = ALU_ADD;    // ADD
-                {ADD_SUB_MUL, SUB}: ctrlif.alu_op = ALU_SUB;    // SUB
-                {SLL_MULH, 7'd0}:   ctrlif.alu_op = ALU_SLL;    // SLL
-                {SRL_SRA, SRA}:     ctrlif.alu_op = ALU_SRA;    // SRA
-                {SRL_SRA, SRL}:     ctrlif.alu_op = ALU_SRL;    // SRL
-                {AND, 7'd0}:        ctrlif.alu_op = ALU_AND;    // AND
-                {OR, 7'd0}:         ctrlif.alu_op = ALU_OR;     // OR
-                {XOR, 7'd0}:        ctrlif.alu_op = ALU_XOR;    // XOR
-                {SLT_MULHSU, 7'd0}: ctrlif.alu_op = ALU_SLT;    // SLT
-                {SLTU_MULHU, 7'd0}: ctrlif.alu_op = ALU_SLTU;   // SLTU
-                {ADD_SUB_MUL, MULT}: begin                      // MUL                 
+                {ADD_SUB_MUL, ADD_SRL}:     ctrlif.alu_op = ALU_ADD;    // ADD
+                {ADD_SUB_MUL, SUB_SRA}:     ctrlif.alu_op = ALU_SUB;    // SUB
+                {SLL_MULH, 7'd0}:           ctrlif.alu_op = ALU_SLL;    // SLL
+                {SRL_SRA_DIVU, SUB_SRA}:    ctrlif.alu_op = ALU_SRA;    // SRA
+                {SRL_SRA_DIVU, ADD_SRL}:    ctrlif.alu_op = ALU_SRL;    // SRL
+                {AND_REMU, 7'd0}:           ctrlif.alu_op = ALU_AND;    // AND
+                {OR_REM, 7'd0}:             ctrlif.alu_op = ALU_OR;     // OR
+                {XOR_DIV, 7'd0}:            ctrlif.alu_op = ALU_XOR;    // XOR
+                {SLT_MULHSU, 7'd0}:         ctrlif.alu_op = ALU_SLT;    // SLT
+                {SLTU_MULHU, 7'd0}:         ctrlif.alu_op = ALU_SLTU;   // SLTU
+                {ADD_SUB_MUL, MUL_DIV}: begin                   // MUL                 
                     ctrlif.mult = 1'b1;
                     ctrlif.mult_signed_a = 1'b1;
                     ctrlif.mult_signed_b = 1'b1;
                     ctrlif.mult_half = 1'b0;
                 end
-                {SLTU_MULHU, MULT}: begin                       // MULHU
+                {SLTU_MULHU, MUL_DIV}: begin                    // MULHU
                     ctrlif.mult = 1'b1;
                     ctrlif.mult_signed_a = 1'b0;
                     ctrlif.mult_signed_b = 1'b0;
                     ctrlif.mult_half = 1'b1;
                 end
-                {SLL_MULH, MULT}: begin                         // MULH
+                {SLL_MULH, MUL_DIV}: begin                      // MULH
                     ctrlif.mult = 1'b1;
                     ctrlif.mult_signed_a = 1'b1;
                     ctrlif.mult_signed_b = 1'b1;
                     ctrlif.mult_half = 1'b1;
                 end
-                {SLT_MULHSU, MULT}: begin                       // MULHSU
+                {SLT_MULHSU, MUL_DIV}: begin                    // MULHSU
                     ctrlif.mult = 1'b1;
                     ctrlif.mult_signed_a = 1'b1;
                     ctrlif.mult_signed_b = 1'b0;
                     ctrlif.mult_half = 1'b1;
+                end
+                {XOR_DIV, MUL_DIV}: begin                       // DIV
+                    ctrlif.div = 1'b1;
+                    ctrlif.div_signed = 1'b1;
+                    ctrlif.div_rem = 1'b0;
+                end
+                {SRL_SRA_DIVU, MUL_DIV}: begin                  // DIVU
+                    ctrlif.div = 1'b1;
+                    ctrlif.div_signed = 1'b0;
+                    ctrlif.div_rem = 1'b0;
+                end
+                {OR_REM, MUL_DIV}: begin                        // REM
+                    ctrlif.div = 1'b1;
+                    ctrlif.div_signed = 1'b1;
+                    ctrlif.div_rem = 1'b1;
+                end
+                {AND_REMU, MUL_DIV}: begin                      // REMU
+                    ctrlif.div = 1'b1;
+                    ctrlif.div_signed = 1'b0;
+                    ctrlif.div_rem = 1'b1;
                 end
                 default: begin
                     // Illegal instruction

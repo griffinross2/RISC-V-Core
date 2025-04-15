@@ -128,6 +128,8 @@ always_comb begin
                     next_n = divider_if.a;
                     next_d = divider_if.b;
                 end
+            end else begin
+                divider_if.ready = 1'b1;
             end
         end
 

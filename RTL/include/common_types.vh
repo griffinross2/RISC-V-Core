@@ -64,14 +64,14 @@ package common_types_pkg;
     } opcode_t;
   
     typedef enum logic [FUNCT3_W-1:0] {
-        SLL_MULH    = 3'h1,
-        SRL_SRA     = 3'h5,
-        ADD_SUB_MUL = 3'h0,
-        AND         = 3'h7,
-        OR          = 3'h6,
-        XOR         = 3'h4,
-        SLT_MULHSU  = 3'h2,
-        SLTU_MULHU  = 3'h3
+        SLL_MULH        = 3'h1,
+        SRL_SRA_DIVU    = 3'h5,
+        ADD_SUB_MUL     = 3'h0,
+        AND_REMU        = 3'h7,
+        OR_REM          = 3'h6,
+        XOR_DIV         = 3'h4,
+        SLT_MULHSU      = 3'h2,
+        SLTU_MULHU      = 3'h3
     } funct3_r_t;
 
     typedef enum logic [FUNCT3_W-1:0] {
@@ -119,15 +119,10 @@ package common_types_pkg;
     } funct3_b_t;
 
     typedef enum logic [FUNCT7_W-1:0] {
-        ADD     = 7'h00,
-        SUB     = 7'h20,
-        MULT    = 7'h01
+        ADD_SRL = 7'h00,
+        SUB_SRA = 7'h20,
+        MUL_DIV = 7'h01
     } funct7_r_t;
-
-    typedef enum logic [FUNCT7_W-1:0] {
-        SRA     = 7'h20,
-        SRL     = 7'h00
-    } funct7_srla_r_t;
 
     typedef enum logic [IMM_W_I-1:0] {
         ECALL   = 12'h0,
