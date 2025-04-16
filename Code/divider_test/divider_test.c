@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include "../riscv.h"
+
 #define UART_BASE 0x00020000
 
 #define UART_CFGR (UART_BASE + 0x00)
@@ -7,15 +9,8 @@
 #define UART_RXDR (UART_BASE + 0x08)
 #define UART_SR (UART_BASE + 0x0C)
 
-#define SET_CSR(csr, val)              \
-    {                                  \
-        asm("addi sp, sp, -4");        \
-        asm("sw x3, 0(sp)");           \
-        asm("li x3, %0" ::"i"(val));   \
-        asm("csrs %0, x3" ::"i"(csr)); \
-        asm("lw x3, 0(sp)");           \
-        asm("addi sp, sp, 4");         \
-    }
+#define SET_CSR(csr, val) \
+    asm volatile("csrs " #csr ", %0" ::"r"(val))
 
 typedef struct uart
 {
@@ -100,7 +95,7 @@ void uart_init(void)
     UART->CFGR = 434; // Set baud rate: 50M / 115200 = 434
 
     // Enable UART interrupt
-    SET_CSR(0x304, 0x00010000); // Set interupt enable bit for UART RXI
+    IRQ_ENABLE(UART_RXI); // Set interupt enable bit for UART RXI
 }
 
 void uart_send(char chr)
@@ -161,10 +156,11 @@ void UART_RXI_Handler()
     // Clear the rx_done flag
     UART->SR = 0x8; // Clear rx_done (bit 3)
 
-    // Re-enable interrupts globally
-    asm("csrs mstatus, 0x8"); // Set MIE (Machine Interrupt Enable) bit
+    IRQ_ENTRY(); // Save interrupt context
 
     // Receive the character and echo it back
     char chr = UART->RXDR; // Read the received character
     uart_send(chr);
+
+    IRQ_EXIT(); // Restore interrupt context
 }

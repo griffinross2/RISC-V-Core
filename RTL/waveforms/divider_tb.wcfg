@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1,013.700 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,228.901 ns"></ZoomEndTime>
-      <Cursor1Time time="1,073.300 ns"></Cursor1Time>
+      <ZoomStartTime time="352,021.734 ns"></ZoomStartTime>
+      <ZoomEndTime time="352,452.935 ns"></ZoomEndTime>
+      <Cursor1Time time="352,180.534 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="191"></NameColumnWidth>
-      <ValueColumnWidth column_width="208"></ValueColumnWidth>
+      <ValueColumnWidth column_width="204"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="27" />
    <wvobject fp_name="/divider_tb/clk" type="logic">
@@ -113,10 +113,12 @@
    <wvobject fp_name="/divider_tb/divider_if/a" type="array">
       <obj_property name="ElementShortName">a[31:0]</obj_property>
       <obj_property name="ObjectShortName">a[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/divider_tb/divider_if/b" type="array">
       <obj_property name="ElementShortName">b[31:0]</obj_property>
       <obj_property name="ObjectShortName">b[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/divider_tb/divider_if/q" type="array">
       <obj_property name="ElementShortName">q[31:0]</obj_property>

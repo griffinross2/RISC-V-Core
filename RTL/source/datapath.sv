@@ -123,6 +123,7 @@ module datapath #(
     csrif.csr_exception = euif.exception;
     csrif.csr_exception_cause = euif.exception_cause;
     csrif.csr_exception_pc = euif.exception_pc;
+    csrif.csr_mret = (e2mif.pc_ctrl == 3'd4); // MRET instruction restores MIE
 
     // Tell the exception unit about whether interrupts are enabled
     euif.interrupt_en = csrif.csr_interrupt_en;

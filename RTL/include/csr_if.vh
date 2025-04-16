@@ -18,6 +18,7 @@ interface csr_if;
 
   // CSR hw override signals
   logic csr_exception;
+  logic csr_mret;
   word_t csr_exception_cause;
   word_t csr_exception_pc;
 
@@ -32,7 +33,7 @@ interface csr_if;
   modport csr (
     input   csr_write, csr_waddr, csr_wdata,
             csr_raddr,
-            csr_exception, csr_exception_cause, csr_exception_pc,
+            csr_exception, csr_mret, csr_exception_cause, csr_exception_pc,
     output  csr_rdata,
             csr_interrupt_en,
             csr_mie,
@@ -49,7 +50,7 @@ interface csr_if;
             csr_mepc,
     output  csr_write, csr_waddr, csr_wdata,
             csr_raddr,
-            csr_exception, csr_exception_cause, csr_exception_pc
+            csr_exception, csr_mret, csr_exception_cause, csr_exception_pc
   );
 endinterface
 

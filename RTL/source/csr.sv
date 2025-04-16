@@ -95,15 +95,19 @@ always_comb begin
 
     // Hardware overrides anything here
     if (csr_if.csr_exception) begin
-        // Save the current MIE in MPIE
-        mstatus_n.mpie = mstatus.mie;
-        
         // Disable interrupts
-        mstatus_n = mstatus & ~32'h8;
+        mstatus_n.mpie = mstatus.mie;   // Save current MIE in MPIE
+        mstatus_n.mie = 0;              // Disable interrupts
 
         // Set exception cause and PC
         mcause_n = csr_if.csr_exception_cause;
         mepc_n = csr_if.csr_exception_pc;
+    end
+
+    if (csr_if.csr_mret) begin
+        // Restore MIE from MPIE
+        mstatus_n.mie = mstatus.mpie;   // Restore MIE from MPIE
+        mstatus_n.mpie = 1;             // Set MPIE
     end
 end
 
