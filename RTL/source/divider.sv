@@ -11,11 +11,13 @@ module divider (
     divider_if.div divider_if
 );
 
-typedef enum logic [1:0] {
-    IDLE = 2'b00,
-    PRECHECK = 2'b01,
-    DIVIDE = 2'b10,
-    DONE = 2'b11
+typedef enum logic [2:0] {
+    IDLE = 3'b000,
+    PRECHECK = 3'b001,
+    DIVIDE = 3'b010,
+    DONE = 3'b011,
+    DONE_DIV_BY_ZERO = 3'b100,
+    DONE_OVERFLOW = 3'b101
 } divider_state_t;
 
 divider_state_t state, next_state;
@@ -60,9 +62,9 @@ always_comb begin
 
         PRECHECK: begin
             if (d == 32'd0) begin
-                next_state = IDLE; // Division by zero, go back to IDLE
+                next_state = DONE_DIV_BY_ZERO;  // Division by zero, go to done
             end else if (divider_if.is_signed && divider_if.a == 32'h80000000 && divider_if.b == 32'hFFFFFFFF) begin
-                next_state = IDLE; // Overflow, go back to IDLE
+                next_state = DONE_OVERFLOW;     // Overflow, go to done
             end else begin
                 next_state = DIVIDE;
             end
@@ -134,23 +136,6 @@ always_comb begin
         end
 
         PRECHECK: begin
-            if (d == 32'd0) begin
-                divider_if.div_by_zero = 1'b1;  // Division by zero
-                divider_if.ready = 1'b1;        // We are done, so set ready
-
-                // Set the quotient to all ones and remainder to dividend
-                divider_if.q = 32'hFFFFFFFF;
-                divider_if.r = divider_if.a;
-            end else if (divider_if.is_signed && divider_if.a == 32'h80000000 && divider_if.b == 32'hFFFFFFFF) begin
-                divider_if.overflow = 1'b1;     // Overflow condition
-                divider_if.ready = 1'b1;        // We are done, so set ready
-
-                // Set the quotient to dividend and remainder to 0
-                divider_if.q = 32'h80000000;
-                divider_if.r = 32'd0;
-            end else begin
-                divider_if.div_by_zero = 1'b0;  // No division by zero
-            end
         end
 
         DIVIDE: begin
@@ -169,6 +154,24 @@ always_comb begin
 
         DONE: begin
             divider_if.ready = 1'b1;    // Division done, set ready flag
+        end
+
+        DONE_DIV_BY_ZERO: begin
+            divider_if.div_by_zero = 1'b1;  // Division by zero
+            divider_if.ready = 1'b1;        // We are done, so set ready
+
+            // Set the quotient to all ones and remainder to dividend
+            divider_if.q = 32'hFFFFFFFF;
+            divider_if.r = divider_if.a;
+        end
+
+        DONE_OVERFLOW: begin
+            divider_if.overflow = 1'b1;     // Overflow condition
+            divider_if.ready = 1'b1;        // We are done, so set ready
+
+            // Set the quotient to dividend and remainder to 0
+            divider_if.q = 32'h80000000;
+            divider_if.r = 32'd0;
         end
 
         default: begin

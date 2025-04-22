@@ -17,7 +17,7 @@ module register_file (
     word_t registers_n [1:31];
 
     // Registers
-    always_ff @(negedge clk) begin
+    always_ff @(posedge clk) begin
         if(~nrst) begin
             registers <= '{default: 0};
         end else begin

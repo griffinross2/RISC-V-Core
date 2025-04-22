@@ -29,9 +29,5 @@ _exception_handler:
     csrr x1, mcause
     sw x1, 0x108(x0)
 
-    # Get the address to return to
-    csrr x1, mepc
-    addi x1, x1, 4
-
-    # Return from exception
-    jr x1
+    # Return
+    mret
