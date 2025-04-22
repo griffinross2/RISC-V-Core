@@ -736,7 +736,7 @@
       </wvobject>
    </wvobject>
    <wvobject fp_name="group180" type="group">
-      <obj_property name="label">AHB-Lite Master Interface</obj_property>
+      <obj_property name="label">AHB-Lite Controller Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/amif/iread" type="logic">
          <obj_property name="ElementShortName">iread</obj_property>
@@ -877,55 +877,55 @@
       </wvobject>
    </wvobject>
    <wvobject fp_name="group209" type="group">
-      <obj_property name="label">Debug AHB-Lite Master</obj_property>
+      <obj_property name="label">Debug AHB-Lite Controller</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/hwdata_n" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/hwdata_n" type="array">
          <obj_property name="ElementShortName">hwdata_n[31:0]</obj_property>
          <obj_property name="ObjectShortName">hwdata_n[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/data_transfer" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/data_transfer" type="array">
          <obj_property name="ElementShortName">data_transfer[1:0]</obj_property>
          <obj_property name="ObjectShortName">data_transfer[1:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/addr_transfer" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/addr_transfer" type="array">
          <obj_property name="ElementShortName">addr_transfer[1:0]</obj_property>
          <obj_property name="ObjectShortName">addr_transfer[1:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/ihit_reg" type="logic">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/ihit_reg" type="logic">
          <obj_property name="ElementShortName">ihit_reg</obj_property>
          <obj_property name="ObjectShortName">ihit_reg</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/dhit_reg" type="logic">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/dhit_reg" type="logic">
          <obj_property name="ElementShortName">dhit_reg</obj_property>
          <obj_property name="ObjectShortName">dhit_reg</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/ihit_n" type="logic">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/ihit_n" type="logic">
          <obj_property name="ElementShortName">ihit_n</obj_property>
          <obj_property name="ObjectShortName">ihit_n</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/dhit_n" type="logic">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/dhit_n" type="logic">
          <obj_property name="ElementShortName">dhit_n</obj_property>
          <obj_property name="ObjectShortName">dhit_n</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/iload_reg" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/iload_reg" type="array">
          <obj_property name="ElementShortName">iload_reg[31:0]</obj_property>
          <obj_property name="ObjectShortName">iload_reg[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/dload_reg" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/dload_reg" type="array">
          <obj_property name="ElementShortName">dload_reg[31:0]</obj_property>
          <obj_property name="ObjectShortName">dload_reg[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/iload_n" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/iload_n" type="array">
          <obj_property name="ElementShortName">iload_n[31:0]</obj_property>
          <obj_property name="ObjectShortName">iload_n[31:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/system_tb/system_inst/debug_master/dload_n" type="array">
+      <wvobject fp_name="/system_tb/system_inst/debug_controller/dload_n" type="array">
          <obj_property name="ElementShortName">dload_n[31:0]</obj_property>
          <obj_property name="ObjectShortName">dload_n[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group237" type="group">
-      <obj_property name="label">UART Slave</obj_property>
+      <obj_property name="label">UART Satellite</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/uart_inst/rxd" type="logic">

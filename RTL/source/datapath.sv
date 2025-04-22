@@ -14,7 +14,7 @@ import common_types_pkg::*;
 `include "forward_unit_if.vh"
 `include "branch_unit_if.vh"
 `include "csr_if.vh"
-`include "ahb_master_if.vh"
+`include "ahb_controller_if.vh"
 `include "ahb_bus_if.vh"
 
 // interface (pipeline)
@@ -29,7 +29,7 @@ module datapath #(
   input logic clk, nrst,
   input logic [31:0] interrupt_in_sync,
   output logic halt,
-  ahb_bus_if.master_to_mux abif
+  ahb_bus_if.controller_to_mux abif
 );
   parameter NOP = 32'h00000013;
 
@@ -50,7 +50,7 @@ module datapath #(
   branch_unit_if buif();
   csr_if csrif();
   exception_unit_if euif();
-  ahb_master_if amif();
+  ahb_controller_if amif();
 
   // Module instantiation
   (* keep_hierarchy = "yes" *) control_unit ctrl0(ctrlif);
@@ -63,7 +63,7 @@ module datapath #(
   (* keep_hierarchy = "yes" *) branch_unit bu0(clk, nrst, buif);
   (* keep_hierarchy = "yes" *) csr csr0(clk, nrst, csrif);
   (* keep_hierarchy = "yes" *) exception_unit eu0(clk, nrst, euif);
-  (* keep_hierarchy = "yes" *) ahb_master am0(clk, nrst, amif, abif);
+  (* keep_hierarchy = "yes" *) ahb_controller am0(clk, nrst, amif, abif);
 
   fetch_to_decode_if      f2dif();
   decode_to_execute_if    d2eif();

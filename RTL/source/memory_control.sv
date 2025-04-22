@@ -7,7 +7,7 @@ import common_types_pkg::*;
 
 module memory_control (
   input logic clk, nrst,
-  ahb_bus_if.slave_to_mux ahb_bus_if,
+  ahb_bus_if.satellite_to_mux ahb_bus_if,
   ram_if.ramctrl ram_if
 );
 

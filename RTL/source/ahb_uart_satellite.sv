@@ -1,5 +1,5 @@
 /********************************/
-/*  AHB-Lite Bus Default Slave  */
+/*  AHB-Lite Bus Default Satellite  */
 /********************************/
 `timescale 1ns/1ns
 
@@ -8,7 +8,7 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 
-module ahb_uart_slave #(
+module ahb_uart_satellite #(
     parameter BASE_ADDR = 32'h0002_0000
 )
 (
@@ -16,7 +16,7 @@ module ahb_uart_slave #(
     input logic rxd,    // Receive data
     output logic txd,   // Transmit data
     output logic rxi,   // Receive interrupt
-    ahb_bus_if.slave_to_mux abif
+    ahb_bus_if.satellite_to_mux abif
 );
 
     logic [15:0] bit_period;

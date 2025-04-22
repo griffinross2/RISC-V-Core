@@ -4,7 +4,7 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 
-interface ahb_master_if;
+interface ahb_controller_if;
     
     // Memory control signals from datapath
     logic iread;
@@ -19,7 +19,7 @@ interface ahb_master_if;
     word_t iload;
     word_t dload;
 
-    modport ahb_master (
+    modport ahb_controller (
         input iread, dread, dwrite, iaddr, daddr, dstore,
         output ihit, dhit, iload, dload
     );

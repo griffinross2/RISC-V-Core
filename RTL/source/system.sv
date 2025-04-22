@@ -7,7 +7,7 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 `include "ram_dump_if.vh"
-`include "ahb_master_if.vh"
+`include "ahb_controller_if.vh"
 `include "ahb_bus_if.vh"
 `include "ram_if.vh"
 
@@ -29,7 +29,7 @@ always_comb begin
 end
 
 // Interfaces
-ahb_master_if debug_master_if();
+ahb_controller_if debug_controller_if();
 
 ahb_bus_if multiplexor_abif();
 ahb_bus_if debug_abif();
@@ -41,24 +41,24 @@ ahb_bus_if uart_abif();
 ram_if ram_if();
 
 // Debug AHB interface
-assign debug_master_if.iread = cpu_ram_debug_if.iren;
-assign debug_master_if.dread = cpu_ram_debug_if.dren;
+assign debug_controller_if.iread = cpu_ram_debug_if.iren;
+assign debug_controller_if.dread = cpu_ram_debug_if.dren;
 always_comb begin
     casez (cpu_ram_debug_if.dwen)
-        4'b0001, 4'b0010, 4'b0100, 4'b1000: debug_master_if.dwrite = 2'b01;
-        4'b1100, 4'b0011: debug_master_if.dwrite = 2'b10;
-        4'b1111: debug_master_if.dwrite = 2'b11;
-        default: debug_master_if.dwrite = 2'b00; // No write
+        4'b0001, 4'b0010, 4'b0100, 4'b1000: debug_controller_if.dwrite = 2'b01;
+        4'b1100, 4'b0011: debug_controller_if.dwrite = 2'b10;
+        4'b1111: debug_controller_if.dwrite = 2'b11;
+        default: debug_controller_if.dwrite = 2'b00; // No write
     endcase
 end
-assign debug_master_if.iaddr = cpu_ram_debug_if.iaddr;
-assign debug_master_if.daddr = cpu_ram_debug_if.daddr;
-assign debug_master_if.dstore = cpu_ram_debug_if.dstore;
+assign debug_controller_if.iaddr = cpu_ram_debug_if.iaddr;
+assign debug_controller_if.daddr = cpu_ram_debug_if.daddr;
+assign debug_controller_if.dstore = cpu_ram_debug_if.dstore;
 
-assign cpu_ram_debug_if.iwait = ~debug_master_if.ihit;
-assign cpu_ram_debug_if.dwait = ~debug_master_if.dhit;
-assign cpu_ram_debug_if.iload = debug_master_if.iload;
-assign cpu_ram_debug_if.dload = debug_master_if.dload;
+assign cpu_ram_debug_if.iwait = ~debug_controller_if.ihit;
+assign cpu_ram_debug_if.dwait = ~debug_controller_if.dhit;
+assign cpu_ram_debug_if.iload = debug_controller_if.iload;
+assign cpu_ram_debug_if.dload = debug_controller_if.dload;
 
 // Connect control from TB or CPU to AHB bus
 assign multiplexor_abif.haddr = cpu_ram_debug_if.override_ctrl ? debug_abif.haddr : cpu_abif.haddr;
@@ -76,11 +76,11 @@ assign debug_abif.hrdata = multiplexor_abif.hrdata;
 assign debug_abif.hready = multiplexor_abif.hready;
 assign debug_abif.hresp = multiplexor_abif.hresp;
 
-// Debug AHB master
-ahb_master debug_master (
+// Debug AHB controller
+ahb_controller debug_controller (
     .clk(clk),
     .nrst(nrst),
-    .amif(debug_master_if),
+    .amif(debug_controller_if),
     .abif(debug_abif)
 );
 
@@ -97,14 +97,14 @@ cpu cpu_inst(
 ahb_multiplexor ahb_mux_inst (
     .clk(clk),
     .nrst(nrst),
-    .abif_to_master(multiplexor_abif),
+    .abif_to_controller(multiplexor_abif),
     .abif_to_def(def_abif),
     .abif_to_ram(ram_abif),
     .abif_to_uart(uart_abif)
 );
 
-// AHB default slave
-ahb_default_slave ahb_slave_def (
+// AHB default satellite
+ahb_default_satellite ahb_satellite_def (
     .clk(clk),
     .nrst(nrst),
     .abif(def_abif)
@@ -119,7 +119,7 @@ memory_control memory_control_inst (
 );
 
 // UART
-ahb_uart_slave uart_inst (
+ahb_uart_satellite uart_inst (
     .clk(clk),
     .nrst(nrst),
     .rxd(rxd),

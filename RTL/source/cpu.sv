@@ -9,7 +9,7 @@ module cpu (
   input logic clk, nrst,
   input logic [31:0] interrupt_in_sync,
   output logic halt,
-  ahb_bus_if.master_to_mux abif
+  ahb_bus_if.controller_to_mux abif
 );
 
 // Datapath

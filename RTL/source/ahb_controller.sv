@@ -1,18 +1,18 @@
 /*************************/
-/*  AHB-Lite Bus Master  */
+/*  AHB-Lite Bus Controller  */
 /*************************/
 `timescale 1ns/1ns
 
-`include "ahb_master_if.vh"
+`include "ahb_controller_if.vh"
 `include "ahb_bus_if.vh"
 
 `include "common_types.vh"
 import common_types_pkg::*;
 
-module ahb_master (
+module ahb_controller (
     input logic clk, nrst,
-    ahb_master_if.ahb_master amif,
-    ahb_bus_if.master_to_mux abif
+    ahb_controller_if.ahb_controller amif,
+    ahb_bus_if.controller_to_mux abif
 );
 
 word_t hwdata_n;

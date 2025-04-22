@@ -18,22 +18,22 @@ interface ahb_bus_if;
     logic hwrite;
     logic hsel;
 
-    modport master_to_mux (
+    modport controller_to_mux (
         input hrdata, hready, hresp,
         output haddr, hburst, hsize, htrans, hwdata, hwrite
     );
 
-    modport mux_to_master (
+    modport mux_to_controller (
         output hrdata, hready, hresp,
         input haddr, hburst, hsize, htrans, hwdata, hwrite
     );
 
-    modport mux_to_slave (
+    modport mux_to_satellite (
         input hrdata, hreadyout, hresp,
         output haddr, hburst, hsize, htrans, hwdata, hwrite, hsel, hready
     );
 
-    modport slave_to_mux (
+    modport satellite_to_mux (
         input haddr, hburst, hsize, htrans, hwdata, hwrite, hsel, hready,
         output hrdata, hreadyout, hresp
     );
