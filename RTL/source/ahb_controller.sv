@@ -70,7 +70,7 @@ always_comb begin
     abif.hburst = '0;
     abif.hsize = '0;
     abif.htrans = HTRANS_IDLE;
-    hwdata_n = '0;
+    hwdata_n = amif.dstore;
     abif.hwrite = '0;
     addr_transfer = data_transfer;
 
@@ -100,7 +100,6 @@ always_comb begin
             abif.hburst = 3'b000;
             abif.hsize = 2'b10;
             abif.htrans = HTRANS_NONSEQ;
-            hwdata_n = '0;
             abif.hwrite = 1'b0;
             addr_transfer = TRANSFER_IREAD;
 
@@ -111,7 +110,6 @@ always_comb begin
             abif.hburst = 3'b000;
             abif.hsize = 2'b10;
             abif.htrans = HTRANS_NONSEQ;
-            hwdata_n = '0;
             abif.hwrite = 1'b0;
             addr_transfer = TRANSFER_DREAD;
 
@@ -126,7 +124,6 @@ always_comb begin
                 default: abif.hsize = 2'b10;
             endcase
             abif.htrans = HTRANS_NONSEQ;
-            hwdata_n = amif.dstore;
             abif.hwrite = 1'b1;
             addr_transfer = TRANSFER_DWRITE;
 
@@ -136,7 +133,6 @@ always_comb begin
             abif.hburst = '0;
             abif.hsize = '0;
             abif.htrans = HTRANS_IDLE;
-            hwdata_n = '0;
             abif.hwrite = '0;
             addr_transfer = TRANSFER_IDLE;
         end
