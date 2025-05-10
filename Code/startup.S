@@ -1,16 +1,20 @@
 .globl _start
-.globl _stack_top
-.globl _svectors
-.section .text.startup, "ax"
+.globl _stack
 # Entry point
+.section .init
 _start:
-    # Set up the stack pointer
-    lui sp,%hi(_stack_top)
-    addi sp,sp,%lo(_stack_top)
+    # Set the stack pointer
+    la sp, __stack
+
+    # Set the global pointer
+    .option push
+	.option norelax
+	la gp, __global_pointer$
+	.option pop
 
     # Set the interrupt vector base address
-    lui a0,%hi(_svectors)
-    addi a0,a0,%lo(_svectors)
+    lui a0,%hi(_vector_table)
+    addi a0,a0,%lo(_vector_table)
     csrw mtvec,a0
 
     # Set vectored interrupts and enable
@@ -18,7 +22,7 @@ _start:
     csrs mstatus,0x8
 
     # Go to main
-    jal main
+    call main
 
     # Loop forever
 _forever:

@@ -12,22 +12,21 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="505,731.400 ns"></ZoomStartTime>
-      <ZoomEndTime time="506,132.201 ns"></ZoomEndTime>
-      <Cursor1Time time="505,878.800 ns"></Cursor1Time>
+      <ZoomStartTime time="3,567.892916 us"></ZoomStartTime>
+      <ZoomEndTime time="3,588.012917 us"></ZoomEndTime>
+      <Cursor1Time time="3,587.043467 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="392"></NameColumnWidth>
-      <ValueColumnWidth column_width="155"></ValueColumnWidth>
+      <ValueColumnWidth column_width="147"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="30" />
+   <WVObjectSize size="29" />
+   <wave_markers>
+      <marker time="3587301536" label="" />
+   </wave_markers>
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/system_tb/system_inst/cpuclk" type="logic">
-      <obj_property name="ElementShortName">cpuclk</obj_property>
-      <obj_property name="ObjectShortName">cpuclk</obj_property>
    </wvobject>
    <wvobject fp_name="/system_tb/nrst" type="logic">
       <obj_property name="ElementShortName">nrst</obj_property>
@@ -95,6 +94,10 @@
          <obj_property name="ElementShortName">inst[31:0]</obj_property>
          <obj_property name="ObjectShortName">inst[31:0]</obj_property>
          <obj_property name="label">ctrlif.inst[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/amif/iload" type="array">
+         <obj_property name="ElementShortName">iload[31:0]</obj_property>
+         <obj_property name="ObjectShortName">iload[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group33" type="group">
@@ -197,6 +200,18 @@
          <obj_property name="ElementShortName">branch_target[31:0]</obj_property>
          <obj_property name="ObjectShortName">branch_target[31:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/d2eif/illegal_inst" type="logic">
+         <obj_property name="ElementShortName">illegal_inst</obj_property>
+         <obj_property name="ObjectShortName">illegal_inst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/forwarded_rdat1" type="array">
+         <obj_property name="ElementShortName">forwarded_rdat1[31:0]</obj_property>
+         <obj_property name="ObjectShortName">forwarded_rdat1[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/forwarded_rdat2" type="array">
+         <obj_property name="ElementShortName">forwarded_rdat2[31:0]</obj_property>
+         <obj_property name="ObjectShortName">forwarded_rdat2[31:0]</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group48" type="group">
       <obj_property name="label">Execute to Memory</obj_property>
@@ -287,6 +302,10 @@
          <obj_property name="ElementShortName">rs1[4:0]</obj_property>
          <obj_property name="ObjectShortName">rs1[4:0]</obj_property>
       </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/e2mif/illegal_inst" type="logic">
+         <obj_property name="ElementShortName">illegal_inst</obj_property>
+         <obj_property name="ObjectShortName">illegal_inst</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="group57" type="group">
       <obj_property name="label">Memory to Writeback</obj_property>
@@ -323,6 +342,10 @@
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/m2wif/dload" type="array">
          <obj_property name="ElementShortName">dload[31:0]</obj_property>
          <obj_property name="ObjectShortName">dload[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/m2wif/alu_out" type="array">
+         <obj_property name="ElementShortName">alu_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_out[31:0]</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="group71" type="group">
@@ -573,6 +596,7 @@
    <wvobject fp_name="group645" type="group">
       <obj_property name="label">Register File</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/rf0/registers" type="array">
          <obj_property name="ElementShortName">registers[1:31][31:0]</obj_property>
          <obj_property name="ObjectShortName">registers[1:31][31:0]</obj_property>
@@ -682,6 +706,7 @@
    <wvobject fp_name="group224" type="group">
       <obj_property name="label">Exception Unit IF</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/euif/interrupt_in_sync" type="array">
          <obj_property name="ElementShortName">interrupt_in_sync[31:0]</obj_property>
          <obj_property name="ObjectShortName">interrupt_in_sync[31:0]</obj_property>
@@ -738,6 +763,7 @@
    <wvobject fp_name="group180" type="group">
       <obj_property name="label">AHB-Lite Controller Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/cpu_inst/datapath_inst/amif/iread" type="logic">
          <obj_property name="ElementShortName">iread</obj_property>
          <obj_property name="ObjectShortName">iread</obj_property>
@@ -830,6 +856,7 @@
    <wvobject fp_name="group192" type="group">
       <obj_property name="label">RAM AHB-Lite Bus Interface</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/ram_abif/haddr" type="array">
          <obj_property name="ElementShortName">haddr[31:0]</obj_property>
          <obj_property name="ObjectShortName">haddr[31:0]</obj_property>
@@ -943,6 +970,7 @@
       <wvobject fp_name="/system_tb/system_inst/uart_inst/tx_data" type="array">
          <obj_property name="ElementShortName">tx_data[7:0]</obj_property>
          <obj_property name="ObjectShortName">tx_data[7:0]</obj_property>
+         <obj_property name="Radix">ASCIIRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/system_tb/system_inst/uart_inst/rx_data" type="array">
          <obj_property name="ElementShortName">rx_data[7:0]</obj_property>
@@ -1072,6 +1100,7 @@
       <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/data" type="array">
          <obj_property name="ElementShortName">data[7:0]</obj_property>
          <obj_property name="ObjectShortName">data[7:0]</obj_property>
+         <obj_property name="Radix">ASCIIRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/system_tb/system_inst/uart_inst/uart_tx_inst/start" type="logic">
          <obj_property name="ElementShortName">start</obj_property>

@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "../include/riscv.h"
 
@@ -31,50 +33,48 @@ void uart_send(char chr);
 void uart_send_str(char *str);
 void uart_receive(char *chr);
 uint32_t lfsr32_next(int *lfsr);
+int ftoa(float f, char *buf, int n);
 
-void main(void)
+int main(void)
 {
     // Initialize UART
     uart_init();
 
-    uart_send_str("Starting divider test...\n");
+    uart_send_str("Starting test...\n");
 
     int lfsr = 0xACE1u;
     int a;
     int b;
-    int result;
-    int rem;
+    float result;
+
+    char chr[64];
 
     // Infinite loop
-    while (1)
+    for (int i = 0; i < 100; i++)
     {
         a = lfsr32_next(&lfsr);
         b = lfsr32_next(&lfsr);
-        result = a / b;
-        rem = a % b;
+        if ((float)b != 0)
+        {
+            result = (float)a / (float)b;
+        }
+        else
+        {
+            result = 0.0F;
+        }
 
-        // Send the test case to UART
-        for (int i = 0; i < 32; i++)
+        int res = snprintf(chr, 64, "%d / %d = ", a, b);
+        int n = 63 - res;
+        if (n > 16)
         {
-            uart_send(((a << i) & 0x80000000) ? '1' : '0');
+            n = 16; // Limit to 16 decimal places
         }
-        uart_send_str(" / ");
-        for (int i = 0; i < 32; i++)
-        {
-            uart_send(((b << i) & 0x80000000) ? '1' : '0');
-        }
-        uart_send_str(" = ");
-        for (int i = 0; i < 32; i++)
-        {
-            uart_send(((result << i) & 0x80000000) ? '1' : '0');
-        }
-        uart_send_str(" R ");
-        for (int i = 0; i < 32; i++)
-        {
-            uart_send(((rem << i) & 0x80000000) ? '1' : '0');
-        }
-        uart_send('\n');
+        ftoa(result, chr + res, n);
+        chr[res + n] = '\n';
+        uart_send_str(chr);
     }
+
+    return 0;
 }
 
 // From GPT
@@ -132,6 +132,92 @@ void uart_receive(char *chr)
 
     // Clear the rx_done flag
     UART->SR = 0x8; // Clear rx_done (bit 3)
+}
+
+int ftoa(float f, char *buf, int n)
+{
+    // Buffer must be longer than 1
+    if (n < 2)
+    {
+        return -1;
+    }
+
+    int pos = 0;
+    int neg = 0;
+    if (f < 0)
+    {
+        neg = 1;
+        buf[pos++] = '-';
+        f = -f;
+    }
+
+    unsigned int int_part = (unsigned int)f;
+    int num_digits = 0;
+
+    // If int part is zero, just put a 0
+    if (int_part == 0)
+    {
+        if (pos + 2 >= n)
+        {
+            return -1;
+        }
+        buf[pos++] = '0';
+        num_digits++;
+    }
+    else
+    {
+        // Otherwise, we need to add the integer part digit by digit, making sure to stop if we exceed the buffer.
+        while (int_part > 0)
+        {
+            // Check limit
+            if (pos + 2 >= n)
+            {
+                return -1;
+            }
+            buf[pos++] = '0' + (int_part % 10);
+            int_part /= 10;
+            num_digits++;
+        }
+
+        // Swap order of digits
+        int swap_start = neg;
+        int swap_end = pos - 1;
+        while (swap_start < swap_end)
+        {
+            char tmp = buf[swap_start];
+            buf[swap_start] = buf[swap_end];
+            buf[swap_end] = tmp;
+            swap_start++;
+            swap_end--;
+        }
+    }
+
+    // Figure out decimal places
+    int decimal_places = n - pos - 2;
+
+    // If < 1, no room
+    if (decimal_places < 1)
+    {
+        buf[pos] = '\0';
+        return 0;
+    }
+
+    // Add decimal point
+    buf[pos++] = '.';
+
+    // Add decimal places
+    f -= (int)f;
+    for (int i = 0; i < decimal_places; i++)
+    {
+        f *= 10;
+        int digit = (int)f;
+        buf[pos++] = '0' + digit;
+        f -= digit;
+    }
+
+    // Done
+    buf[pos] = '\0';
+    return 0;
 }
 
 void Unknown_Interrupt_Handler()

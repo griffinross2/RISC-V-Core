@@ -46,8 +46,8 @@ module ahb_multiplexor (
         abif_to_ram.hsel = 1'b0;
         abif_to_uart.hsel = 1'b0;
 
-        // RAM address range = 0x0000_0000 to 0x0000_FFFF
-        if (abif_to_controller.htrans != HTRANS_IDLE && abif_to_controller.haddr < 32'h0001_0000) begin
+        // RAM address range = 0x0000_0000 to 0x0001_FFFF
+        if (abif_to_controller.htrans != HTRANS_IDLE && abif_to_controller.haddr < 32'h0002_0000) begin
             abif_to_ram.hsel = 1'b1;
             sel_i = 1;
         // UART address range = 0x0002_0000 to 0x0002_000C

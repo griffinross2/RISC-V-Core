@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "../riscv.h"
+#include "../include/riscv.h"
 
 #define UART_BASE 0x00020000
 
