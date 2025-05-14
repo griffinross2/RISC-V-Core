@@ -1,5 +1,5 @@
 /**************/
-/* RAM module */
+/* ROM module */
 /**************/
 `timescale 1ns/1ns
 
@@ -7,13 +7,13 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 
-module ram (
+module rom (
     input logic clk, nrst,
     ram_if.ram ram_if
 );
 
 // Number of words
-parameter RAM_SIZE = 32768; // 128kB
+parameter RAM_SIZE = 1024; // 1024 words = 4kB
 parameter LAT = 0;
 
 // Counter state

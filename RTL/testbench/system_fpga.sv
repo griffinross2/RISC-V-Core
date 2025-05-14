@@ -9,7 +9,7 @@ module system_fpga (
   input logic ck_rst,
   input logic uart_txd_in,
   output logic UART_TXD,
-  output logic LED [0:3]
+  output logic LED [0:3],
 );
 
   // Clock and reset

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36" version="26.2.14">
+  <diagram name="State Diagram" id="V_dztQzECKVeK8a1-iYN">
+    <mxGraphModel dx="1029" dy="959" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="2339" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Z35Seh688EH_hjcrxX-N-1" value="TRANSFER_IDLE" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="680" y="80" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-2" target="Z35Seh688EH_hjcrxX-N-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-15" value="arready" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-13">
+          <mxGeometry x="-0.0778" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-2" value="TRANSFER_READ_ADDR&lt;div&gt;------------------------------------&lt;/div&gt;&lt;div&gt;Assert arvalid and araddr,&lt;/div&gt;&lt;div&gt;other ar- signals&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="480" y="280" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-3" target="Z35Seh688EH_hjcrxX-N-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-18" value="awready" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-14">
+          <mxGeometry x="-0.05" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-3" value="TRANSFER_WRITE_ADDR&lt;div&gt;-------------------------------------&lt;/div&gt;&lt;div&gt;Assert awvalid and awaddr,&lt;/div&gt;&lt;div&gt;other aw- signals&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="880" y="280" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-4" target="Z35Seh688EH_hjcrxX-N-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="640" />
+              <mxPoint x="440" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-22" value="done" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-21">
+          <mxGeometry x="-0.6397" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-4" value="TRANSFER_READ_DATA&lt;div&gt;-----------------------------------&lt;/div&gt;&lt;div&gt;Assert rready&lt;/div&gt;&lt;div&gt;If rvalid, latch data and response&lt;/div&gt;&lt;div&gt;Assert ready when data and response are latched&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="480" y="560" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-5" target="Z35Seh688EH_hjcrxX-N-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-20" value="wvalid &amp;amp;&amp;amp; wlast" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-19">
+          <mxGeometry x="-0.05" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-5" value="TRANSFER_WRITE_DATA&lt;div&gt;-------------------------------------&lt;/div&gt;&lt;div&gt;&lt;div&gt;Assert wready&lt;/div&gt;&lt;div&gt;If wvalid, latch data&lt;/div&gt;&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="880" y="560" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-6" target="Z35Seh688EH_hjcrxX-N-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1080" y="920" />
+              <mxPoint x="1080" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-24" value="done" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-23">
+          <mxGeometry x="-0.7769" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-6" value="TRANSFER_WRITE_RESP&lt;div&gt;-------------------------------------&lt;/div&gt;&lt;div&gt;Assert bready&lt;/div&gt;&lt;div&gt;If bvalid, latch response&lt;/div&gt;&lt;div&gt;Assert ready when response is latched&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="880" y="840" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-7" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0;entryDx=0;entryDy=0;exitX=0;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-1" target="Z35Seh688EH_hjcrxX-N-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="590" y="220" as="sourcePoint" />
+            <mxPoint x="640" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-11" value="read" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-7">
+          <mxGeometry x="-0.0574" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-8" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z35Seh688EH_hjcrxX-N-1" target="Z35Seh688EH_hjcrxX-N-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="900" y="230" as="sourcePoint" />
+            <mxPoint x="950" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-12" value="write &amp;amp;&amp;amp; !read" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-8">
+          <mxGeometry x="0.0078" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-9" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="Z35Seh688EH_hjcrxX-N-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="650" y="60" as="sourcePoint" />
+            <mxPoint x="650" y="80" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="660" y="90" />
+              <mxPoint x="690" y="70" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Z35Seh688EH_hjcrxX-N-10" value="~nrst" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Z35Seh688EH_hjcrxX-N-9">
+          <mxGeometry x="-0.8394" relative="1" as="geometry">
+            <mxPoint x="-13" y="-18" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

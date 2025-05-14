@@ -1,2 +1,2 @@
 # RISC-V Core
-This repository contains an implementation for a RISC-V processor to run on a Spartan-7 FPGA. The architecture is a 5-stage pipeline with a shared instruction and data memory. The CPU supports the RV32I base instruction set.
+This repository contains an implementation for a RISC-V processor to run on a Spartan-7 FPGA. The architecture is a 5-stage pipeline with a block bootloader ROM and external DDR3 RAM. In my implementation, the actual program text and data is stored on the configuration flash of the FPGA, and loaded into DDR3 by the bootloader on startup. The CPU supports the RV32IM_zicsr instruction set.

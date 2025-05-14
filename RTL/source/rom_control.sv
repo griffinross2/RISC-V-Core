@@ -5,7 +5,7 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 
-module memory_control (
+module rom_control (
   input logic clk, nrst,
   ahb_bus_if.satellite_to_mux ahb_bus_if,
   ram_if.ramctrl ram_if

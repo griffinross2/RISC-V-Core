@@ -1,0 +1,28 @@
+{signal: [
+  	{name: 'clk', 	wave: 'p.......'},
+  	['CPU signals',
+  	{name: 'read', 	wave: '01.....0'},
+  	{name: 'addr', 	wave: 'x3.....x', data: ["ADDR"]},
+  	{name: 'ready', 	wave: '0....1.0'},
+    {name: 'done', 	wave: '0.....10'},
+  	{name: 'load', 	wave: 'x....4.x', data: ["DATA"]},
+	],
+	{},
+     
+    ['AXI AR CH',
+    {name: 'arvalid', 	wave: '0.1.0...'},
+    {name: 'arready', 	wave: '0..10...'},
+    {name: 'araddr', 	wave: 'x.3.x...', data: ["ADDR"]},
+    ],
+    {},
+     
+    ['AXI R CH',
+    {name: 'rvalid', 	wave: '0...10..'},
+    {name: 'rready', 	wave: '0...10..'},
+    {name: 'rlast', 	wave: '0...10..'},
+    {name: 'rdata', 	wave: 'x...4x..', data: ["DATA"]},
+    {name: 'rresp', 	wave: 'x...4x..', data: ["OKAY"]},
+    ],
+], 
+head: {text: 'AXI Controller Read'},
+config: {hscale: 2}}

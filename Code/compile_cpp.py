@@ -3,7 +3,7 @@ import sys
 import os
 
 def convert_intel_hex_to_vivado_mem(file_path):
-    memsize = 4096
+    memsize = 32768
     hex_strings = []
 
     # Fill with zeros
@@ -23,9 +23,6 @@ def convert_intel_hex_to_vivado_mem(file_path):
                     if record_type == 2:
                         #  Segment address record
                         base_addr = int(hex_data[8:12], 16) << 4
-                    elif record_type == 4:
-                        #  Linear address record
-                        base_addr = int(hex_data[8:12], 16) << 16
                     else:
                         # Otherwise process data records
                         continue
@@ -40,10 +37,8 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
                     addr = (record_addr + i) + base_addr
 
-                    # Only accept addresses in the range 0x0 to 0xFFF
-                    if addr < 0x1000:
-                        # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
-                        hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
+                    # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
+                    hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
 
     return '\n'.join(hex_strings)
 
@@ -53,7 +48,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     src_dir = sys.argv[1]
-    c_files_in_dir = [x for x in os.listdir(src_dir) if x.endswith('.c')]
+    c_files_in_dir = [x for x in os.listdir(src_dir) if x.endswith('.cpp')]
     c_files_out = [x + ".o" for x in c_files_in_dir]
     S_files_in_dir = [x for x in os.listdir(src_dir) if x.endswith('.S')]
     S_files_out = [x + ".o" for x in S_files_in_dir]
@@ -65,7 +60,7 @@ if __name__ == "__main__":
 
     # Generate object files from C source files
     for c_in, c_out in zip(c_files_in_dir, c_files_out):
-        subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -march=rv32im_zicsr -mabi=ilp32 -fdata-sections -ffunction-sections -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
+        subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-g++ -std=c++11 -march=rv32im_zicsr -mabi=ilp32 -fdata-sections -ffunction-sections -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
 
     # Generate object files from ASM source files
     for S_in, S_out in zip(S_files_in_dir, S_files_out):
@@ -73,16 +68,12 @@ if __name__ == "__main__":
     
     # Generate object files from startup files
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-as -march=rv32im_zicsr -mabi=ilp32 -o build/startup.o startup.S", shell=True)
-    subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -fdata-sections -ffunction-sections -c -march=rv32im_zicsr -mabi=ilp32 -o build/syscalls.o syscalls.c", shell=True)
+    subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-g++ -std=c++11 -fdata-sections -ffunction-sections -c -march=rv32im_zicsr -mabi=ilp32 -o build/syscalls.o syscalls.c", shell=True)
 
-    subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -Wl,--print-memory-usage -Wl,--gc-sections -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/syscalls.o build/startup.o -o build/program.elf", shell=True)
+    subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-g++ -std=c++11 -Wl,--print-memory-usage -Wl,--gc-sections -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/syscalls.o build/startup.o -o build/program.elf", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objdump -D build/program.elf > build/program.S", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O ihex build/program.elf build/program.hex", shell=True)
 
-    # Generate the .mem file for the bootloader ROM
     mem = convert_intel_hex_to_vivado_mem('build/program.hex')
     with open('build/raminit.mem', 'w') as file:
         file.write(mem)
-
-    # Generate a binary file for the FLASH
-    subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O binary --change-addresses -0x00800000 --remove-section .boot build/program.elf build/program.bin", shell=True)
