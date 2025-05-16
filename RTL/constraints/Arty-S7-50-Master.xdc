@@ -8,6 +8,7 @@ set_property -dict { PACKAGE_PIN F14   IOSTANDARD LVCMOS33 } [get_ports { CLK12M
 create_clock -add -name sys_clk_pin -period 83.333 -waveform {0 41.667} [get_ports { CLK12MHZ }];
 # set_property -dict {PACKAGE_PIN R2 IOSTANDARD SSTL135} [get_ports CLK]
 # create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports CLK]
+create_clock -period 12.308 -name clk -waveform {0.000 6.154} -add [get_nets clk]
 #create_generated_clock -name cpuclk -source [get_ports sys_clk_i] -divide_by 2 [get_nets cpuclk]
 
 # Switches

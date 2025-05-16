@@ -3,7 +3,7 @@ import sys
 import os
 
 def convert_intel_hex_to_vivado_mem(file_path):
-    memsize = 4096
+    memsize = 1024
     hex_strings = []
 
     # Fill with zeros
@@ -76,12 +76,13 @@ if __name__ == "__main__":
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -fdata-sections -ffunction-sections -c -march=rv32im_zicsr -mabi=ilp32 -o build/syscalls.o syscalls.c", shell=True)
 
     subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -Wl,--print-memory-usage -Wl,--gc-sections -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/syscalls.o build/startup.o -o build/program.elf", shell=True)
+    subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-size build/program.elf", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objdump -D build/program.elf > build/program.S", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O ihex build/program.elf build/program.hex", shell=True)
 
     # Generate the .mem file for the bootloader ROM
     mem = convert_intel_hex_to_vivado_mem('build/program.hex')
-    with open('build/raminit.mem', 'w') as file:
+    with open('build/bootloader.mem', 'w') as file:
         file.write(mem)
 
     # Generate a binary file for the FLASH

@@ -28,7 +28,7 @@ ram_state_t state_n;
 xpm_memory_spram #(
     .ADDR_WIDTH_A(30),                                          // 32 bit but aligned
     .MEMORY_SIZE(RAM_SIZE * 32),                                // RAM_SIZE words of 32 bits
-    .MEMORY_INIT_FILE("raminit.mem"),                           // Initialization file
+    .MEMORY_INIT_FILE("bootloader.mem"),                           // Initialization file
     .WRITE_DATA_WIDTH_A(32),                                    // 32 bits data width
     .BYTE_WRITE_WIDTH_A(8),                                     // Word-wide width
     .READ_DATA_WIDTH_A(32),                                     // 32 bits data width
@@ -51,7 +51,7 @@ xpm_memory_spram #(
 `else
 reg [31:0] ram [0:RAM_SIZE-1];
 initial begin
-    $readmemh("raminit.mem", ram);
+    $readmemh("bootloader.mem", ram);
 end
 always_ff @(posedge clk) begin
     begin

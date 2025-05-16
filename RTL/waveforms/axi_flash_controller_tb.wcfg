@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2.734 ns"></ZoomStartTime>
-      <ZoomEndTime time="136.335 ns"></ZoomEndTime>
-      <Cursor1Time time="25.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.005000 us"></ZoomStartTime>
+      <ZoomEndTime time="6.845001 us"></ZoomEndTime>
+      <Cursor1Time time="1.475000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="191"></NameColumnWidth>
-      <ValueColumnWidth column_width="172"></ValueColumnWidth>
+      <ValueColumnWidth column_width="156"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="8" />
+   <WVObjectSize size="9" />
    <wvobject fp_name="/axi_flash_controller_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -318,10 +318,7 @@
       <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/flash_dq" type="array">
          <obj_property name="ElementShortName">flash_dq[3:0]</obj_property>
          <obj_property name="ObjectShortName">flash_dq[3:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/next_flash_cs" type="logic">
-         <obj_property name="ElementShortName">next_flash_cs</obj_property>
-         <obj_property name="ObjectShortName">next_flash_cs</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/flash_clk" type="logic">
          <obj_property name="ElementShortName">flash_clk</obj_property>
@@ -331,13 +328,13 @@
          <obj_property name="ElementShortName">flash_clk_en</obj_property>
          <obj_property name="ObjectShortName">flash_clk_en</obj_property>
       </wvobject>
-      <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/next_flash_clk_en" type="logic">
-         <obj_property name="ElementShortName">next_flash_clk_en</obj_property>
-         <obj_property name="ObjectShortName">next_flash_clk_en</obj_property>
-      </wvobject>
       <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/flash_clk_div" type="logic">
          <obj_property name="ElementShortName">flash_clk_div</obj_property>
          <obj_property name="ObjectShortName">flash_clk_div</obj_property>
+      </wvobject>
+      <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/flash_clk_strobe" type="logic">
+         <obj_property name="ElementShortName">flash_clk_strobe</obj_property>
+         <obj_property name="ObjectShortName">flash_clk_strobe</obj_property>
       </wvobject>
       <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/clk_cnt" type="array">
          <obj_property name="ElementShortName">clk_cnt[3:0]</obj_property>
@@ -403,9 +400,9 @@
          <obj_property name="ElementShortName">next_axi_state[1:0]</obj_property>
          <obj_property name="ObjectShortName">next_axi_state[1:0]</obj_property>
       </wvobject>
-      <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/next_flash_read_addr" type="logic">
-         <obj_property name="ElementShortName">next_flash_read_addr</obj_property>
-         <obj_property name="ObjectShortName">next_flash_read_addr</obj_property>
+      <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/next_flash_read_addr" type="array">
+         <obj_property name="ElementShortName">next_flash_read_addr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">next_flash_read_addr[31:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/axi_flash_controller_tb/axi_flash_inst/read_id" type="array">
          <obj_property name="ElementShortName">read_id[3:0]</obj_property>
@@ -427,5 +424,9 @@
          <obj_property name="ElementShortName">QIO_READ_LAT_CYCLES[2:0]</obj_property>
          <obj_property name="ObjectShortName">QIO_READ_LAT_CYCLES[2:0]</obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject fp_name="/axi_flash_controller_tb/flash_model_inst/state" type="array">
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
    </wvobject>
 </wave_config>

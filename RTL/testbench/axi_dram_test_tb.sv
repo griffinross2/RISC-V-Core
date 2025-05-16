@@ -46,7 +46,6 @@ module axi_dram_test_tb (
     logic ui_clk_sync_rst;
     logic ui_ref_clk;
     logic mmcm_locked;
-    logic aresetn;
     logic app_sr_req;
     logic app_ref_req;
     logic app_zq_req;
@@ -59,7 +58,6 @@ module axi_dram_test_tb (
     assign clk = ui_clk;
     assign nrst = ~ui_clk_sync_rst;
 
-    assign aresetn = 1'b1;
     assign app_sr_req = 1'b0;
     assign app_ref_req = 1'b0;
     assign app_zq_req = 1'b0;

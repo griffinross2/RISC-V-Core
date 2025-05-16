@@ -1,7 +1,7 @@
 def create_mem():
     diff_lines = []
 
-    with open('raminit.mem', 'r') as f:
+    with open('bootloader.mem', 'r') as f:
         lines_old = f.readlines()
 
     with open('ramnew.mem', 'r') as f:

@@ -12,19 +12,6 @@ _start:
 	la gp, __global_pointer$
 	.option pop
 
-    # Initialize the text segment
-    la a0, __text_start_load
-    la a1, __text_end_load
-    la a2, __text_start
-    text_load_loop:
-        bge a0, a1, text_load_done
-        lw t0, 0(a0)
-        sw t0, 0(a2)
-        addi a0, a0, 4
-        addi a2, a2, 4
-        j text_load_loop
-    text_load_done:
-
     # Initialize the sdata segment
     la a0, __sdata_start_load
     la a1, __sdata_end_load

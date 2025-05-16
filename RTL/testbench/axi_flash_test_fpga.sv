@@ -148,7 +148,7 @@ module axi_flash_test_fpga (
 
             TEST_READ: begin
                 amif.read = 1'b1;
-                amif.addr = 32'h00800000;
+                amif.addr = 32'h0080_0000;
 
                 if (amif.ready) begin
                     amif.done = 1'b1;

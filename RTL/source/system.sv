@@ -6,17 +6,35 @@
 
 `include "common_types.vh"
 import common_types_pkg::*;
-`include "ram_dump_if.vh"
-`include "ahb_controller_if.vh"
+`include "axi_controller_if.vh"
+`include "axi_bus_if.vh"
 `include "ahb_bus_if.vh"
 `include "ram_if.vh"
 
 module system (
-    input logic clk, nrst,
+    input logic sys_clk_i, ck_rst,
+    output logic clk, nrst,
     input logic rxd,
     output logic txd,
     output logic halt,
-    ram_dump_if.tb cpu_ram_debug_if
+    axi_controller_if.axi_controller debug_amif,
+    output logic flash_cs,
+    inout wire [3:0] flash_dq,
+    inout [15:0] ddr3_dq,
+    output [1:0] ddr3_dm,
+    inout [1:0] ddr3_dqs_p,
+    inout [1:0] ddr3_dqs_n,
+    output [13:0] ddr3_addr,
+    output [2:0] ddr3_ba,
+    output [0:0] ddr3_ck_p,
+    output [0:0] ddr3_ck_n,
+    output ddr3_ras_n,
+    output ddr3_cas_n,
+    output ddr3_we_n,
+    output ddr3_reset_n,
+    output [0:0] ddr3_cke,
+    output [0:0] ddr3_odt,
+    output [0:0] ddr3_cs_n
 );
 
 // Interrupt lines
@@ -29,110 +47,153 @@ always_comb begin
 end
 
 // Interfaces
-ahb_controller_if debug_controller_if();
+axi_controller_if fetch_amif();
+axi_controller_if mem_amif();
 
-ahb_bus_if multiplexor_abif();
-ahb_bus_if debug_abif();
-ahb_bus_if cpu_abif();
-ahb_bus_if def_abif();
-ahb_bus_if ram_abif();
-ahb_bus_if uart_abif();
+axi_bus_if multiplexor_abif();
+axi_bus_if debug_abif();
+axi_bus_if icache_abif();
+axi_bus_if dcache_abif();
+axi_bus_if sram_abif();
+axi_bus_if flash_abif();
+axi_bus_if dram_abif();
+axi_bus_if ahb_abif();
+ahb_bus_if controller_ahb();
+ahb_bus_if uart_ahb();
+ahb_bus_if def_ahb();
 
 ram_if ram_if();
 
-// Debug AHB interface
-assign debug_controller_if.iread = cpu_ram_debug_if.iren;
-assign debug_controller_if.dread = cpu_ram_debug_if.dren;
-always_comb begin
-    casez (cpu_ram_debug_if.dwen)
-        4'b0001, 4'b0010, 4'b0100, 4'b1000: debug_controller_if.dwrite = 2'b01;
-        4'b1100, 4'b0011: debug_controller_if.dwrite = 2'b10;
-        4'b1111: debug_controller_if.dwrite = 2'b11;
-        default: debug_controller_if.dwrite = 2'b00; // No write
-    endcase
-end
-assign debug_controller_if.iaddr = cpu_ram_debug_if.iaddr;
-assign debug_controller_if.daddr = cpu_ram_debug_if.daddr;
-assign debug_controller_if.dstore = cpu_ram_debug_if.dstore;
-
-assign cpu_ram_debug_if.iwait = ~debug_controller_if.ihit;
-assign cpu_ram_debug_if.dwait = ~debug_controller_if.dhit;
-assign cpu_ram_debug_if.iload = debug_controller_if.iload;
-assign cpu_ram_debug_if.dload = debug_controller_if.dload;
-
-// Connect control from TB or CPU to AHB bus
-assign multiplexor_abif.haddr = cpu_ram_debug_if.override_ctrl ? debug_abif.haddr : cpu_abif.haddr;
-assign multiplexor_abif.hburst = cpu_ram_debug_if.override_ctrl ? debug_abif.hburst : cpu_abif.hburst;
-assign multiplexor_abif.hsize = cpu_ram_debug_if.override_ctrl ? debug_abif.hsize : cpu_abif.hsize;
-assign multiplexor_abif.htrans = cpu_ram_debug_if.override_ctrl ? debug_abif.htrans : cpu_abif.htrans;
-assign multiplexor_abif.hwdata = cpu_ram_debug_if.override_ctrl ? debug_abif.hwdata : cpu_abif.hwdata;
-assign multiplexor_abif.hwrite = cpu_ram_debug_if.override_ctrl ? debug_abif.hwrite : cpu_abif.hwrite;
-
-// Connect AHB bus to TB and CPU
-assign cpu_abif.hrdata = multiplexor_abif.hrdata;
-assign cpu_abif.hready = multiplexor_abif.hready;
-assign cpu_abif.hresp = multiplexor_abif.hresp;
-assign debug_abif.hrdata = multiplexor_abif.hrdata;
-assign debug_abif.hready = multiplexor_abif.hready;
-assign debug_abif.hresp = multiplexor_abif.hresp;
-
-// Debug AHB controller
-ahb_controller debug_controller (
-    .clk(clk),
-    .nrst(nrst),
-    .amif(debug_controller_if),
-    .abif(debug_abif)
-);
-
-// CPU
-cpu cpu_inst(
+// Datapath
+datapath datapath_inst (
     .clk(clk),
     .nrst(nrst),
     .interrupt_in_sync(interrupt_in_sync),
     .halt(halt),
-    .abif(cpu_abif)
+    .amif_fetch(fetch_amif),
+    .amif_mem(mem_amif)
 );
 
-// AHB multiplexor
-ahb_multiplexor ahb_mux_inst (
+// AXI interconnect
+axi_interconnect axi_interconnect_inst (
     .clk(clk),
     .nrst(nrst),
-    .abif_to_controller(multiplexor_abif),
-    .abif_to_def(def_abif),
-    .abif_to_ram(ram_abif),
-    .abif_to_uart(uart_abif)
+    .abif_to_icache(icache_abif),
+    .abif_to_dcache(dcache_abif),
+    .abif_to_dma(debug_abif),   // Plug debug into DMA for now
+    .abif_to_sram(sram_abif),
+    .abif_to_flash(flash_abif),
+    .abif_to_dram(dram_abif),
+    .abif_to_ahb(ahb_abif)
 );
 
-// AHB default satellite
-ahb_default_satellite ahb_satellite_def (
+// Debug AXI controller
+axi_controller debug_controller (
     .clk(clk),
     .nrst(nrst),
-    .abif(def_abif)
+    .amif(debug_amif),
+    .abif(debug_abif)
 );
 
-// Memory controller
-memory_control memory_control_inst (
+// AXI ICache controller
+// No icache rn
+axi_controller icache_controller (
     .clk(clk),
     .nrst(nrst),
-    .ahb_bus_if(ram_abif),
+    .amif(fetch_amif),
+    .abif(icache_abif)
+);
+
+// AXI DCache controller
+// No dcache rn
+axi_controller dcache_controller (
+    .clk(clk),
+    .nrst(nrst),
+    .amif(mem_amif),
+    .abif(dcache_abif)
+);
+
+// AXI Flash controller
+axi_flash_controller flash_controller (
+    .clk(clk),
+    .nrst(nrst),
+    .abif(flash_abif),
+    .clk_div(4'd1),
+    .flash_cs(flash_cs),
+    .flash_dq(flash_dq)
+);
+
+// AXI ROM controller
+axi_rom_controller rom_controller (
+    .clk(clk),
+    .nrst(nrst),
+    .abif(sram_abif),
     .ram_if(ram_if)
 );
 
-// UART
-ahb_uart_satellite uart_inst (
+// ROM
+rom rom_inst (
     .clk(clk),
     .nrst(nrst),
+    .ram_if(ram_if)
+);
+
+// AXI DRAM controller
+axi_dram_controller dram_controller (
+    .sys_clk_i(sys_clk_i),
+    .ck_rst(ck_rst),
+    .ddr3_dq(ddr3_dq),
+    .ddr3_dm(ddr3_dm),
+    .ddr3_dqs_p(ddr3_dqs_p),
+    .ddr3_dqs_n(ddr3_dqs_n),
+    .ddr3_addr(ddr3_addr),
+    .ddr3_ba(ddr3_ba),
+    .ddr3_ck_p(ddr3_ck_p),
+    .ddr3_ck_n(ddr3_ck_n),
+    .ddr3_ras_n(ddr3_ras_n),
+    .ddr3_cas_n(ddr3_cas_n),
+    .ddr3_we_n(ddr3_we_n),
+    .ddr3_reset_n(ddr3_reset_n),
+    .ddr3_cke(ddr3_cke),
+    .ddr3_odt(ddr3_odt),
+    .ddr3_cs_n(ddr3_cs_n),
+    .clk(clk),
+    .nrst(nrst),
+    .abif(dram_abif)
+);
+
+// AXI to AHB-Lite bridge
+axi_to_ahb_bridge axi_to_ahb_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .axi(ahb_abif),
+    .ahb(controller_ahb)
+);
+
+// AHB-Lite Multiplexor
+ahb_multiplexor ahb_multiplexor_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .abif_to_controller(controller_ahb),
+    .abif_to_uart(uart_ahb),
+    .abif_to_def(def_ahb)
+);
+
+// AHB-Lite UART satellite
+ahb_uart_satellite ahb_uart_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .abif(uart_ahb),
     .rxd(rxd),
     .txd(txd),
-    .rxi(uart_rx_int),
-    .abif(uart_abif)
+    .rxi(uart_rx_int)
 );
 
-// Shared Instruction-Data RAM
-ram ram_inst (
+// AHB-Lite default satellite
+ahb_default_satellite ahb_default_inst (
     .clk(clk),
     .nrst(nrst),
-    .ram_if(ram_if)
+    .abif(def_ahb)
 );
 
 endmodule

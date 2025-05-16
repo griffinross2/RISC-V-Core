@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 def convert_intel_hex_to_vivado_mem(file_path):
-    memsize = 16384
+    memsize = 1024
     hex_strings = []
 
     # Fill with zeros
@@ -56,5 +56,5 @@ if __name__ == "__main__":
 
     assemble(sys.argv[1])
     viv_mem = convert_intel_hex_to_vivado_mem('.'.join(sys.argv[1].split('.')[:-1]) + ".hex")
-    with open("raminit.mem", 'w') as file:
+    with open("bootloader.mem", 'w') as file:
         file.write(viv_mem)

@@ -21,6 +21,11 @@ interface axi_controller_if;
         input read, write, addr, store, done,
         output ready, load
     );
+
+    modport datapath (
+        output read, write, addr, store, done,
+        input ready, load
+    );
     
     modport tb (
         output read, write, addr, store, done,

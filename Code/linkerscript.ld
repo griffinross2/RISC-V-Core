@@ -32,7 +32,7 @@ SECTIONS
         KEEP(*(.ctors))
         KEEP(*(.dtors))
         __text_end = .;
-    } > RAM AT > FLASH
+    } > FLASH
 
     /* Small initialized data (for gp-relative access) */
     .sdata :

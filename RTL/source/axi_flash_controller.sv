@@ -17,14 +17,13 @@ module axi_flash_controller (
 );
     localparam logic [2:0] QIO_READ_LAT_CYCLES = 3'd4;
 
-    logic next_flash_cs;
-
     // Flash clock - sent external through STARTUPE2
     logic flash_clk;
-    logic flash_clk_en, next_flash_clk_en;
+    logic flash_clk_en, next_flash_clk_en, next_next_flash_clk_en;
 
     // Flash clock divider
     logic flash_clk_div;
+    logic flash_clk_strobe;
     logic [3:0] clk_cnt;
     always_ff @(posedge clk) begin
         if (~nrst) begin
@@ -39,11 +38,18 @@ module axi_flash_controller (
     end
 
     always_comb begin
+        flash_clk_strobe = 1'b0;
+    
         // Bypass the flash clock divider if clk_div is 0
         if (clk_div == 4'd0) begin
             flash_clk = clk;
+            flash_clk_strobe = 1'b1;
         end else begin
             flash_clk = flash_clk_div;
+
+            if (!flash_clk_div && (clk_cnt == (clk_div - 4'd1))) begin
+                flash_clk_strobe = 1'b1;
+            end
         end
     end
 
@@ -85,6 +91,8 @@ module axi_flash_controller (
     word_t flash_read_addr;
     word_t flash_read_data, next_flash_read_data;
 
+    logic next_flash_cs, next_next_flash_cs;
+
     // Flash bidirectional buffer
     logic flash_tristate;   // 1 -> high-Z
     logic [3:0] flash_dq_o, next_flash_dq_o;
@@ -119,28 +127,32 @@ module axi_flash_controller (
     );
 
     // Flash control signals
-    always_ff @(posedge flash_clk) begin
+    always_ff @(posedge clk) begin
         if (~nrst) begin
             state <= FLASH_IDLE;
-            flash_cs <= 1'b1;
-            flash_clk_en <= 1'b0;
+            next_flash_cs <= 1'b1;
+            next_flash_clk_en <= 1'b0;
             cycle_counter <= 3'b000;
             flash_read_data <= '0;
-        end else begin
+        end else if (flash_clk_strobe) begin
             state <= next_state;
-            flash_cs <= next_flash_cs;
-            flash_clk_en <= next_flash_clk_en;
+            next_flash_cs <= next_next_flash_cs;
+            next_flash_clk_en <= next_next_flash_clk_en;
             cycle_counter <= next_cycle_counter;
             flash_read_data <= next_flash_read_data;
         end
     end
 
     // Flash data output
-    always_ff @(negedge flash_clk) begin
+    always_ff @(negedge flash_clk, negedge nrst) begin
         if (~nrst) begin
             flash_dq_o <= 4'b0000;
+            flash_cs <= 1'b1;
+            flash_clk_en <= 1'b0;
         end else begin
             flash_dq_o <= next_flash_dq_o;
+            flash_cs <= next_flash_cs;
+            flash_clk_en <= next_flash_clk_en;
         end
     end
 
@@ -193,8 +205,8 @@ module axi_flash_controller (
     // State output logic
     always_comb begin
         next_cycle_counter = cycle_counter;
-        next_flash_cs = flash_cs;
-        next_flash_clk_en = flash_clk_en;
+        next_next_flash_cs = next_flash_cs;
+        next_next_flash_clk_en = next_flash_clk_en;
         next_flash_dq_o = flash_dq_o;
 
         flash_read_done = 1'b0;
@@ -205,8 +217,8 @@ module axi_flash_controller (
         case (state)
             FLASH_IDLE: begin
                 if (next_state == FLASH_READ_INST) begin
-                    next_flash_cs = 1'b0;
-                    next_flash_clk_en = 1'b1;
+                    next_next_flash_cs = 1'b0;
+                    next_next_flash_clk_en = 1'b1;
                     next_cycle_counter = 3'b000;
                 end
             end
@@ -300,9 +312,14 @@ module axi_flash_controller (
                     3'd6: next_flash_read_data[31:28] = flash_dq_i; // Top of fourth byte
                     3'd7: begin 
                         next_flash_read_data[27:24] = flash_dq_i; // Bottom of fourth byte
-                        next_flash_cs = 1'b1; // Deassert chip select
-                        next_flash_clk_en = 1'b0; // Disable flash clock
-                        flash_read_done = 1'b1; // Indicate read done
+                        next_next_flash_cs = 1'b1; // Deassert chip select
+                        next_next_flash_clk_en = 1'b0; // Disable flash clock
+                        
+                        // Only on the clk cycle where flash clock is going high,
+                        // ensure that the AXI side doesn't see this twice
+                        if (flash_clk_strobe) begin
+                            flash_read_done = 1'b1; // Indicate read done
+                        end
                     end
                     default begin end
                 endcase
@@ -348,7 +365,7 @@ module axi_flash_controller (
 
         case (axi_state)
             AXI_IDLE: begin
-                if (abif.arvalid) begin
+                if (abif.arvalid && abif.arready) begin
                     next_axi_state = AXI_READ_WAIT;
                 end
             end
@@ -384,7 +401,7 @@ module axi_flash_controller (
         abif.bvalid = 1'b0;
         abif.bresp = 2'b00;
 
-        abif.arready = 0'b1;
+        abif.arready = 1'b0;
 
         abif.rid = read_id;
         abif.rdata = flash_read_data;
@@ -396,11 +413,15 @@ module axi_flash_controller (
 
         case (axi_state)
             AXI_IDLE: begin
-                abif.arready = 1'b1;
+                // Only proceed on the rising edge of the flash clock
+                // Makes sure the flash_read_start signal takes effect
+                if (flash_clk_strobe) begin
+                    abif.arready = 1'b1;
+                end
                 
-                if (abif.arvalid) begin
+                if (abif.arvalid && abif.arready) begin
                     next_read_id = abif.arid;
-                    next_flash_read_addr = abif.araddr;
+                    next_flash_read_addr = {abif.araddr[31:2], 2'b00};  // Align
                     flash_read_start = 1'b1;
                 end
             end

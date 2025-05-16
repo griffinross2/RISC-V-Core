@@ -2,7 +2,7 @@
 
 #include "../include/riscv.h"
 
-#define UART_BASE 0x00020000
+#define UART_BASE 0x20020000
 
 #define UART_CFGR (UART_BASE + 0x00)
 #define UART_TXDR (UART_BASE + 0x04)
@@ -85,7 +85,7 @@ uint32_t lfsr32_next(int *lfsr)
 void uart_init(void)
 {
     // Initialize UART configuration register
-    UART->CFGR = 434; // Set baud rate: 50M / 115200 = 434
+    UART->CFGR = 705; // Set baud rate: 81.25M / 115200 = 705
 
     // Enable UART interrupt
     IRQ_ENABLE(UART_RXI); // Set interupt enable bit for UART RXI

@@ -4,7 +4,7 @@
 
 #include "../include/riscv.h"
 
-#define UART_BASE 0x00020000
+#define UART_BASE 0x20020000
 
 #define UART_CFGR (UART_BASE + 0x00)
 #define UART_TXDR (UART_BASE + 0x04)
@@ -64,13 +64,14 @@ int main(void)
         }
 
         int res = snprintf(chr, 64, "%d / %d = ", a, b);
-        int n = 63 - res;
+        int n = 62 - res;
         if (n > 16)
         {
             n = 16; // Limit to 16 decimal places
         }
         ftoa(result, chr + res, n);
         chr[res + n] = '\n';
+        chr[res + n + 1] = '\0';
         uart_send_str(chr);
     }
 
@@ -92,7 +93,7 @@ uint32_t lfsr32_next(int *lfsr)
 void uart_init(void)
 {
     // Initialize UART configuration register
-    UART->CFGR = 434; // Set baud rate: 50M / 115200 = 434
+    UART->CFGR = 705; // Set baud rate: 81.25M / 115200 = 705
 
     // Enable UART interrupt
     IRQ_ENABLE(UART_RXI); // Set interupt enable bit for UART RXI
@@ -166,7 +167,8 @@ int ftoa(float f, char *buf, int n)
     }
     else
     {
-        // Otherwise, we need to add the integer part digit by digit, making sure to stop if we exceed the buffer.
+        // Otherwise, we need to add the integer part digit by digit, making sure to
+        // stop if we exceed the buffer.
         while (int_part > 0)
         {
             // Check limit
@@ -193,12 +195,11 @@ int ftoa(float f, char *buf, int n)
     }
 
     // Figure out decimal places
-    int decimal_places = n - pos - 2;
+    int decimal_places = n - pos - 1;
 
     // If < 1, no room
     if (decimal_places < 1)
     {
-        buf[pos] = '\0';
         return 0;
     }
 
@@ -216,7 +217,6 @@ int ftoa(float f, char *buf, int n)
     }
 
     // Done
-    buf[pos] = '\0';
     return 0;
 }
 

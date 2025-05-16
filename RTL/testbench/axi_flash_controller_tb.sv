@@ -31,9 +31,17 @@ module axi_flash_controller_tb ();
         .clk(clk),
         .nrst(nrst),
         .abif(abif_controller),
-        .clk_div(4'd0),
+        .clk_div(4'd2),
         .flash_cs(flash_cs),
         .flash_dq(flash_dq)
+    );
+
+    flash_model flash_model_inst (
+        .clk(clk),
+        .nrst(nrst),
+        .clk_div(4'd2),
+        .cs(flash_cs),
+        .dq(flash_dq)
     );
 
     // Clock generation
@@ -60,9 +68,9 @@ module axi_flash_controller_tb ();
             abif_controller.rdata = '0;
 
             nrst = 0;
-            @(posedge clk);
-            @(posedge clk);
+            #200ns;
             nrst = 1;
+            @(posedge clk);
         end
     endtask
 
@@ -83,6 +91,7 @@ module axi_flash_controller_tb ();
             amif.done = 0;
             amif.read = 0;
             amif.addr = 0;
+            @(posedge clk);
         end
     endtask
 
@@ -93,7 +102,10 @@ module axi_flash_controller_tb ();
         @(posedge clk);
 
         // Store and read from RAM
-        test_read(32'h00000020, 32'h00000000);
+        test_read(32'h0080_0D90, 32'h0000_0000);
+        test_read(32'h0080_167C, 32'h0000_0000);
+        test_read(32'h0080_112C, 32'h0000_0000);
+        test_read(32'h0080_0140, 32'h0000_0000);
 
         // Finish simulation
         #50;

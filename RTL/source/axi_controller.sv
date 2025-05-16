@@ -161,9 +161,6 @@ always_comb begin
     abif.arprot = 3'b000;   // Normal access
     abif.arqos = 4'b0000;   // No QoS
 
-    abif.rid = 4'b0000;     // ID
-    abif.rlast = 2'b00;     // Always last data transfer
-
     abif.awid = 4'b0000;    // ID
     abif.awlen = 8'd0;      // 1 data transfer
     abif.awsize = 3'd2;     // 4-byte word
@@ -175,8 +172,6 @@ always_comb begin
 
     abif.wlast = 1'b1;      // Always last data transfer
 
-    abif.bid = 4'b0000;     // ID
-
     casez(state)
         TRANSFER_IDLE: begin
             next_ready = 1'b0;
@@ -186,11 +181,11 @@ always_comb begin
             next_bready = 1'b0;
             next_rready = 1'b0;
 
-            if (next_state == TRANSFER_READ_ADDR) begin
+            if (amif.read) begin
                 // Read address
                 next_araddr = amif.addr;
                 next_arvalid = 1'b1;
-            end else if (next_state == TRANSFER_WRITE_ADDR) begin
+            end else if (|amif.write) begin
                 // Write address
                 next_awaddr = amif.addr;
                 next_awvalid = 1'b1;
@@ -198,7 +193,7 @@ always_comb begin
         end
 
         TRANSFER_READ_ADDR: begin
-            if (next_state == TRANSFER_READ_DATA) begin
+            if (abif.arready) begin
                 // Satellite is ready to accept transaction
                 next_arvalid = 1'b0;
                 next_rready = 1'b1;
@@ -220,22 +215,38 @@ always_comb begin
                 next_read_counter = read_counter + 8'd1;
             end
 
-            if (next_state == TRANSFER_IDLE) begin
+            if (amif.done) begin
                 // Transaction is done
                 next_ready = 1'b0;
             end
         end
 
         TRANSFER_WRITE_ADDR: begin
-            if (next_state == TRANSFER_WRITE_DATA) begin
+            if (abif.awready) begin
                 // Satellite is ready to accept transaction
                 next_awvalid = 1'b0;
                 next_wvalid = 1'b1;
                 next_wdata = amif.store;
 
                 case (amif.write)
-                    2'b01: next_wstrb = 4'b0001; // Byte
-                    2'b10: next_wstrb = 4'b0011; // Halfword
+                    2'b01: begin
+                        case (amif.addr[1:0])
+                            2'b00: next_wstrb = 4'b0001; // Byte
+                            2'b01: next_wstrb = 4'b0010; // Byte
+                            2'b10: next_wstrb = 4'b0100; // Byte
+                            2'b11: next_wstrb = 4'b1000; // Byte
+                            default: next_wstrb = 4'b0000; // No write
+                        endcase
+                    end
+                    2'b10: begin
+                        case (amif.addr[1:0])
+                            2'b00: next_wstrb = 4'b0011; // Halfword
+                            2'b01: next_wstrb = 4'b0011; // Halfword
+                            2'b10: next_wstrb = 4'b1100; // Halfword
+                            2'b11: next_wstrb = 4'b1100; // Halfword
+                            default: next_wstrb = 4'b0000; // No write
+                        endcase
+                    end
                     2'b11: next_wstrb = 4'b1111; // Word
                     default: next_wstrb = 4'b0000; // No write
                 endcase
@@ -243,7 +254,7 @@ always_comb begin
         end
 
         TRANSFER_WRITE_DATA: begin
-            if (next_state == TRANSFER_WRITE_RESP) begin
+            if (abif.wready) begin
                 // Write data is accepted
                 next_wvalid = 1'b0;
                 next_bready = 1'b1;
@@ -257,7 +268,7 @@ always_comb begin
                 next_ready = 1'b1;
             end
 
-            if (next_state == TRANSFER_IDLE) begin
+            if (amif.done) begin
                 // Transaction is done
                 next_ready = 1'b0;
             end
