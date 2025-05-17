@@ -23,6 +23,9 @@ def convert_intel_hex_to_vivado_mem(file_path):
                     if record_type == 2:
                         #  Segment address record
                         base_addr = int(hex_data[8:12], 16) << 4
+                    elif record_type == 4:
+                        #  Linear address record
+                        base_addr = int(hex_data[8:12], 16) << 16
                     else:
                         # Otherwise process data records
                         continue
@@ -37,8 +40,10 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
                     addr = (record_addr + i) + base_addr
 
-                    # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
-                    hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
+                    # Only accept addresses in bootloader
+                    if addr < (memsize * 4):
+                        # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
+                        hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
 
     return '\n'.join(hex_strings)
 

@@ -6,7 +6,7 @@ ENTRY(_start) /* where execution begins */
 MEMORY
 {
     ROM (rx) : ORIGIN = 0x00000000, LENGTH = 4K
-    RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 256M
+    RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 64K
     FLASH (rx) : ORIGIN = 0x00800000, LENGTH = 8M
 }
 

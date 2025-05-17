@@ -12,29 +12,13 @@ import common_types_pkg::*;
 `include "ram_if.vh"
 
 module system (
-    input logic sys_clk_i, ck_rst,
-    output logic clk, nrst,
+    input logic clk, nrst,
     input logic rxd,
     output logic txd,
     output logic halt,
     axi_controller_if.axi_controller debug_amif,
     output logic flash_cs,
-    inout wire [3:0] flash_dq,
-    inout [15:0] ddr3_dq,
-    output [1:0] ddr3_dm,
-    inout [1:0] ddr3_dqs_p,
-    inout [1:0] ddr3_dqs_n,
-    output [13:0] ddr3_addr,
-    output [2:0] ddr3_ba,
-    output [0:0] ddr3_ck_p,
-    output [0:0] ddr3_ck_n,
-    output ddr3_ras_n,
-    output ddr3_cas_n,
-    output ddr3_we_n,
-    output ddr3_reset_n,
-    output [0:0] ddr3_cke,
-    output [0:0] ddr3_odt,
-    output [0:0] ddr3_cs_n
+    inout wire [3:0] flash_dq
 );
 
 // Interrupt lines
@@ -62,7 +46,8 @@ ahb_bus_if controller_ahb();
 ahb_bus_if uart_ahb();
 ahb_bus_if def_ahb();
 
-ram_if ram_if();
+ram_if rom_if();
+ram_if sram_if();
 
 // Datapath
 datapath datapath_inst (
@@ -128,38 +113,29 @@ axi_rom_controller rom_controller (
     .clk(clk),
     .nrst(nrst),
     .abif(sram_abif),
-    .ram_if(ram_if)
+    .ram_if(rom_if)
 );
 
 // ROM
 rom rom_inst (
     .clk(clk),
     .nrst(nrst),
-    .ram_if(ram_if)
+    .ram_if(rom_if)
 );
 
-// AXI DRAM controller
-axi_dram_controller dram_controller (
-    .sys_clk_i(sys_clk_i),
-    .ck_rst(ck_rst),
-    .ddr3_dq(ddr3_dq),
-    .ddr3_dm(ddr3_dm),
-    .ddr3_dqs_p(ddr3_dqs_p),
-    .ddr3_dqs_n(ddr3_dqs_n),
-    .ddr3_addr(ddr3_addr),
-    .ddr3_ba(ddr3_ba),
-    .ddr3_ck_p(ddr3_ck_p),
-    .ddr3_ck_n(ddr3_ck_n),
-    .ddr3_ras_n(ddr3_ras_n),
-    .ddr3_cas_n(ddr3_cas_n),
-    .ddr3_we_n(ddr3_we_n),
-    .ddr3_reset_n(ddr3_reset_n),
-    .ddr3_cke(ddr3_cke),
-    .ddr3_odt(ddr3_odt),
-    .ddr3_cs_n(ddr3_cs_n),
+// AXI SRAM controller
+axi_sram_controller sram_controller (
     .clk(clk),
     .nrst(nrst),
-    .abif(dram_abif)
+    .abif(dram_abif),
+    .ram_if(sram_if)
+);
+
+// SRAM
+sram sram_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .ram_if(sram_if)
 );
 
 // AXI to AHB-Lite bridge

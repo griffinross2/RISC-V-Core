@@ -82,7 +82,7 @@ def run_test():
             sys.exit(1)
 
         # Compare the output
-        success = diff_files("memsim.hex", "ramcpu.hex")
+        success = diff_files("memsim.hex", "cpudump.hex")
 
         if success:
             print("\x1b[32mPASSED\x1b[0m")

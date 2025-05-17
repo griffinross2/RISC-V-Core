@@ -60,6 +60,9 @@ _start:
     # Go to main
     call main
 
+    # Break
+    ebreak
+
     # Loop forever
 _forever:
     j _forever

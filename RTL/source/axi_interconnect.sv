@@ -164,13 +164,13 @@ always_comb begin
     next_ahb_controller = ahb_controller;
 
     // First check the requests
-    icache_writing_sram = abif_to_icache.awvalid && abif_to_icache.awaddr >= 32'h0000_0000 && abif_to_icache.awaddr < 32'h0000_1000;
-    dcache_writing_sram = abif_to_dcache.awvalid && abif_to_dcache.awaddr >= 32'h0000_0000 && abif_to_dcache.awaddr < 32'h0000_1000;
-    dma_writing_sram = abif_to_dma.awvalid && abif_to_dma.awaddr >= 32'h0000_0000 && abif_to_dma.awaddr < 32'h0000_1000;
+    icache_writing_sram = abif_to_icache.awvalid && abif_to_icache.awaddr < 32'h0000_1000;
+    dcache_writing_sram = abif_to_dcache.awvalid && abif_to_dcache.awaddr < 32'h0000_1000;
+    dma_writing_sram = abif_to_dma.awvalid && abif_to_dma.awaddr < 32'h0000_1000;
 
-    icache_reading_sram = abif_to_icache.arvalid && abif_to_icache.araddr >= 32'h0000_0000 && abif_to_icache.araddr < 32'h0000_1000;
-    dcache_reading_sram = abif_to_dcache.arvalid && abif_to_dcache.araddr >= 32'h0000_0000 && abif_to_dcache.araddr < 32'h0000_1000;
-    dma_reading_sram = abif_to_dma.arvalid && abif_to_dma.araddr >= 32'h0000_0000 && abif_to_dma.araddr < 32'h0000_1000;
+    icache_reading_sram = abif_to_icache.arvalid && abif_to_icache.araddr < 32'h0000_1000;
+    dcache_reading_sram = abif_to_dcache.arvalid && abif_to_dcache.araddr < 32'h0000_1000;
+    dma_reading_sram = abif_to_dma.arvalid && abif_to_dma.araddr < 32'h0000_1000;
 
     icache_writing_flash = abif_to_icache.awvalid && abif_to_icache.awaddr >= 32'h0080_0000 && abif_to_icache.awaddr < 32'h0100_0000;
     dcache_writing_flash = abif_to_dcache.awvalid && abif_to_dcache.awaddr >= 32'h0080_0000 && abif_to_dcache.awaddr < 32'h0100_0000;

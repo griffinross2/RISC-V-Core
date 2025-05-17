@@ -67,12 +67,20 @@ end
 // State outputs
 always_comb begin
   axi.arready = 1'b1;
-  axi.awready = 1'b1;
+
   axi.rlast = 1'b1;
   axi.rid = '0;
   axi.rdata = '0;
   axi.rresp = '0;
   axi.rvalid = '0;
+  
+  axi.awready = 1'b1;
+  
+  axi.wready = 1'b1;
+
+  axi.bid = '0;
+  axi.bresp = '0;
+  axi.bvalid = '0;
 
   ahb.haddr = '0;
   ahb.hburst = '0;

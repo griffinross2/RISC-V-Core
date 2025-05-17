@@ -208,6 +208,7 @@ module axi_flash_controller (
         next_next_flash_cs = next_flash_cs;
         next_next_flash_clk_en = next_flash_clk_en;
         next_flash_dq_o = flash_dq_o;
+        next_flash_read_data = flash_read_data;
 
         flash_read_done = 1'b0;
 

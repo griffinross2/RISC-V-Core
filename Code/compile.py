@@ -3,7 +3,7 @@ import sys
 import os
 
 def convert_intel_hex_to_vivado_mem(file_path):
-    memsize = 1024
+    memsize = 1024 # words
     hex_strings = []
 
     # Fill with zeros
@@ -40,8 +40,8 @@ def convert_intel_hex_to_vivado_mem(file_path):
 
                     addr = (record_addr + i) + base_addr
 
-                    # Only accept addresses in the range 0x0 to 0xFFF
-                    if addr < 0x1000:
+                    # Only accept addresses in bootloader
+                    if addr < (memsize * 4):
                         # Write to the row floor(addr/4) at position (6-2*(addr%4)):(8-2*(addr%4))
                         hex_strings[addr//4] = hex_strings[addr//4][0:(6-2*(addr%4))] + data + hex_strings[addr//4][(8-2*(addr%4)):]
 

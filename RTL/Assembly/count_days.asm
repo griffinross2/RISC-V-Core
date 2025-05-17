@@ -5,7 +5,7 @@
 
 _start:
     # Setup data
-    li      sp,    0x10000         # Initial Stack pointer
+    li      sp,    0x1000           # Initial Stack pointer
     li      x18,    21              # 21th
     li      x19,    1               # January
     li      x20,    2025            # 2025

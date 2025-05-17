@@ -57,7 +57,11 @@ module flash_model (
             flash_array[i] = 8'h00;
         end
 
+`ifndef SIMULATOR
         fd = $fopen("../../../../program.bin", "rb");
+`else
+        fd = $fopen("program.bin", "rb");
+`endif
         if (fd == 0) begin
             $fatal("Error: Could not open program.bin");
             $finish;

@@ -85,7 +85,7 @@ uint32_t lfsr32_next(int *lfsr)
 void uart_init(void)
 {
     // Initialize UART configuration register
-    UART->CFGR = 705; // Set baud rate: 81.25M / 115200 = 705
+    UART->CFGR = 434; // Set baud rate: 50M / 115200 = 434
 
     // Enable UART interrupt
     IRQ_ENABLE(UART_RXI); // Set interupt enable bit for UART RXI
