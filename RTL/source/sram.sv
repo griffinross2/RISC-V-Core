@@ -13,7 +13,7 @@ module sram (
 );
 
 // Number of words
-parameter RAM_SIZE = 16384; // 16K words = 64 KB
+parameter RAM_SIZE = 32768; // 32K words = 128 KB
 parameter LAT = 0;
 
 // Counter state
@@ -55,10 +55,10 @@ end
 always_ff @(posedge clk) begin
     begin
         if (|ram_if.wen) begin
-            ram[ram_if.addr[15:2]] <= {ram_if.wen[3] ? ram_if.store[31:24] : ram[ram_if.addr[15:2]][31:24], ram_if.wen[2] ? ram_if.store[23:16] : ram[ram_if.addr[15:2]][23:16], ram_if.wen[1] ? ram_if.store[15:8] : ram[ram_if.addr[15:2]][15:8], ram_if.wen[0] ? ram_if.store[7:0] : ram[ram_if.addr[15:2]][7:0]};
+            ram[ram_if.addr[16:2]] <= {ram_if.wen[3] ? ram_if.store[31:24] : ram[ram_if.addr[16:2]][31:24], ram_if.wen[2] ? ram_if.store[23:16] : ram[ram_if.addr[16:2]][23:16], ram_if.wen[1] ? ram_if.store[15:8] : ram[ram_if.addr[16:2]][15:8], ram_if.wen[0] ? ram_if.store[7:0] : ram[ram_if.addr[16:2]][7:0]};
         end
         if (ram_if.ren) begin
-            ram_if.load <= ram[ram_if.addr[15:2]];
+            ram_if.load <= ram[ram_if.addr[16:2]];
         end
     end
 end

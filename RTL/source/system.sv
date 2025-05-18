@@ -7,6 +7,7 @@
 `include "common_types.vh"
 import common_types_pkg::*;
 `include "axi_controller_if.vh"
+`include "cache_if.vh"
 `include "axi_bus_if.vh"
 `include "ahb_bus_if.vh"
 `include "ram_if.vh"
@@ -31,7 +32,8 @@ always_comb begin
 end
 
 // Interfaces
-axi_controller_if fetch_amif();
+cache_if fetch_amif();
+axi_controller_if icache_amif();
 axi_controller_if mem_amif();
 
 axi_bus_if multiplexor_abif();
@@ -80,12 +82,28 @@ axi_controller debug_controller (
     .abif(debug_abif)
 );
 
+icache icache_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .amif(icache_amif),
+    .cif(fetch_amif)
+);
+
+// always_comb begin
+//     fetch_amif.load = icache_amif.load;
+//     fetch_amif.ready = icache_amif.ready;
+//     icache_amif.done = fetch_amif.done;
+//     icache_amif.store = fetch_amif.store;
+//     icache_amif.read = fetch_amif.read;
+//     icache_amif.write = fetch_amif.write;
+//     icache_amif.addr = fetch_amif.addr;
+// end
+
 // AXI ICache controller
-// No icache rn
 axi_controller icache_controller (
     .clk(clk),
     .nrst(nrst),
-    .amif(fetch_amif),
+    .amif(icache_amif),
     .abif(icache_abif)
 );
 

@@ -38,6 +38,16 @@ _start:
         j data_load_loop
     data_load_done:
 
+    # Zero-initialize the sbss segment
+    la a0, __sbss_start
+    la a1, __sbss_end
+    sbss_zero_loop:
+        bge a0, a1, sbss_zero_done
+        sw zero, 0(a0)
+        addi a0, a0, 4
+        j sbss_zero_loop
+    sbss_zero_done:
+
     # Zero-initialize the bss segment
     la a0, __bss_start
     la a1, __bss_end

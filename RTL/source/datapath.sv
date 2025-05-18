@@ -15,6 +15,7 @@ import common_types_pkg::*;
 `include "branch_unit_if.vh"
 `include "csr_if.vh"
 `include "axi_controller_if.vh"
+`include "cache_if.vh"
 
 // interface (pipeline)
 `include "fetch_to_decode_if.vh"
@@ -28,8 +29,8 @@ module datapath #(
   input logic clk, nrst,
   input logic [31:0] interrupt_in_sync,
   output logic halt,
-  axi_controller_if.datapath amif_fetch,
-  axi_controller_if.datapath amif_mem
+  cache_if.datapath amif_fetch,
+  axi_controller_if.cache amif_mem
 );
   parameter NOP = 32'h00000013;
 

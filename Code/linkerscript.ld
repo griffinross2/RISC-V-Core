@@ -6,7 +6,7 @@ ENTRY(_start) /* where execution begins */
 MEMORY
 {
     ROM (rx) : ORIGIN = 0x00000000, LENGTH = 4K
-    RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 64K
+    RAM (rwx)  : ORIGIN = 0x10000000, LENGTH = 128K
     FLASH (rx) : ORIGIN = 0x00800000, LENGTH = 8M
 }
 
@@ -75,16 +75,14 @@ SECTIONS
     {
         . = ALIGN(4);
         __stack_start = .;
-        . = . + 4K;
+        . = . + 16K;
         __stack_end = .;
     } > RAM
 
     _end = .;
 
-    __text_start_load = LOADADDR(.text);
     __sdata_start_load = LOADADDR(.sdata);
     __data_start_load = LOADADDR(.data);
-    __text_end_load = LOADADDR(.text) + SIZEOF(.text);
     __sdata_end_load = LOADADDR(.sdata) + SIZEOF(.sdata);
     __data_end_load = LOADADDR(.data) + SIZEOF(.data);
 }

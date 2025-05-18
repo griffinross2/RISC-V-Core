@@ -22,7 +22,7 @@ interface axi_controller_if;
         output ready, load
     );
 
-    modport datapath (
+    modport cache (
         output read, write, addr, store, done,
         input ready, load
     );
