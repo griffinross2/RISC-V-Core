@@ -12,15 +12,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000000 ms"></ZoomStartTime>
-      <ZoomEndTime time="1,823.265957455 ms"></ZoomEndTime>
-      <Cursor1Time time="3.610930000 ms"></Cursor1Time>
+      <ZoomStartTime time="3,816.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="5,874.001 ns"></ZoomEndTime>
+      <Cursor1Time time="4,770.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="207"></NameColumnWidth>
-      <ValueColumnWidth column_width="139"></ValueColumnWidth>
+      <NameColumnWidth column_width="222"></NameColumnWidth>
+      <ValueColumnWidth column_width="116"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="35" />
+   <WVObjectSize size="37" />
    <wvobject fp_name="/system_tb/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -2243,7 +2243,6 @@
    <wvobject fp_name="/system_tb/system_inst/datapath_inst/rf0/registers" type="array">
       <obj_property name="ElementShortName">registers[1:31][31:0]</obj_property>
       <obj_property name="ObjectShortName">registers[1:31][31:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="group557" type="group">
       <obj_property name="label">Debug AMIF</obj_property>
@@ -2280,7 +2279,6 @@
    <wvobject fp_name="group582" type="group">
       <obj_property name="label">ICache</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/icache_inst/clk" type="logic">
          <obj_property name="ElementShortName">clk</obj_property>
          <obj_property name="ObjectShortName">clk</obj_property>
@@ -2357,7 +2355,6 @@
    <wvobject fp_name="group590" type="group">
       <obj_property name="label">ICache AMIF</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject fp_name="/system_tb/system_inst/icache_amif/read" type="logic">
          <obj_property name="ElementShortName">read</obj_property>
          <obj_property name="ObjectShortName">read</obj_property>
@@ -2385,6 +2382,127 @@
       <wvobject fp_name="/system_tb/system_inst/icache_amif/done" type="logic">
          <obj_property name="ElementShortName">done</obj_property>
          <obj_property name="ObjectShortName">done</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group641" type="group">
+      <obj_property name="label">DCache</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/nrst" type="logic">
+         <obj_property name="ElementShortName">nrst</obj_property>
+         <obj_property name="ObjectShortName">nrst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/state" type="array">
+         <obj_property name="ElementShortName">state[3:0]</obj_property>
+         <obj_property name="ObjectShortName">state[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/next_state" type="array">
+         <obj_property name="ElementShortName">next_state[3:0]</obj_property>
+         <obj_property name="ObjectShortName">next_state[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/hit" type="logic">
+         <obj_property name="ElementShortName">hit</obj_property>
+         <obj_property name="ObjectShortName">hit</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/block_idx" type="logic">
+         <obj_property name="ElementShortName">block_idx</obj_property>
+         <obj_property name="ObjectShortName">block_idx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/lru_idx" type="logic">
+         <obj_property name="ElementShortName">lru_idx</obj_property>
+         <obj_property name="ObjectShortName">lru_idx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/next_lru_idx" type="logic">
+         <obj_property name="ElementShortName">next_lru_idx</obj_property>
+         <obj_property name="ObjectShortName">next_lru_idx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/ren" type="logic">
+         <obj_property name="ElementShortName">ren</obj_property>
+         <obj_property name="ObjectShortName">ren</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/wen" type="logic">
+         <obj_property name="ElementShortName">wen</obj_property>
+         <obj_property name="ObjectShortName">wen</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/addr" type="array">
+         <obj_property name="ElementShortName">addr</obj_property>
+         <obj_property name="ObjectShortName">addr</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/wdata" type="array">
+         <obj_property name="ElementShortName">wdata[0:3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">wdata[0:3][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/rdata0" type="array">
+         <obj_property name="ElementShortName">rdata0[0:3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">rdata0[0:3][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/rdata1" type="array">
+         <obj_property name="ElementShortName">rdata1[0:3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">rdata1[0:3][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/wmeta0" type="array">
+         <obj_property name="ElementShortName">wmeta0</obj_property>
+         <obj_property name="ObjectShortName">wmeta0</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/wmeta1" type="array">
+         <obj_property name="ElementShortName">wmeta1</obj_property>
+         <obj_property name="ObjectShortName">wmeta1</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/rmeta0" type="array">
+         <obj_property name="ElementShortName">rmeta0</obj_property>
+         <obj_property name="ObjectShortName">rmeta0</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/rmeta1" type="array">
+         <obj_property name="ElementShortName">rmeta1</obj_property>
+         <obj_property name="ObjectShortName">rmeta1</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/rmeta" type="array">
+         <obj_property name="ElementShortName">rmeta[0:1]</obj_property>
+         <obj_property name="ObjectShortName">rmeta[0:1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/flush_block" type="array">
+         <obj_property name="ElementShortName">flush_block[9:0]</obj_property>
+         <obj_property name="ObjectShortName">flush_block[9:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_inst/next_flush_block" type="array">
+         <obj_property name="ElementShortName">next_flush_block[9:0]</obj_property>
+         <obj_property name="ObjectShortName">next_flush_block[9:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group651" type="group">
+      <obj_property name="label">DCache AMIF</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/read" type="logic">
+         <obj_property name="ElementShortName">read</obj_property>
+         <obj_property name="ObjectShortName">read</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/write" type="array">
+         <obj_property name="ElementShortName">write[1:0]</obj_property>
+         <obj_property name="ObjectShortName">write[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/addr" type="array">
+         <obj_property name="ElementShortName">addr[31:0]</obj_property>
+         <obj_property name="ObjectShortName">addr[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/store" type="array">
+         <obj_property name="ElementShortName">store[31:0]</obj_property>
+         <obj_property name="ObjectShortName">store[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/done" type="logic">
+         <obj_property name="ElementShortName">done</obj_property>
+         <obj_property name="ObjectShortName">done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/ready" type="logic">
+         <obj_property name="ElementShortName">ready</obj_property>
+         <obj_property name="ObjectShortName">ready</obj_property>
+      </wvobject>
+      <wvobject fp_name="/system_tb/system_inst/dcache_amif/load" type="array">
+         <obj_property name="ElementShortName">load[31:0]</obj_property>
+         <obj_property name="ObjectShortName">load[31:0]</obj_property>
       </wvobject>
    </wvobject>
 </wave_config>

@@ -210,7 +210,7 @@ end
 xpm_memory_spram #(
     .ADDR_WIDTH_A(ICACHE_SET_IDX_W),
     .MEMORY_SIZE(512 * (ICACHE_TAG_W + 2)),  // 512 sets
-    .WRITE_DATA_WIDTH_A(ICACHE_TAG_W + 2), // Tag + valid bit
+    .WRITE_DATA_WIDTH_A(ICACHE_TAG_W + 2), // Tag + valid + lru
     .BYTE_WRITE_WIDTH_A(ICACHE_TAG_W + 2),
     .READ_DATA_WIDTH_A(ICACHE_TAG_W + 2),
     .READ_LATENCY_A(1),
@@ -234,7 +234,7 @@ xpm_memory_spram #(
 xpm_memory_spram #(
     .ADDR_WIDTH_A(ICACHE_SET_IDX_W),
     .MEMORY_SIZE(512 * (ICACHE_TAG_W + 2)),  // 512 sets
-    .WRITE_DATA_WIDTH_A(ICACHE_TAG_W + 2), // Tag + valid bit + lru bit
+    .WRITE_DATA_WIDTH_A(ICACHE_TAG_W + 2), // Tag + valid + bit
     .BYTE_WRITE_WIDTH_A(ICACHE_TAG_W + 2),
     .READ_DATA_WIDTH_A(ICACHE_TAG_W + 2),
     .READ_LATENCY_A(1),

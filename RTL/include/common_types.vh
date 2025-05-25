@@ -273,6 +273,13 @@ package common_types_pkg;
         logic lru;
     } icache_meta_t;
 
+    typedef struct packed {
+        logic [DCACHE_TAG_W-1:0] tag;
+        logic valid;
+        logic dirty;
+        logic lru;
+    } dcache_meta_t;
+
 endpackage
 
 `endif // COMMON_TYPES_VH

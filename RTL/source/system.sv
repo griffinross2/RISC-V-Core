@@ -33,8 +33,9 @@ end
 
 // Interfaces
 cache_if fetch_amif();
+cache_if mem_amif();
 axi_controller_if icache_amif();
-axi_controller_if mem_amif();
+axi_controller_if dcache_amif();
 
 axi_bus_if multiplexor_abif();
 axi_bus_if debug_abif();
@@ -56,10 +57,11 @@ datapath datapath_inst (
     .clk(clk),
     .nrst(nrst),
     .interrupt_in_sync(interrupt_in_sync),
-    .halt(halt),
+    .halt(mem_amif.halt),
     .amif_fetch(fetch_amif),
     .amif_mem(mem_amif)
 );
+assign halt = mem_amif.flushed;
 
 // AXI interconnect
 axi_interconnect axi_interconnect_inst (
@@ -82,11 +84,20 @@ axi_controller debug_controller (
     .abif(debug_abif)
 );
 
+// Instruction Cache
 icache icache_inst (
     .clk(clk),
     .nrst(nrst),
     .amif(icache_amif),
     .cif(fetch_amif)
+);
+
+// Data Cache
+dcache dcache_inst (
+    .clk(clk),
+    .nrst(nrst),
+    .amif(dcache_amif),
+    .cif(mem_amif)
 );
 
 // always_comb begin
@@ -108,11 +119,10 @@ axi_controller icache_controller (
 );
 
 // AXI DCache controller
-// No dcache rn
 axi_controller dcache_controller (
     .clk(clk),
     .nrst(nrst),
-    .amif(mem_amif),
+    .amif(dcache_amif),
     .abif(dcache_abif)
 );
 

@@ -17,19 +17,23 @@ interface cache_if;
     logic ready;            // Tell datapath that the read/write is done
     word_t load;            // Data loaded from memory
 
+    // Other signals
+    logic halt;
+    logic flushed;
+
     modport cache (
-        input read, write, addr, store, done,
-        output ready, load
+        input read, write, addr, store, done, halt,
+        output ready, load, flushed
     );
 
     modport datapath (
-        output read, write, addr, store, done,
-        input ready, load
+        output read, write, addr, store, done, halt,
+        input ready, load, flushed
     );
     
     modport tb (
-        output read, write, addr, store, done,
-        input ready, load
+        output read, write, addr, store, done, halt,
+        input ready, load, flushed
     );
 endinterface
 

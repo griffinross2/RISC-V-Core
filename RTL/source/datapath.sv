@@ -30,7 +30,7 @@ module datapath #(
   input logic [31:0] interrupt_in_sync,
   output logic halt,
   cache_if.datapath amif_fetch,
-  axi_controller_if.cache amif_mem
+  cache_if.datapath amif_mem
 );
   parameter NOP = 32'h00000013;
 
@@ -832,7 +832,7 @@ module datapath #(
     if(~nrst) begin
       halt <= '0;
     end else begin
-      halt <= m2wif.halt | halt;
+      halt <= e2mif.halt | halt;
     end
   end
 endmodule

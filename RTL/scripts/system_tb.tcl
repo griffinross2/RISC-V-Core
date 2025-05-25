@@ -14,7 +14,7 @@
     add_files -fileset sources_1 [ glob ./include/*.vh ]
     add_files -fileset sim_1 [ glob ./include/*.vh ]
     add_files -fileset constrs_1 [ glob ./constraints/*.xdc ]
-    add_files -fileset constrs_1 ./IP/mig_7series_0/mig_7series_0/user_design/constraints/mig_7series_0.xdc
+    # add_files -fileset constrs_1 ./IP/mig_7series_0/mig_7series_0/user_design/constraints/mig_7series_0.xdc
 
     # Get the list of .vh files in the target directory
     set vh_files [glob -nocomplain -directory ./include *.vh]
@@ -30,17 +30,17 @@
         }
     }
 
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/axi/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/clocking/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/controller/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ecc/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ip_top/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/phy/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ui/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.sv ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.v ]
-    add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.vh ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/axi/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/clocking/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/controller/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ecc/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ip_top/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/phy/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/ui/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/user_design/rtl/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.sv ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.v ]
+    # add_files -fileset sources_1 [ glob ./IP/mig_7series_0/mig_7series_0/example_design/sim/*.vh ]
     add_files -fileset sources_1 [ glob ./source/*.sv ]
     add_files -fileset sim_1 [ glob ./testbench/system_tb.sv ]
     add_files -fileset sim_1 [ glob ./testbench/flash_model.sv ]

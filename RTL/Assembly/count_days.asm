@@ -50,7 +50,7 @@ multiply:
 loop:
     add     x7,     x7,     x5      # Add multiplicand to product
     addi    x6,     x6,     -1      # Decrement multiplier
-    bne     x6,     zero,  loop    # Loop
+    bne     x6,     zero,  loop     # Loop
 exit:
     addi    sp,    sp,    -4        # Reserve space for result
     sw      x7,     0(sp)           # First result
