@@ -92,14 +92,6 @@ icache icache_inst (
     .cif(fetch_amif)
 );
 
-// Data Cache
-dcache dcache_inst (
-    .clk(clk),
-    .nrst(nrst),
-    .amif(dcache_amif),
-    .cif(mem_amif)
-);
-
 // always_comb begin
 //     fetch_amif.load = icache_amif.load;
 //     fetch_amif.ready = icache_amif.ready;
@@ -109,6 +101,25 @@ dcache dcache_inst (
 //     icache_amif.write = fetch_amif.write;
 //     icache_amif.addr = fetch_amif.addr;
 // end
+
+// Data Cache
+// dcache dcache_inst (
+//     .clk(clk),
+//     .nrst(nrst),
+//     .amif(dcache_amif),
+//     .cif(mem_amif)
+// );
+
+always_comb begin
+    mem_amif.load = dcache_amif.load;
+    mem_amif.ready = dcache_amif.ready;
+    dcache_amif.done = mem_amif.done;
+    dcache_amif.store = mem_amif.store;
+    dcache_amif.read = mem_amif.read;
+    dcache_amif.write = mem_amif.write;
+    dcache_amif.addr = mem_amif.addr;
+    mem_amif.flushed = mem_amif.halt;
+end
 
 // AXI ICache controller
 axi_controller icache_controller (

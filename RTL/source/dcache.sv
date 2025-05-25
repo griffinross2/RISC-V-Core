@@ -38,6 +38,7 @@ logic hit;
 logic block_idx;    // which block in set got a hit
 logic lru_idx;      // which block in set is Least Recently Used
 logic next_lru_idx; // next state for lru
+logic write_idx;    // which block in set is being written to
 logic ren;
 logic wen;
 dcache_addr_t addr;
@@ -169,6 +170,7 @@ always_comb begin
     hit = 1'b0;
     block_idx = '0;
     lru_idx = '0;
+    write_idx = '0;
 
     // TEMPORARY
     cif.flushed = cif.halt;
@@ -218,10 +220,10 @@ always_comb begin
 
                 // If done, change lru
                 if (cif.done) begin
-                    // Update the cache entry
+                    // Update the cache entry (dummy write data)
                     next_lru_idx = ~block_idx;
                     wen = 1'b1;
-                    wdata = lru_idx ? rdata1 : rdata0;
+                    wdata = write_idx ? rdata1 : rdata0;
                     
                     // Update the metadata
                     wmeta0.lru = next_lru_idx;
@@ -236,13 +238,14 @@ always_comb begin
                     // Update the cache entry
                     next_lru_idx = ~block_idx;
                     wen = 1'b1;
-                    wdata = lru_idx ? rdata1 : rdata0;
+                    write_idx = block_idx;
+                    wdata = write_idx ? rdata1 : rdata0;
                     wdata[addr.word_off] = cif.store;
                     
                     // Update the metadata
                     wmeta0.lru = next_lru_idx;
                     wmeta1.lru = next_lru_idx;
-                    if (lru_idx) begin
+                    if (block_idx) begin
                         wmeta1.dirty = 1'b1;
                     end else begin
                         wmeta0.dirty = 1'b0;
@@ -275,6 +278,7 @@ always_comb begin
 
                 // Write the first word to cache (keeping other words the same)
                 wen = 1'b1;
+                write_idx = lru_idx;
                 wdata[0] = amif.load;
                 wdata[1] = lru_idx ? rdata1[1] : rdata0[1];
                 wdata[2] = lru_idx ? rdata1[2] : rdata0[2];
@@ -300,6 +304,7 @@ always_comb begin
 
                 // Write the second word to cache (keeping other words the same)
                 wen = 1'b1;
+                write_idx = lru_idx;
                 wdata[0] = lru_idx ? rdata1[0] : rdata0[0];
                 wdata[1] = amif.load;
                 wdata[2] = lru_idx ? rdata1[2] : rdata0[2];
@@ -325,6 +330,7 @@ always_comb begin
 
                 // Write the third word to cache (keeping other words the same)
                 wen = 1'b1;
+                write_idx = lru_idx;
                 wdata[0] = lru_idx ? rdata1[0] : rdata0[0];
                 wdata[1] = lru_idx ? rdata1[1] : rdata0[1];
                 wdata[2] = amif.load;
@@ -351,6 +357,7 @@ always_comb begin
                 if (cif.done) begin
                     // Write the fourth word to cache (keeping other words the same)
                     wen = 1'b1;
+                    write_idx = lru_idx;
                     wdata[0] = lru_idx ? rdata1[0] : rdata0[0];
                     wdata[1] = lru_idx ? rdata1[1] : rdata0[1];
                     wdata[2] = lru_idx ? rdata1[2] : rdata0[2];
@@ -525,8 +532,8 @@ xpm_memory_spram #(
 ) block_0_data_0 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b0)),  // Only replace this block if it is LRU
+    .ena(1'b1),
+    .wea(wen & (write_idx == 1'b0)),
     .addra(addr.set_index),
     .dina(wdata[0]),
     .douta(rdata0[0]),
@@ -549,8 +556,8 @@ xpm_memory_spram #(
 ) block_0_data_1 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b0)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b0)), 
     .addra(addr.set_index),
     .dina(wdata[1]),
     .douta(rdata0[1]),
@@ -573,8 +580,8 @@ xpm_memory_spram #(
 ) block_0_data_2 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b0)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b0)), 
     .addra(addr.set_index),
     .dina(wdata[2]),
     .douta(rdata0[2]),
@@ -597,8 +604,8 @@ xpm_memory_spram #(
 ) block_0_data_3 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b0)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b0)), 
     .addra(addr.set_index),
     .dina(wdata[3]),
     .douta(rdata0[3]),
@@ -621,8 +628,8 @@ xpm_memory_spram #(
 ) block_1_data_0 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b1)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b1)), 
     .addra(addr.set_index),
     .dina(wdata[0]),
     .douta(rdata1[0]),
@@ -645,8 +652,8 @@ xpm_memory_spram #(
 ) block_1_data_1 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b1)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b1)), 
     .addra(addr.set_index),
     .dina(wdata[1]),
     .douta(rdata1[1]),
@@ -669,8 +676,8 @@ xpm_memory_spram #(
 ) block_1_data_2 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b1)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b1)), 
     .addra(addr.set_index),
     .dina(wdata[2]),
     .douta(rdata1[2]),
@@ -693,8 +700,8 @@ xpm_memory_spram #(
 ) block_1_data_3 (
     .clka(clk),
     .rsta(~nrst),
-    .ena(1'b1),  // Only replace this block if it is LRU
-    .wea(wen & (lru_idx == 1'b1)),  // Only replace this block if it is LRU
+    .ena(1'b1), 
+    .wea(wen & (write_idx == 1'b1)), 
     .addra(addr.set_index),
     .dina(wdata[3]),
     .douta(rdata1[3]),

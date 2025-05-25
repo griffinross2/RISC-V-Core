@@ -10,5 +10,6 @@
 *.tcl
 !scripts/*.tcl
 *.o
+*.dmp
 obj_dir/
 IP/
