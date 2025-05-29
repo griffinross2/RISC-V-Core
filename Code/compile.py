@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     # Generate object files from C source files
     for c_in, c_out in zip(c_files_in_dir, c_files_out):
-        subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -O3 --param l1-cache-size=4 -march=rv32im_zicsr -mabi=ilp32 -fdata-sections -ffunction-sections -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
+        subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -O0 --param l1-cache-size=4 -march=rv32im_zicsr -mabi=ilp32 -fdata-sections -ffunction-sections -c -o build/{c_out} {src_dir}/{c_in}", shell=True)
 
     # Generate object files from ASM source files
     for S_in, S_out in zip(S_files_in_dir, S_files_out):
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-as -march=rv32im_zicsr -mabi=ilp32 -o build/startup.o startup.S", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -fdata-sections -ffunction-sections -c -march=rv32im_zicsr -mabi=ilp32 -o build/syscalls.o syscalls.c", shell=True)
 
-    subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -O3 --param l1-cache-size=4 -Wl,--print-memory-usage -Wl,--gc-sections -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/syscalls.o build/startup.o -o build/program.elf", shell=True)
+    subprocess.run(f"wsl -e /opt/riscv/bin/riscv32-unknown-elf-gcc -O0 --param l1-cache-size=4 -Wl,--print-memory-usage -Wl,--gc-sections -nostartfiles -T linkerscript.ld {" ".join(["build/" + x for x in c_files_out])} {" ".join(["build/" + x for x in S_files_out])} build/syscalls.o build/startup.o -o build/program.elf", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-size build/program.elf", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objdump -D build/program.elf > build/program.S", shell=True)
     subprocess.run("wsl -e /opt/riscv/bin/riscv32-unknown-elf-objcopy -O ihex build/program.elf build/program.hex", shell=True)

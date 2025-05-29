@@ -105,7 +105,7 @@ module datapath #(
 
     // Signals from other modules to the exception unit
     euif.illegal_inst = e2mif.illegal_inst;
-    euif.interrupt_in_sync = interrupt_in_sync & {32{e2mif.en}};  // Allow through when mem is finishing
+    euif.interrupt_in_sync = interrupt_in_sync;
   end
 
   // Forwarding Unit to Pipeline
@@ -461,7 +461,6 @@ module datapath #(
       e2mif.rdat2 <= '0;
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
-      e2mif.alu_zero <= '0;
       e2mif.branch_predict <= 0;
       e2mif.branch_target <= 0;
       e2mif.csr_write <= '0;
@@ -485,7 +484,6 @@ module datapath #(
       e2mif.rdat2 <= '0;
       e2mif.pc_plus_imm <= '0;
       e2mif.alu_out <= '0;
-      e2mif.alu_zero <= '0;
       e2mif.branch_predict <= 0;
       e2mif.branch_target <= 0;
       e2mif.csr_write <= '0;
@@ -509,7 +507,6 @@ module datapath #(
       e2mif.rdat2 <= forwarded_rdat2;
       e2mif.pc_plus_imm <= (d2eif.pc + {d2eif.immediate[31:1], 1'b0});
       e2mif.alu_out <= execute_alu_out;
-      e2mif.alu_zero <= aluif.zero;
       e2mif.branch_predict <= d2eif.branch_predict;
       e2mif.branch_target <= d2eif.branch_target;
       e2mif.csr_write <= d2eif.csr_write;
@@ -713,6 +710,13 @@ module datapath #(
   end
 
   // Program Counter Control
+  word_t e2mif_pc_plus_4;
+  cla_32_bit mem_target_adder (
+    .a(e2mif.pc),
+    .b(32'd4),
+    .cin(1'b0),
+    .sum(e2mif_pc_plus_4)
+  );
   always_comb begin
     pc_n = pc;
 
@@ -724,7 +728,8 @@ module datapath #(
     // Default to telling BU no branch
     buif.mem_branch = 1'b0;
     buif.mem_taken = 1'b0;
-    buif.mem_target_res = e2mif.pc + 32'd4;
+    
+    buif.mem_target_res = e2mif_pc_plus_4;
 
     // Signal to handle this branch instruction
     if(e2mif.en & |e2mif.pc_ctrl) begin
@@ -735,7 +740,7 @@ module datapath #(
     casez(e2mif.pc_ctrl)
       3'b001: begin
         buif.mem_target_res = e2mif.pc_plus_imm;
-        if(e2mif.branch_pol ^ e2mif.alu_zero) begin
+        if(e2mif.branch_pol ^ (e2mif.alu_out == '0)) begin
           // Resolve to taken
           buif.mem_taken = 1'b1;
         end
@@ -758,7 +763,7 @@ module datapath #(
       default: begin
         // Default to telling BU no branch
         buif.mem_taken = 1'b0;
-        buif.mem_target_res = e2mif.pc + 32'd4;
+        buif.mem_target_res = e2mif_pc_plus_4;
       end
     endcase
 
@@ -788,7 +793,7 @@ module datapath #(
         // The branch predictor either predicted a false branch, or the wrong destination
         casez(e2mif.pc_ctrl)
           3'b001: begin
-            if(e2mif.branch_pol ^ e2mif.alu_zero) begin
+            if(e2mif.branch_pol ^ (e2mif.alu_out == '0)) begin
               pc_n = e2mif.pc_plus_imm;
             end else begin
               // False branch

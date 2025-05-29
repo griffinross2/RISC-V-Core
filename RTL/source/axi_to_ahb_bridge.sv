@@ -53,7 +53,7 @@ always_comb begin
     end
 
     TRANSFER_READ_DATA: begin
-      if (axi.rready) begin
+      if (axi.rready && axi.rvalid) begin
         next_state = TRANSFER_IDLE;
       end
     end

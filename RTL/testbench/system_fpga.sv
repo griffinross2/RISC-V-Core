@@ -17,13 +17,14 @@ module system_fpga (
   (* keep = "true", dont_touch = "true", mark_debug = "true" *) reg cpuclk;
 
   // Clock division
-  initial begin
-    cpuclk = 1'b0;
-  end
+  // initial begin
+  //   cpuclk = 1'b0;
+  // end
 
-  always_ff @(posedge CLK) begin
-    cpuclk <= ~cpuclk;
-  end
+  // always_ff @(posedge CLK) begin
+  //   cpuclk <= ~cpuclk;
+  // end
+  assign cpuclk = CLK;
 
   logic nrst;
   assign nrst = ck_rst;

@@ -71,7 +71,7 @@ _start:
     call main
 
     # Break
-    ebreak
+    # ebreak
 
     # Loop forever
 _forever:

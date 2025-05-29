@@ -55,7 +55,6 @@ interface execute_to_memory_if;
   /* ALU */
   /*******/
   word_t alu_out;
-  logic alu_zero;
 
   /*****************/
   /* PC Arithmetic */

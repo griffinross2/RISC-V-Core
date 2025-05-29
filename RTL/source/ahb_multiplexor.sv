@@ -12,7 +12,8 @@ module ahb_multiplexor (
     input logic clk, nrst,
     ahb_bus_if.mux_to_controller abif_to_controller,
     ahb_bus_if.mux_to_satellite abif_to_def,
-    ahb_bus_if.mux_to_satellite abif_to_uart
+    ahb_bus_if.mux_to_satellite abif_to_uart,
+    ahb_bus_if.mux_to_satellite abif_to_gnss
 );
 
     integer sel_i;
@@ -43,11 +44,15 @@ module ahb_multiplexor (
         // Select the appropriate satellite based on the address
         abif_to_def.hsel = 1'b0;
         abif_to_uart.hsel = 1'b0;
+        abif_to_gnss.hsel = 1'b0;
 
         // UART address range = 0x2002_0000 to 0x2002_000C
         if (abif_to_controller.htrans != HTRANS_IDLE && abif_to_controller.haddr >= 32'h2002_0000 && abif_to_controller.haddr < 32'h2002_0010) begin
             abif_to_uart.hsel = 1'b1;
             sel_i = 1;
+        end else if (abif_to_controller.htrans != HTRANS_IDLE && abif_to_controller.haddr >= 32'h2004_0000 && abif_to_controller.haddr < 32'h2004_0800) begin
+            abif_to_gnss.hsel = 1'b1;
+            sel_i = 2;
         end else begin
             abif_to_def.hsel = 1'b1;
             sel_i = 0;
@@ -66,6 +71,12 @@ module ahb_multiplexor (
                 abif_to_controller.hrdata = abif_to_uart.hrdata;
                 readyout = abif_to_uart.hreadyout;
                 abif_to_controller.hresp = abif_to_uart.hresp;
+            end
+
+            2: begin // GNSS satellite
+                abif_to_controller.hrdata = abif_to_gnss.hrdata;
+                readyout = abif_to_gnss.hreadyout;
+                abif_to_controller.hresp = abif_to_gnss.hresp;
             end
 
             default: begin // Invalid address, default to default satellite
@@ -97,5 +108,13 @@ module ahb_multiplexor (
         abif_to_uart.htrans = abif_to_controller.htrans;
         abif_to_uart.hwrite = abif_to_controller.hwrite;
         abif_to_uart.hready = readyout;
+
+        abif_to_gnss.hwdata = abif_to_controller.hwdata;
+        abif_to_gnss.haddr = abif_to_controller.haddr;
+        abif_to_gnss.hburst = abif_to_controller.hburst;
+        abif_to_gnss.hsize = abif_to_controller.hsize;
+        abif_to_gnss.htrans = abif_to_controller.htrans;
+        abif_to_gnss.hwrite = abif_to_controller.hwrite;
+        abif_to_gnss.hready = readyout;
     end
 endmodule
